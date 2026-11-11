@@ -3,16 +3,20 @@
 精选 AI 工具导航站。只收王牌，一键直达官网。
 
 - **85 个精选工具**：写作、绘画、编程、办公、视频、Agent 六个分类
-- **搜索与筛选**：支持中英文、分类/定价/平台/开源等关键词别名；分类、定价、授权可组合筛选
-- **可分享状态**：搜索和筛选写入 URL，刷新、复制链接、浏览器后退都能恢复
+- **搜索与筛选**：支持中英文、分类/定价/平台/开源等关键词别名；`⌘K` / `Ctrl+K` 打开 Command 快速搜索，筛选使用 Sheet 面板
+- **可分享状态**：搜索和筛选写入 URL，刷新、复制链接、浏览器后退都能恢复；筛选栏滚动吸顶
 - **真实品牌 Logo**：本地存放 60+ 个工具品牌图标，无运行时 favicon 请求
 - **整卡直达**：点击卡片直接打开官网，不做中转页，也没有详情页
 - **深色模式**：跟随系统，也可手动切换
-- **键盘操作**：`⌘K` / `Ctrl+K` 聚焦搜索，`Esc` 清空；完整的 focus ring 与跳转链接
+- **键盘操作**：`⌘K` / `Ctrl+K` 打开快速搜索，`Esc` 关闭；完整的 focus ring 与跳转链接
 - **提交表单**：实时预览、校验、复制 JSON、生成 GitHub Issue；可选邮件入口
 - **纯静态**：无后端、无数据库、无登录、无第三方统计；搜索与筛选全部在浏览器本地完成
 
-视觉参考 [Heroicons](https://heroicons.com)：violet 品牌色、beams 背景、全宽搜索带、胶囊分类、圆角卡片、克制的字号层级与留白。
+## 设计参考
+
+- **页面参考**：[Cult Directory](https://github.com/nolly-studio/cult-directory-template) 的“目录页 Hero + 精选面板 + 筛选 + 卡片网格”结构，以及它克制的纸张质感与编辑感。
+- **组件参考**：[shadcn/ui](https://ui.shadcn.com)：Command、Sheet、Tooltip、Select、ToggleGroup、Badge、Sonner 等。
+- **落地结果**：暖纸底色 + 深紫单一强调色、单行大标题、本期精选面板、Command 快速搜索、移动端 Sheet 菜单、筛选 Sheet、分类选择与粘性工具栏。
 
 ## 预览
 
@@ -23,7 +27,7 @@
 ## 技术栈
 
 Next.js 16 App Router、React 19、Tailwind CSS v4、Geist 字体、zod；
-交互组件使用 shadcn/ui 风格的 Radix Select / ToggleGroup / Tooltip / DropdownMenu，主题切换使用 next-themes。
+交互组件使用 shadcn/ui 风格的 Command / Sheet / Dialog / Select / ToggleGroup / Tooltip / Sonner，主题切换使用 next-themes。
 
 ## 开发
 

@@ -9,6 +9,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -76,7 +77,6 @@ export function SubmitForm() {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [copied, setCopied] = useState(false);
-  const [copyError, setCopyError] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const jsonRef = useRef<HTMLPreElement>(null);
 
@@ -204,11 +204,12 @@ export function SubmitForm() {
     if (!validate()) return;
     const ok = await copyText(json);
     setCopied(ok);
-    setCopyError(!ok);
     if (ok) {
+      toast.success("JSON 已复制");
       if (timer.current) clearTimeout(timer.current);
       timer.current = setTimeout(() => setCopied(false), 2200);
     } else {
+      toast.info("已选中 JSON，按 ⌘C / Ctrl+C 复制");
       const node = jsonRef.current;
       if (node) {
         const range = document.createRange();
@@ -529,13 +530,6 @@ ${json}
               邮件提交
             </a>
           ) : null}
-          <output aria-live="polite" className="ml-auto text-[11px] text-brand">
-            {copied
-              ? "已复制，去 GitHub 粘贴即可"
-              : copyError
-                ? "已选中 JSON，请按 ⌘C / Ctrl+C 复制"
-                : ""}
-          </output>
         </div>
         <p className="mt-3 text-[10px] leading-4 text-muted-foreground">
           需要 GitHub 账号才能创建 Issue；没有账号可以先复制 JSON 保存，

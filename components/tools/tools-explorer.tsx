@@ -17,8 +17,10 @@ import {
   useRef,
   useState,
 } from "react";
+import { toast } from "sonner";
 
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -39,13 +41,15 @@ import { getToolLogo } from "@/lib/tool-logos";
 import {
   CATEGORIES,
   type Category,
+  categoryLabel,
   type OpenSourceFilter,
-  PRICING_OPTIONS,
   type Pricing,
   pricingLabel,
   type Tool,
 } from "@/lib/tool-meta";
 import { cn } from "@/lib/utils";
+import { FilterSheet } from "./filter-sheet";
+import { SearchCommand } from "./search-command";
 import { ToolCard } from "./tool-card";
 
 const EMPTY_FILTERS: ToolFilters = {
@@ -110,94 +114,141 @@ function filterChipClass() {
   return "inline-flex min-h-8 items-center gap-1 rounded-md bg-accent px-2 py-1 text-[11px] leading-4 text-accent-foreground transition-colors hover:bg-muted";
 }
 
-function HeroMark({ tools }: { tools: Tool[] }) {
-  const showcase = [
-    "chatgpt",
-    "midjourney",
-    "cursor",
-    "claude",
-    "notion",
-    "deepseek",
-  ]
-    .map((id) => tools.find((tool) => tool.id === id))
-    .filter((tool): tool is Tool => Boolean(tool));
+function FeaturedPanel({ tools }: { tools: Tool[] }) {
+  const primary =
+    tools.find((tool) => tool.id === "chatgpt") ??
+    tools.find((tool) => tool.id === "cursor") ??
+    tools[0];
 
-  const positions = [
-    { left: 12, top: 78, size: 56 },
-    { left: 136, top: 24, size: 56 },
-    { left: 286, top: 52, size: 56 },
-    { left: 48, top: 204, size: 56 },
-    { left: 190, top: 130, size: 76 },
-    { left: 326, top: 204, size: 56 },
-  ];
+  if (!primary) return null;
+
+  const rows = ["midjourney", "cursor", "deepseek"]
+    .map((id) => tools.find((tool) => tool.id === id))
+    .filter(
+      (tool): tool is Tool => tool !== undefined && tool.id !== primary.id,
+    );
+
+  const primaryLogo = getToolLogo(primary.id);
 
   return (
-    <div
-      aria-hidden
-      className="relative mx-auto h-[330px] w-full max-w-[430px]"
-    >
-      <div className="absolute top-1/2 left-1/2 size-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand/10 blur-3xl" />
-      <svg
-        viewBox="0 0 430 330"
-        className="absolute inset-0 size-full text-brand"
-      >
-        <title>精选工具</title>
-        <g
-          fill="none"
-          stroke="currentColor"
-          strokeOpacity="0.13"
-          strokeDasharray="2 7"
-        >
-          <circle cx="215" cy="165" r="108" />
-          <circle cx="215" cy="165" r="178" />
-          <circle cx="215" cy="165" r="248" />
-        </g>
-      </svg>
+    <div className="w-full max-w-[420px] rounded-2xl border border-border bg-background p-2 shadow-[0_0_0_1px_rgba(25,23,33,0.03),0_1px_2px_rgba(25,23,33,0.04)] lg:ml-auto">
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
+        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+          <span className="font-mono text-[9px] tracking-[0.16em] text-muted-foreground uppercase">
+            本期精选
+          </span>
+          <span className="font-mono text-[10px] text-muted-foreground tabular-nums">
+            04
+          </span>
+        </div>
 
-      {showcase.map((tool, index) => {
-        const position = positions[index];
-        const logo = getToolLogo(tool.id);
-        const center = index === 4;
-        return (
-          <div
-            key={tool.id}
-            className={cn(
-              "absolute flex items-center justify-center overflow-hidden rounded-[14px] border border-border bg-white shadow-[0_12px_30px_-12px_rgba(15,23,42,0.2)] dark:border-white/10 dark:bg-white",
-              center
-                ? "z-10 rounded-[18px] shadow-[0_18px_40px_-16px_rgba(15,23,42,0.28)]"
-                : "z-0",
-            )}
-            style={{
-              left: position.left,
-              top: position.top,
-              width: position.size,
-              height: position.size,
-            }}
-          >
-            {logo ? (
-              // Local brand assets: no runtime favicon request.
-              // biome-ignore lint/performance/noImgElement: local, fixed-size brand marks
-              <img
-                src={logo}
-                alt=""
-                width={center ? 42 : 30}
-                height={center ? 42 : 30}
-                loading="eager"
-                decoding="async"
-                className={
-                  center
-                    ? "size-[42px] object-contain"
-                    : "size-[30px] object-contain"
-                }
-              />
-            ) : (
-              <span className="text-[15px] font-semibold">
-                {tool.name.slice(0, 1)}
-              </span>
-            )}
+        <a
+          href={primary.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group relative block p-4 transition-colors hover:bg-accent/30 focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:ring-inset focus-visible:outline-none"
+        >
+          <span
+            aria-hidden
+            className="absolute inset-y-4 left-0 w-0.5 rounded-full bg-brand"
+          />
+          <div className="flex items-start gap-3">
+            <span className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-[10px] border border-border bg-white">
+              {primaryLogo ? (
+                // biome-ignore lint/performance/noImgElement: local brand mark
+                <img
+                  src={primaryLogo}
+                  alt=""
+                  width={28}
+                  height={28}
+                  className="size-7 object-contain"
+                />
+              ) : (
+                <span className="text-sm font-semibold">
+                  {primary.name.slice(0, 1)}
+                </span>
+              )}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="font-mono text-[9px] tracking-[0.12em] text-brand">
+                编辑推荐
+              </p>
+              <h2 className="mt-0.5 truncate text-[18px] font-semibold tracking-[-0.025em]">
+                {primary.name}
+              </h2>
+            </div>
+            <ArrowUpRight
+              aria-hidden
+              className="mt-1 size-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+            />
           </div>
-        );
-      })}
+          <p className="mt-3 line-clamp-2 text-[13px] leading-5 text-muted-foreground">
+            {primary.desc}
+          </p>
+          <div className="mt-3 flex items-center justify-between gap-3 border-t border-border pt-3">
+            <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+              {categoryLabel(primary.categories[0] ?? "productivity")}
+              <span className="text-border" aria-hidden>
+                /
+              </span>
+              <Badge
+                variant="secondary"
+                className={cn(
+                  "h-5 rounded-md px-1.5 text-[10px]",
+                  primary.pricing === "free" && "bg-brand-soft text-brand",
+                )}
+              >
+                {pricingLabel(primary.pricing)}
+              </Badge>
+            </span>
+            <span className="text-[11px] text-muted-foreground">
+              打开官网 ↗
+            </span>
+          </div>
+        </a>
+
+        <div className="border-t border-border">
+          {rows.map((tool) => {
+            const logo = getToolLogo(tool.id);
+            return (
+              <a
+                key={tool.id}
+                href={tool.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2.5 border-b border-border px-4 py-2.5 transition-colors last:border-b-0 hover:bg-accent/30 focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:ring-inset focus-visible:outline-none"
+              >
+                <span className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-[5px]">
+                  {logo ? (
+                    // biome-ignore lint/performance/noImgElement: local brand mark
+                    <img
+                      src={logo}
+                      alt=""
+                      width={20}
+                      height={20}
+                      className="size-5 object-contain"
+                    />
+                  ) : (
+                    <span className="text-[10px] font-semibold">
+                      {tool.name.slice(0, 1)}
+                    </span>
+                  )}
+                </span>
+                <span className="min-w-0 flex-1 truncate text-[13px] font-medium">
+                  {tool.name}
+                </span>
+                <span className="text-[10px] text-muted-foreground">
+                  {categoryLabel(tool.categories[0] ?? "productivity")}
+                </span>
+                <ArrowUpRight
+                  className="size-3 text-muted-foreground"
+                  aria-hidden
+                />
+              </a>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
@@ -278,12 +329,6 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        searchRef.current?.focus();
-        searchRef.current?.select();
-      }
-
       if (event.defaultPrevented || event.key !== "Escape") return;
 
       const target = event.target as HTMLElement | null;
@@ -388,10 +433,12 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
     try {
       await navigator.clipboard.writeText(window.location.href);
       setCopied(true);
+      toast.success("筛选链接已复制");
       if (copyTimer.current) clearTimeout(copyTimer.current);
       copyTimer.current = setTimeout(() => setCopied(false), 2200);
     } catch {
       setCopied(false);
+      toast.error("复制失败，请从地址栏复制");
     }
   }
 
@@ -410,228 +457,212 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
 
   return (
     <div>
+      <SearchCommand tools={tools} />
       <section className="hero-surface relative overflow-hidden border-b border-border">
-        <div aria-hidden className="hero-beams" />
-        <div className="relative mx-auto max-w-7xl px-4 pt-8 pb-8 sm:px-6 sm:pt-10 sm:pb-10 lg:px-8">
-          <div className="grid items-center gap-10 lg:grid-cols-12">
+        <div className="relative mx-auto max-w-7xl px-4 pt-[calc(3.5rem+1.75rem)] pb-10 sm:px-6 sm:pt-[calc(5rem+3rem)] lg:px-8">
+          <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
             <div className="lg:col-span-7">
-              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[12px] text-muted-foreground">
-                <span>{tools.length} 个工具</span>
-                <span className="size-1 rounded-full bg-border" aria-hidden />
-                <span>{CATEGORIES.length} 个分类</span>
-                <span className="size-1 rounded-full bg-border" aria-hidden />
-                <span>本地搜索</span>
-                <span className="size-1 rounded-full bg-border" aria-hidden />
-                <span>无需登录</span>
-              </div>
-
-              <h1 className="display-title mt-5 text-[clamp(2.25rem,4.6vw,3.5rem)] font-bold text-foreground">
-                只收王牌，
-                <br />
-                一键直达。
+              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background/70 px-3 py-1 text-[12px] text-muted-foreground backdrop-blur">
+                <span className="size-1.5 rounded-full bg-brand" aria-hidden />
+                人工编排 · 无需登录
+              </span>
+              <h1 className="display-title mt-5 text-[clamp(1.9rem,9.5vw,3.75rem)] leading-[1.06] font-bold tracking-[-0.02em] text-foreground">
+                只收王牌，一键直达
               </h1>
-              <p className="mt-4 max-w-[36rem] text-[14px] leading-6 text-pretty text-muted-foreground sm:text-[15px] sm:leading-7">
+              <p className="mt-4 max-w-[34rem] text-[14px] leading-6 text-pretty text-muted-foreground sm:text-[15px] sm:leading-7">
                 精选真正值得用的 AI
                 工具。免费浏览，无需登录；搜索与筛选在本地完成。
               </p>
 
-              <div className="mt-5 flex flex-wrap items-center gap-3">
+              <div className="relative mt-7 max-w-[560px]">
+                <div className="relative flex h-14 items-center rounded-xl border border-border bg-card shadow-[0_24px_60px_-30px_rgba(15,23,42,0.35)] transition-shadow focus-within:ring-2 focus-within:ring-brand/35 focus-within:ring-offset-2 focus-within:ring-offset-background">
+                  <Search
+                    className="pointer-events-none absolute left-4 size-4 text-muted-foreground"
+                    aria-hidden
+                  />
+                  <Input
+                    ref={searchRef}
+                    type="search"
+                    value={filters.query}
+                    onChange={(event) =>
+                      updateFilters((previous) => ({
+                        ...previous,
+                        query: event.target.value,
+                      }))
+                    }
+                    placeholder="搜索所有工具…"
+                    aria-label="搜索 AI 工具"
+                    autoComplete="off"
+                    spellCheck={false}
+                    className="h-14 rounded-xl border-0 bg-transparent pr-20 pl-11 text-[15px] shadow-none focus-visible:ring-0"
+                  />
+                  {filters.query ? (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateFilters((previous) => ({
+                          ...previous,
+                          query: "",
+                        }))
+                      }
+                      aria-label="清空搜索"
+                      className="absolute right-1.5 flex size-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:outline-none"
+                    >
+                      <X className="size-4" aria-hidden />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        window.dispatchEvent(new Event("open-search"))
+                      }
+                      aria-label="打开快速搜索"
+                      className="absolute right-2 hidden h-8 items-center rounded-md border border-border bg-muted/40 px-2 font-sans text-[10px] font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:outline-none sm:flex"
+                    >
+                      ⌘K
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px]">
                 <a
                   href="#all-tools"
-                  className={buttonVariants({
-                    size: "lg",
-                    className: "h-10 rounded-lg px-4",
-                  })}
+                  className="inline-flex items-center gap-1.5 font-medium text-foreground transition-colors hover:text-brand focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:outline-none"
                 >
                   浏览全部工具
                   <ArrowDown className="size-3.5" aria-hidden />
                 </a>
                 <Link
                   href="/about"
-                  className="inline-flex h-10 items-center gap-1.5 rounded-lg px-3 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:outline-none"
+                  className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:outline-none"
                 >
                   收录标准
                   <ArrowUpRight className="size-3.5" aria-hidden />
                 </Link>
+                {tools[0] ? (
+                  <a
+                    href={tools[0].url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground lg:hidden"
+                  >
+                    本周王牌：{tools[0].name}
+                    <ArrowUpRight className="size-3" aria-hidden />
+                  </a>
+                ) : null}
               </div>
             </div>
 
             <div className="relative hidden lg:col-span-5 lg:block">
-              <HeroMark tools={tools} />
+              <FeaturedPanel tools={tools} />
             </div>
           </div>
         </div>
       </section>
 
-      <div className="sticky top-[57px] z-30 border-b border-border bg-background sm:static">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="relative flex h-14 items-center focus-within:ring-2 focus-within:ring-brand/40 focus-within:ring-inset sm:h-[72px]">
-            <Search
-              className="pointer-events-none absolute left-1 size-4 text-muted-foreground"
-              aria-hidden
-            />
-            <Input
-              ref={searchRef}
-              type="search"
-              value={filters.query}
-              onChange={(event) =>
-                updateFilters((previous) => ({
-                  ...previous,
-                  query: event.target.value,
-                }))
-              }
-              placeholder="搜索所有工具…"
-              aria-label="搜索 AI 工具"
-              aria-keyshortcuts="Meta+K Control+K"
-              autoComplete="off"
-              spellCheck={false}
-              className="h-14 rounded-none border-0 bg-transparent pr-20 pl-8 text-[15px] shadow-none focus-visible:ring-0 sm:h-[72px]"
-            />
-            {filters.query ? (
-              <button
-                type="button"
-                onClick={() =>
-                  updateFilters((previous) => ({ ...previous, query: "" }))
-                }
-                aria-label="清空搜索"
-                className="absolute right-0 flex size-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:outline-none"
-              >
-                <X className="size-4" aria-hidden />
-              </button>
-            ) : (
-              <kbd className="pointer-events-none absolute right-0 hidden items-center gap-0.5 rounded-md border border-border bg-muted/50 px-2 py-1 font-sans text-[10px] font-medium text-muted-foreground sm:flex">
-                ⌘K
-              </kbd>
-            )}
-          </div>
-        </div>
-      </div>
-
       <section
         id="all-tools"
-        className="mx-auto max-w-7xl scroll-mt-[129px] px-4 py-8 sm:scroll-mt-24 sm:px-6 lg:px-8"
+        className="mx-auto max-w-7xl scroll-mt-20 px-4 py-8 sm:scroll-mt-24 sm:px-6 lg:px-8"
       >
         <p className="sr-only" aria-live="polite">
           {filtered.length} 个工具
         </p>
-        <div className="flex flex-col gap-4 border-b border-border pb-5 xl:flex-row xl:items-center xl:justify-between">
-          <ToggleGroup
-            type="single"
-            value={activeCategory ?? "all"}
-            onValueChange={selectCategory}
-            aria-label="按分类筛选"
-            className="flex flex-wrap items-center gap-1.5"
-          >
-            <ToggleGroupItem
-              value="all"
-              aria-label={`全部，${categoryFacet.length} 个工具`}
-              className={tabClass(!activeCategory)}
-              onKeyDown={(event) => handleCategoryKeyDown(event, 0)}
-            >
-              全部
-              <span className="text-[11px] font-normal text-muted-foreground tabular-nums">
-                {categoryFacet.length}
-              </span>
-            </ToggleGroupItem>
-            {CATEGORIES.map((category) => {
-              const count = categoryCounts.get(category.value) ?? 0;
-              return (
-                <ToggleGroupItem
-                  key={category.value}
-                  value={category.value}
-                  aria-label={`${category.label}，${count} 个工具`}
-                  className={tabClass(activeCategory === category.value)}
-                  onKeyDown={(event) =>
-                    handleCategoryKeyDown(
-                      event,
-                      CATEGORIES.findIndex(
-                        (item) => item.value === category.value,
-                      ) + 1,
-                    )
-                  }
+        <div className="sticky top-14 z-20 -mx-4 border-b border-border bg-background/95 px-4 backdrop-blur sm:top-20 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+          <div className="flex items-center gap-2 py-3">
+            <div className="min-w-0 flex-1 sm:hidden">
+              <Select
+                value={activeCategory ?? "all"}
+                onValueChange={selectCategory}
+              >
+                <SelectTrigger
+                  aria-label="按分类筛选"
+                  className="h-10 w-full rounded-full border-border bg-background px-3 text-[12px] shadow-none"
                 >
-                  {category.label}
-                  <span className="text-[11px] font-normal text-muted-foreground tabular-nums">
-                    {count}
-                  </span>
-                </ToggleGroupItem>
-              );
-            })}
-          </ToggleGroup>
-
-          <div className="flex flex-wrap items-center gap-1.5">
-            <Select
-              value={filters.pricing}
-              onValueChange={(value) =>
-                updateFilters((previous) => ({
-                  ...previous,
-                  pricing: value as Pricing | "all",
-                }))
-              }
-            >
-              <SelectTrigger
-                aria-label="按定价筛选"
-                className={cn(
-                  "h-10 w-auto gap-1.5 rounded-lg border-border bg-background px-2.5 text-[12px] shadow-none",
-                  filters.pricing !== "all" && "border-brand/40 text-brand",
-                )}
-              >
-                <span className="text-muted-foreground">价格</span>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent align="start">
-                <SelectItem value="all">
-                  全部 · {pricingFacet.length}
-                </SelectItem>
-                {PRICING_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label} · {pricingCounts.get(option.value) ?? 0}
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">
+                    全部分类 · {categoryFacet.length}
                   </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                  {CATEGORIES.map((category) => (
+                    <SelectItem key={category.value} value={category.value}>
+                      {category.label} ·{" "}
+                      {categoryCounts.get(category.value) ?? 0}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <ToggleGroup
+              type="single"
+              value={activeCategory ?? "all"}
+              onValueChange={selectCategory}
+              aria-label="按分类筛选"
+              className="hidden min-w-0 flex-1 flex-wrap items-center gap-1.5 sm:flex"
+            >
+              <ToggleGroupItem
+                value="all"
+                aria-label={`全部，${categoryFacet.length} 个工具`}
+                className={tabClass(!activeCategory)}
+                onKeyDown={(event) => handleCategoryKeyDown(event, 0)}
+              >
+                全部
+                <span className="text-[11px] font-normal text-muted-foreground tabular-nums">
+                  {categoryFacet.length}
+                </span>
+              </ToggleGroupItem>
+              {CATEGORIES.map((category) => {
+                const count = categoryCounts.get(category.value) ?? 0;
+                return (
+                  <ToggleGroupItem
+                    key={category.value}
+                    value={category.value}
+                    aria-label={`${category.label}，${count} 个工具`}
+                    className={tabClass(activeCategory === category.value)}
+                    onKeyDown={(event) =>
+                      handleCategoryKeyDown(
+                        event,
+                        CATEGORIES.findIndex(
+                          (item) => item.value === category.value,
+                        ) + 1,
+                      )
+                    }
+                  >
+                    {category.label}
+                    <span className="text-[11px] font-normal text-muted-foreground tabular-nums">
+                      {count}
+                    </span>
+                  </ToggleGroupItem>
+                );
+              })}
+            </ToggleGroup>
 
-            <Select
-              value={filters.openSource}
-              onValueChange={(value) =>
+            <FilterSheet
+              pricing={filters.pricing}
+              openSource={filters.openSource}
+              pricingCounts={pricingCounts}
+              pricingTotal={pricingFacet.length}
+              sourceTotal={sourceFacet.length}
+              openSourceCount={openSourceCount}
+              resultCount={filtered.length}
+              onPricingChange={(value) =>
+                updateFilters((previous) => ({ ...previous, pricing: value }))
+              }
+              onOpenSourceChange={(value) =>
                 updateFilters((previous) => ({
                   ...previous,
-                  openSource: value as OpenSourceFilter,
+                  openSource: value,
                 }))
               }
-            >
-              <SelectTrigger
-                aria-label="按授权方式筛选"
-                className={cn(
-                  "h-10 w-auto gap-1.5 rounded-lg border-border bg-background px-2.5 text-[12px] shadow-none",
-                  filters.openSource !== "all" && "border-brand/40 text-brand",
-                )}
-              >
-                <span className="text-muted-foreground">授权</span>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent align="start">
-                <SelectItem value="all">全部 · {sourceFacet.length}</SelectItem>
-                <SelectItem value="yes">开源 · {openSourceCount}</SelectItem>
-                <SelectItem value="no">
-                  闭源 · {tools.length - openSourceCount}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-
-            {hasFilters ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={resetFilters}
-                className="h-10 gap-1 px-2 text-[11px] text-muted-foreground"
-              >
-                <X className="size-3" aria-hidden />
-                清除
-              </Button>
-            ) : null}
-
+              onReset={() =>
+                updateFilters((previous) => ({
+                  ...previous,
+                  pricing: "all",
+                  openSource: "all",
+                }))
+              }
+            />
             {hasFilters ? (
               <Button
                 type="button"
@@ -640,7 +671,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
                 onClick={copyCurrentView}
                 aria-label={copied ? "链接已复制" : "复制当前筛选链接"}
                 title={copied ? "链接已复制" : "复制当前筛选链接"}
-                className="size-10 text-muted-foreground"
+                className="size-10 shrink-0 text-muted-foreground"
               >
                 {copied ? (
                   <Check className="size-4 text-brand" aria-hidden />
@@ -649,79 +680,69 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
                 )}
               </Button>
             ) : null}
-
-            <p
-              className="ml-auto hidden text-[11px] text-muted-foreground tabular-nums sm:block"
-              aria-live="polite"
-            >
-              {filtered.length} 个结果
-            </p>
           </div>
+
+          {hasFilters ? (
+            <div className="flex flex-wrap items-center gap-1.5 border-b border-border py-3">
+              <span className="eyebrow mr-1">已筛选</span>
+              {filters.categories.map((category) => (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => removeCategory(category)}
+                  className={filterChipClass()}
+                  aria-label={`移除分类筛选：${
+                    CATEGORIES.find((item) => item.value === category)?.label ??
+                    category
+                  }`}
+                >
+                  {CATEGORIES.find((item) => item.value === category)?.label ??
+                    category}
+                  <X className="size-3" aria-hidden />
+                </button>
+              ))}
+              {filters.pricing !== "all" ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    updateFilters((previous) => ({
+                      ...previous,
+                      pricing: "all",
+                    }))
+                  }
+                  className={filterChipClass()}
+                  aria-label="移除定价筛选"
+                >
+                  {pricingLabel(filters.pricing)}
+                  <X className="size-3" aria-hidden />
+                </button>
+              ) : null}
+              {filters.openSource !== "all" ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    updateFilters((previous) => ({
+                      ...previous,
+                      openSource: "all",
+                    }))
+                  }
+                  className={filterChipClass()}
+                  aria-label="移除授权筛选"
+                >
+                  {filters.openSource === "yes" ? "开源" : "闭源"}
+                  <X className="size-3" aria-hidden />
+                </button>
+              ) : null}
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="ml-1 inline-flex min-h-8 items-center text-[11px] text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
+              >
+                清除全部
+              </button>
+            </div>
+          ) : null}
         </div>
-
-        {hasFilters ? (
-          <div className="flex flex-wrap items-center gap-1.5 border-b border-border py-3">
-            <span className="eyebrow mr-1">已筛选</span>
-            {filters.categories.map((category) => (
-              <button
-                key={category}
-                type="button"
-                onClick={() => removeCategory(category)}
-                className={filterChipClass()}
-                aria-label={`移除分类筛选：${
-                  CATEGORIES.find((item) => item.value === category)?.label ??
-                  category
-                }`}
-              >
-                {CATEGORIES.find((item) => item.value === category)?.label ??
-                  category}
-                <X className="size-3" aria-hidden />
-              </button>
-            ))}
-            {filters.pricing !== "all" ? (
-              <button
-                type="button"
-                onClick={() =>
-                  updateFilters((previous) => ({ ...previous, pricing: "all" }))
-                }
-                className={filterChipClass()}
-                aria-label="移除定价筛选"
-              >
-                {pricingLabel(filters.pricing)}
-                <X className="size-3" aria-hidden />
-              </button>
-            ) : null}
-            {filters.openSource !== "all" ? (
-              <button
-                type="button"
-                onClick={() =>
-                  updateFilters((previous) => ({
-                    ...previous,
-                    openSource: "all",
-                  }))
-                }
-                className={filterChipClass()}
-                aria-label="移除授权筛选"
-              >
-                {filters.openSource === "yes" ? "开源" : "闭源"}
-                <X className="size-3" aria-hidden />
-              </button>
-            ) : null}
-            <button
-              type="button"
-              onClick={resetFilters}
-              className="ml-1 inline-flex min-h-8 items-center text-[11px] text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
-            >
-              清除全部
-            </button>
-            <output
-              aria-live="polite"
-              className="ml-auto text-[11px] text-brand"
-            >
-              {copied ? "筛选链接已复制" : ""}
-            </output>
-          </div>
-        ) : null}
 
         <div className="mt-4 flex items-center justify-between gap-4">
           <h2 className="text-[18px] font-semibold tracking-[-0.02em]">

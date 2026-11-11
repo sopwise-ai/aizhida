@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -41,52 +42,52 @@
 :root {
   color-scheme: light;
   --radius: 0.75rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.21 0.03 260);
+  --background: oklch(0.965 0.008 82);
+  --foreground: oklch(0.17 0.012 300);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0.03 260);
+  --card-foreground: oklch(0.17 0.012 300);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.03 260);
-  --primary: oklch(0.21 0.03 260);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.968 0.006 260);
-  --secondary-foreground: oklch(0.27 0.03 260);
-  --muted: oklch(0.968 0.006 260);
-  --muted-foreground: oklch(0.54 0.02 260);
-  --accent: oklch(0.96 0.018 285);
-  --accent-foreground: oklch(0.42 0.18 285);
-  --destructive: oklch(0.58 0.22 27);
-  --border: oklch(0.93 0 0);
-  --input: oklch(0.93 0 0);
-  --ring: oklch(0.58 0.22 285);
-  --brand: oklch(0.58 0.22 285);
+  --popover-foreground: oklch(0.17 0.012 300);
+  --primary: oklch(0.17 0.012 300);
+  --primary-foreground: oklch(0.99 0.003 80);
+  --secondary: oklch(0.935 0.008 80);
+  --secondary-foreground: oklch(0.22 0.012 300);
+  --muted: oklch(0.935 0.008 80);
+  --muted-foreground: oklch(0.46 0.014 80);
+  --accent: oklch(0.92 0.012 80);
+  --accent-foreground: oklch(0.2 0.012 300);
+  --destructive: oklch(0.56 0.19 30);
+  --border: oklch(0.885 0.008 78);
+  --input: oklch(0.885 0.008 78);
+  --ring: oklch(0.48 0.23 285);
+  --brand: oklch(0.48 0.23 285);
   --brand-foreground: oklch(1 0 0);
-  --brand-soft: oklch(0.96 0.025 285);
+  --brand-soft: oklch(0.94 0.032 285);
 }
 
 .dark {
   color-scheme: dark;
-  --background: oklch(0.13 0.02 260);
-  --foreground: oklch(0.975 0.005 260);
-  --card: oklch(0.19 0.025 260);
-  --card-foreground: oklch(0.975 0.005 260);
-  --popover: oklch(0.2 0.025 260);
-  --popover-foreground: oklch(0.975 0.005 260);
-  --primary: oklch(0.975 0.005 260);
-  --primary-foreground: oklch(0.16 0.02 260);
-  --secondary: oklch(0.23 0.025 260);
-  --secondary-foreground: oklch(0.975 0.005 260);
-  --muted: oklch(0.23 0.025 260);
-  --muted-foreground: oklch(0.72 0.015 260);
-  --accent: oklch(0.26 0.04 285);
-  --accent-foreground: oklch(0.9 0.05 285);
+  --background: oklch(0.145 0.01 300);
+  --foreground: oklch(0.96 0.004 80);
+  --card: oklch(0.19 0.012 300);
+  --card-foreground: oklch(0.96 0.004 80);
+  --popover: oklch(0.2 0.012 300);
+  --popover-foreground: oklch(0.96 0.004 80);
+  --primary: oklch(0.96 0.004 80);
+  --primary-foreground: oklch(0.16 0.01 300);
+  --secondary: oklch(0.24 0.012 300);
+  --secondary-foreground: oklch(0.96 0.004 80);
+  --muted: oklch(0.24 0.012 300);
+  --muted-foreground: oklch(0.7 0.012 80);
+  --accent: oklch(0.26 0.016 300);
+  --accent-foreground: oklch(0.94 0.004 80);
   --destructive: oklch(0.7 0.19 22);
-  --border: oklch(1 0 0 / 11%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.7 0.18 285);
-  --brand: oklch(0.72 0.18 285);
-  --brand-foreground: oklch(0.16 0.02 260);
-  --brand-soft: oklch(0.28 0.06 285);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.72 0.17 285);
+  --brand: oklch(0.72 0.17 285);
+  --brand-foreground: oklch(0.16 0.01 300);
+  --brand-soft: oklch(0.27 0.055 285);
 }
 
 @layer base {
@@ -128,35 +129,7 @@
   }
 
   .hero-surface {
-    background: linear-gradient(
-      180deg,
-      color-mix(in oklch, var(--muted) 72%, var(--background)) 0%,
-      var(--background) 78%
-    );
-  }
-
-  .hero-beams {
-    pointer-events: none;
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(
-        90deg,
-        transparent 0 71.9%,
-        color-mix(in oklch, var(--border) 62%, transparent) 72%,
-        transparent 72.1%
-      ),
-      linear-gradient(
-        90deg,
-        transparent 0 85.9%,
-        color-mix(in oklch, var(--border) 50%, transparent) 86%,
-        transparent 86.1%
-      ),
-      radial-gradient(
-        34% 52% at 82% 28%,
-        color-mix(in oklch, var(--brand) 13%, transparent),
-        transparent 72%
-      );
+    background: var(--background);
   }
 
   .eyebrow {

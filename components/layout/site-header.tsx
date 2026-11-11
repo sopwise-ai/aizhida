@@ -1,20 +1,23 @@
 "use client";
 
-import { BookOpen, Home, Menu, Plus } from "lucide-react";
+import { BookOpen, Home, Menu, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { BrandMark } from "@/components/brand-mark";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { buttonVariants } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { SITE_NAME } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -25,9 +28,28 @@ const navLinks = [
 
 export function SiteHeader({ toolCount }: { toolCount: number }) {
   const pathname = usePathname();
+  const isHome = pathname === "/";
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 8);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/80 bg-background/85 backdrop-blur-xl">
+    <header
+      className={cn(
+        "top-0 z-40 w-full border-b transition-[background-color,border-color,backdrop-filter] duration-200",
+        isHome ? "fixed" : "sticky",
+        isHome && !scrolled
+          ? "border-transparent bg-transparent"
+          : "border-border/80 bg-background/90 shadow-sm backdrop-blur-xl",
+      )}
+    >
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4 sm:h-20 sm:px-6 lg:px-8">
         <Link
           href="/"
@@ -37,9 +59,6 @@ export function SiteHeader({ toolCount }: { toolCount: number }) {
           <BrandMark className="size-7 text-brand transition-transform duration-200 group-hover:-rotate-3 sm:size-8" />
           <span className="text-[15px] font-semibold tracking-[-0.025em] sm:text-[17px]">
             {SITE_NAME}
-          </span>
-          <span className="mt-px hidden rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-muted-foreground sm:inline">
-            {toolCount} tools
           </span>
         </Link>
 
@@ -59,28 +78,45 @@ export function SiteHeader({ toolCount }: { toolCount: number }) {
                 )}
               >
                 {link.label}
+                {active ? (
+                  <span
+                    aria-hidden
+                    className="absolute inset-x-3 -bottom-[13px] h-px bg-brand"
+                  />
+                ) : null}
               </Link>
             );
           })}
         </nav>
 
         <div className="ml-auto flex items-center gap-1">
-          <ThemeToggle />
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new Event("open-search"))}
+            aria-label="快速搜索工具"
+            className="flex size-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:outline-none md:hidden"
+          >
+            <Search className="size-4" aria-hidden />
+          </button>
+
+          <div className="hidden md:block">
+            <ThemeToggle />
+          </div>
 
           <Link
             href="/submit"
             aria-label="提交工具"
             className={cn(
               buttonVariants({ size: "sm" }),
-              "ml-1 h-10 gap-1.5 px-2.5 max-[379px]:w-10 max-[379px]:px-0 sm:px-3",
+              "ml-1 hidden h-10 gap-1.5 px-3 md:inline-flex",
             )}
           >
             <Plus className="size-3.5" aria-hidden />
-            <span className="hidden sm:inline">提交工具</span>
+            <span>提交工具</span>
           </Link>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+          <Sheet>
+            <SheetTrigger asChild>
               <button
                 type="button"
                 className={cn(
@@ -91,29 +127,84 @@ export function SiteHeader({ toolCount }: { toolCount: number }) {
               >
                 <Menu className="size-4" aria-hidden />
               </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuLabel>导航</DropdownMenuLabel>
-              {navLinks.map((link) => (
-                <DropdownMenuItem key={link.href} asChild>
-                  <Link
-                    href={link.href}
-                    aria-current={pathname === link.href ? "page" : undefined}
-                  >
-                    <link.icon aria-hidden />
-                    {link.label}
-                  </Link>
-                </DropdownMenuItem>
-              ))}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/submit">
-                  <Plus aria-hidden />
-                  提交工具
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            </SheetTrigger>
+            <SheetContent
+              side="right"
+              className="w-[min(20rem,calc(100%-2rem))] p-0"
+            >
+              <SheetHeader className="border-b border-border p-5">
+                <SheetTitle className="flex items-center gap-2.5">
+                  <BrandMark className="size-7 text-brand" />
+                  {SITE_NAME}
+                </SheetTitle>
+                <SheetDescription>
+                  {toolCount} 个精选工具，只收王牌。
+                </SheetDescription>
+              </SheetHeader>
+
+              <div className="flex-1 overflow-y-auto p-4">
+                {isHome ? (
+                  <SheetClose asChild>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        window.dispatchEvent(new Event("open-search"))
+                      }
+                      className="mb-4 flex h-11 w-full items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 text-[13px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:outline-none"
+                    >
+                      <Search className="size-4" aria-hidden />
+                      搜索所有工具…
+                    </button>
+                  </SheetClose>
+                ) : null}
+
+                <nav aria-label="移动端导航" className="grid gap-1">
+                  {navLinks.map((link) => (
+                    <SheetClose key={link.href} asChild>
+                      <Link
+                        href={link.href}
+                        aria-current={
+                          pathname === link.href ? "page" : undefined
+                        }
+                        className={cn(
+                          "flex h-11 items-center gap-2.5 rounded-lg px-3 text-[14px] font-medium transition-colors",
+                          pathname === link.href
+                            ? "bg-secondary text-foreground"
+                            : "text-muted-foreground hover:bg-muted/70 hover:text-foreground",
+                        )}
+                      >
+                        <link.icon className="size-4" aria-hidden />
+                        {link.label}
+                      </Link>
+                    </SheetClose>
+                  ))}
+                </nav>
+
+                <Separator className="my-4" />
+
+                <div className="mt-4 grid gap-2">
+                  <SheetClose asChild>
+                    <Link
+                      href="/submit"
+                      className={cn(
+                        buttonVariants({ size: "lg" }),
+                        "h-11 w-full rounded-lg",
+                      )}
+                    >
+                      <Plus className="size-4" aria-hidden />
+                      提交工具
+                    </Link>
+                  </SheetClose>
+                  <div className="flex h-11 items-center justify-between rounded-lg px-3">
+                    <span className="text-[14px] text-muted-foreground">
+                      外观
+                    </span>
+                    <ThemeToggle />
+                  </div>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>
