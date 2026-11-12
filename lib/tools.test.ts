@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { getToolLogo } from "./tool-logos";
-import { getTool, toolSchema, tools } from "./tools";
+import { getTool, toolSchema, tools, toolsSchema } from "./tools";
 
 const minimalTool = {
   id: "x-tool",
@@ -114,5 +114,34 @@ describe("tools dataset", () => {
       description: "太短了。",
     });
     expect(result.success).toBe(false);
+  });
+
+  it("rejects duplicate ids and duplicate websites", () => {
+    // 数组级别的 superRefine：直接构造两条相同记录。
+    const result = toolsSchema.safeParse([minimalTool, minimalTool]);
+    expect(result.success).toBe(false);
+    if (result.success) return;
+    const messages = JSON.stringify(result.error.issues);
+    expect(messages).toContain("id 重复");
+    expect(messages).toContain("官网重复");
+  });
+
+  it("rejects unknown vendorId", () => {
+    const result = toolsSchema.safeParse([
+      { ...minimalTool, vendorId: "no-such-vendor" },
+    ]);
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects incoherent dates", () => {
+    const earlyUpdate = toolsSchema.safeParse([
+      { ...minimalTool, updatedAt: "2026-11-10" },
+    ]);
+    expect(earlyUpdate.success).toBe(false);
+
+    const lateVerified = toolsSchema.safeParse([
+      { ...minimalTool, verifiedAt: "2026-11-12" },
+    ]);
+    expect(lateVerified.success).toBe(false);
   });
 });

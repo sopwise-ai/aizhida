@@ -2,10 +2,13 @@ import { describe, expect, it } from "vitest";
 
 import {
   CATEGORIES,
+  categoryLabel,
   FEATURES,
   featureLabel,
   PLATFORMS,
   platformLabel,
+  STATUS_VALUES,
+  statusLabel,
   TOOL_TYPES,
   typeLabel,
 } from "./tool-meta";
@@ -61,5 +64,21 @@ describe("dataset invariants", () => {
         expect(platformLabel(platform).length).toBeGreaterThan(0);
       }
     }
+  });
+
+  it("labels every status and falls back for unknown values", () => {
+    // TOOL_STATUSES 未导出；经 STATUS_VALUES 枚举合法值。
+    for (const status of STATUS_VALUES) {
+      expect(statusLabel(status).length).toBeGreaterThan(0);
+    }
+    for (const tool of tools) {
+      expect(statusLabel(tool.status).length).toBeGreaterThan(0);
+    }
+    // 未知值回退为原样输出，兜底而不是抛错。
+    expect(statusLabel("unknown" as never)).toBe("unknown");
+    expect(typeLabel("mystery" as never)).toBe("mystery");
+    expect(categoryLabel("mystery" as never)).toBe("mystery");
+    expect(featureLabel("mystery" as never)).toBe("mystery");
+    expect(platformLabel("mystery" as never)).toBe("mystery");
   });
 });

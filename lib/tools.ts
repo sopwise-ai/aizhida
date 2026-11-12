@@ -92,7 +92,8 @@ export const toolSchema = z.object({
   verifiedAt: isoDate,
 });
 
-const toolsSchema = z.array(toolSchema).superRefine((items, ctx) => {
+// 导出供测试直接构造数组级用例（重复 id / 未知厂商 / 日期矛盾等）。
+export const toolsSchema = z.array(toolSchema).superRefine((items, ctx) => {
   const seenIds = new Set<string>();
   const seenSites = new Set<string>();
   const vendorIds = new Set(vendors.map((vendor) => vendor.id));
