@@ -4,13 +4,12 @@ test.describe("mobile navigation", () => {
   test("opens the mobile menu via sheet", async ({ page }) => {
     await page.goto("/");
 
-    const trigger = page
-      .getByRole("button", { name: /打开导航|菜单|导航菜单/ })
-      .first();
+    const trigger = page.getByRole("button", { name: "打开菜单" }).first();
     await trigger.click();
 
+    // Sheet 打开后出现站点标题。
     await expect(
-      page.getByRole("dialog").or(page.getByRole("menu")).first(),
+      page.getByRole("heading", { name: "AI 直达" }).first(),
     ).toBeVisible();
   });
 

@@ -17,10 +17,9 @@ test.describe("home page", () => {
 
     const search = page.getByPlaceholder("搜索所有工具…");
     await search.fill("聊天");
-    await expect(
-      page.getByRole("article").or(page.getByTestId("tool-card")).first(),
-    ).toBeVisible();
-    // ChatGPT 作为对话类工具应在结果中
+
+    // 结果区标题变为“搜索结果”，且 ChatGPT（对话类工具）在结果中。
+    await expect(page.getByRole("heading", { name: "搜索结果" })).toBeVisible();
     await expect(
       page.getByRole("link", { name: /ChatGPT/ }).first(),
     ).toBeVisible();
@@ -80,7 +79,7 @@ test.describe("home page", () => {
   test("renders sitemap and robots", async ({ request }) => {
     const sitemap = await request.get("/sitemap.xml");
     expect(sitemap.ok()).toBeTruthy();
-    expect(await sitemap.text()).toContain("sitemap.xml");
+    expect(await sitemap.text()).toContain("<urlset");
 
     const robots = await request.get("/robots.txt");
     expect(robots.ok()).toBeTruthy();
