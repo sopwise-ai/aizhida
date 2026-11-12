@@ -131,13 +131,13 @@ function FeaturedPanel({ tools }: { tools: Tool[] }) {
   const primaryLogo = getToolLogo(primary.id);
 
   return (
-    <div className="w-full max-w-[420px] rounded-2xl border border-border bg-background p-2 shadow-[0_0_0_1px_rgba(25,23,33,0.03),0_1px_2px_rgba(25,23,33,0.04)] lg:ml-auto">
-      <div className="overflow-hidden rounded-xl border border-border bg-card">
-        <div className="flex items-center justify-between border-b border-border px-4 py-3">
-          <span className="font-mono text-[9px] tracking-[0.16em] text-muted-foreground uppercase">
+    <div className="border-border bg-background w-full max-w-[420px] rounded-2xl border p-2 shadow-[0_0_0_1px_rgba(25,23,33,0.03),0_1px_2px_rgba(25,23,33,0.04)] lg:ml-auto">
+      <div className="border-border bg-card overflow-hidden rounded-xl border">
+        <div className="border-border flex items-center justify-between border-b px-4 py-3">
+          <span className="text-muted-foreground font-mono text-[9px] tracking-[0.16em] uppercase">
             本期精选
           </span>
-          <span className="font-mono text-[10px] text-muted-foreground tabular-nums">
+          <span className="text-muted-foreground font-mono text-[10px] tabular-nums">
             04
           </span>
         </div>
@@ -146,14 +146,14 @@ function FeaturedPanel({ tools }: { tools: Tool[] }) {
           href={primary.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="group relative block p-4 transition-colors hover:bg-accent/30 focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:ring-inset focus-visible:outline-none"
+          className="group hover:bg-accent/30 focus-visible:ring-brand/35 relative block p-4 transition-colors focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
         >
           <span
             aria-hidden
-            className="absolute inset-y-4 left-0 w-0.5 rounded-full bg-brand"
+            className="bg-brand absolute inset-y-4 left-0 w-0.5 rounded-full"
           />
           <div className="flex items-start gap-3">
-            <span className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-[10px] border border-border bg-white">
+            <span className="border-border flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-[10px] border bg-white">
               {primaryLogo ? (
                 // biome-ignore lint/performance/noImgElement: local brand mark
                 <img
@@ -170,7 +170,7 @@ function FeaturedPanel({ tools }: { tools: Tool[] }) {
               )}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="font-mono text-[9px] tracking-[0.12em] text-brand">
+              <p className="text-brand font-mono text-[9px] tracking-[0.12em]">
                 编辑推荐
               </p>
               <h2 className="mt-0.5 truncate text-[18px] font-semibold tracking-[-0.025em]">
@@ -179,14 +179,14 @@ function FeaturedPanel({ tools }: { tools: Tool[] }) {
             </div>
             <ArrowUpRight
               aria-hidden
-              className="mt-1 size-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              className="text-muted-foreground mt-1 size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
             />
           </div>
-          <p className="mt-3 line-clamp-2 text-[13px] leading-5 text-muted-foreground">
+          <p className="text-muted-foreground mt-3 line-clamp-2 text-[13px] leading-5">
             {primary.desc}
           </p>
-          <div className="mt-3 flex items-center justify-between gap-3 border-t border-border pt-3">
-            <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+          <div className="border-border mt-3 flex items-center justify-between gap-3 border-t pt-3">
+            <span className="text-muted-foreground flex items-center gap-1.5 text-[11px]">
               {categoryLabel(primary.categories[0] ?? "productivity")}
               <span className="text-border" aria-hidden>
                 /
@@ -201,13 +201,13 @@ function FeaturedPanel({ tools }: { tools: Tool[] }) {
                 {pricingLabel(primary.pricing)}
               </Badge>
             </span>
-            <span className="text-[11px] text-muted-foreground">
+            <span className="text-muted-foreground text-[11px]">
               打开官网 ↗
             </span>
           </div>
         </a>
 
-        <div className="border-t border-border">
+        <div className="border-border border-t">
           {rows.map((tool) => {
             const logo = getToolLogo(tool.id);
             return (
@@ -216,7 +216,7 @@ function FeaturedPanel({ tools }: { tools: Tool[] }) {
                 href={tool.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2.5 border-b border-border px-4 py-2.5 transition-colors last:border-b-0 hover:bg-accent/30 focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:ring-inset focus-visible:outline-none"
+                className="border-border hover:bg-accent/30 focus-visible:ring-brand/35 flex items-center gap-2.5 border-b px-4 py-2.5 transition-colors last:border-b-0 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
               >
                 <span className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-[5px]">
                   {logo ? (
@@ -237,11 +237,11 @@ function FeaturedPanel({ tools }: { tools: Tool[] }) {
                 <span className="min-w-0 flex-1 truncate text-[13px] font-medium">
                   {tool.name}
                 </span>
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-muted-foreground text-[10px]">
                   {categoryLabel(tool.categories[0] ?? "productivity")}
                 </span>
                 <ArrowUpRight
-                  className="size-3 text-muted-foreground"
+                  className="text-muted-foreground size-3"
                   aria-hidden
                 />
               </a>
@@ -458,26 +458,26 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
   return (
     <div>
       <SearchCommand tools={tools} />
-      <section className="hero-surface relative overflow-hidden border-b border-border">
+      <section className="hero-surface border-border relative overflow-hidden border-b">
         <div className="relative mx-auto max-w-7xl px-4 pt-[calc(3.5rem+1.75rem)] pb-10 sm:px-6 sm:pt-[calc(5rem+3rem)] lg:px-8">
           <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
             <div className="lg:col-span-7">
-              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background/70 px-3 py-1 text-[12px] text-muted-foreground backdrop-blur">
-                <span className="size-1.5 rounded-full bg-brand" aria-hidden />
+              <span className="border-border bg-background/70 text-muted-foreground inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[12px] backdrop-blur">
+                <span className="bg-brand size-1.5 rounded-full" aria-hidden />
                 人工编排 · 无需登录
               </span>
-              <h1 className="display-title mt-5 text-[clamp(1.9rem,9.5vw,3.75rem)] leading-[1.06] font-bold tracking-[-0.02em] text-foreground">
+              <h1 className="display-title text-foreground mt-5 text-[clamp(1.9rem,9.5vw,3.75rem)] leading-[1.06] font-bold tracking-[-0.02em]">
                 只收王牌，一键直达
               </h1>
-              <p className="mt-4 max-w-[34rem] text-[14px] leading-6 text-pretty text-muted-foreground sm:text-[15px] sm:leading-7">
+              <p className="text-muted-foreground mt-4 max-w-[34rem] text-[14px] leading-6 text-pretty sm:text-[15px] sm:leading-7">
                 精选真正值得用的 AI
                 工具。免费浏览，无需登录；搜索与筛选在本地完成。
               </p>
 
               <div className="relative mt-7 max-w-[560px]">
-                <div className="relative flex h-14 items-center rounded-xl border border-border bg-card shadow-[0_24px_60px_-30px_rgba(15,23,42,0.35)] transition-shadow focus-within:ring-2 focus-within:ring-brand/35 focus-within:ring-offset-2 focus-within:ring-offset-background">
+                <div className="border-border bg-card focus-within:ring-brand/35 focus-within:ring-offset-background relative flex h-14 items-center rounded-xl border shadow-[0_24px_60px_-30px_rgba(15,23,42,0.35)] transition-shadow focus-within:ring-2 focus-within:ring-offset-2">
                   <Search
-                    className="pointer-events-none absolute left-4 size-4 text-muted-foreground"
+                    className="text-muted-foreground pointer-events-none absolute left-4 size-4"
                     aria-hidden
                   />
                   <Input
@@ -506,7 +506,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
                         }))
                       }
                       aria-label="清空搜索"
-                      className="absolute right-1.5 flex size-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:outline-none"
+                      className="text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-brand/35 absolute right-1.5 flex size-10 items-center justify-center rounded-lg transition-colors focus-visible:ring-2 focus-visible:outline-none"
                     >
                       <X className="size-4" aria-hidden />
                     </button>
@@ -517,7 +517,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
                         window.dispatchEvent(new Event("open-search"))
                       }
                       aria-label="打开快速搜索"
-                      className="absolute right-2 hidden h-8 items-center rounded-md border border-border bg-muted/40 px-2 font-sans text-[10px] font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:outline-none sm:flex"
+                      className="border-border bg-muted/40 text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-brand/35 absolute right-2 hidden h-8 items-center rounded-md border px-2 font-sans text-[10px] font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none sm:flex"
                     >
                       ⌘K
                     </button>
@@ -528,14 +528,14 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
               <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px]">
                 <a
                   href="#all-tools"
-                  className="inline-flex items-center gap-1.5 font-medium text-foreground transition-colors hover:text-brand focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:outline-none"
+                  className="text-foreground hover:text-brand focus-visible:ring-brand/35 inline-flex items-center gap-1.5 font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none"
                 >
                   浏览全部工具
                   <ArrowDown className="size-3.5" aria-hidden />
                 </a>
                 <Link
                   href="/about"
-                  className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:outline-none"
+                  className="text-muted-foreground hover:text-foreground focus-visible:ring-brand/35 inline-flex items-center gap-1.5 transition-colors focus-visible:ring-2 focus-visible:outline-none"
                 >
                   收录标准
                   <ArrowUpRight className="size-3.5" aria-hidden />
@@ -545,7 +545,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
                     href={tools[0].url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground lg:hidden"
+                    className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 transition-colors lg:hidden"
                   >
                     本周王牌：{tools[0].name}
                     <ArrowUpRight className="size-3" aria-hidden />
@@ -568,7 +568,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
         <p className="sr-only" aria-live="polite">
           {filtered.length} 个工具
         </p>
-        <div className="sticky top-14 z-20 -mx-4 border-b border-border bg-background/95 px-4 backdrop-blur sm:top-20 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+        <div className="border-border bg-background/95 sticky top-14 z-20 -mx-4 border-b px-4 backdrop-blur sm:top-20 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
           <div className="flex items-center gap-2 py-3">
             <div className="min-w-0 flex-1 sm:hidden">
               <Select
@@ -577,7 +577,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
               >
                 <SelectTrigger
                   aria-label="按分类筛选"
-                  className="h-10 w-full rounded-full border-border bg-background px-3 text-[12px] shadow-none"
+                  className="border-border bg-background h-10 w-full rounded-full px-3 text-[12px] shadow-none"
                 >
                   <SelectValue />
                 </SelectTrigger>
@@ -608,7 +608,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
                 onKeyDown={(event) => handleCategoryKeyDown(event, 0)}
               >
                 全部
-                <span className="text-[11px] font-normal text-muted-foreground tabular-nums">
+                <span className="text-muted-foreground text-[11px] font-normal tabular-nums">
                   {categoryFacet.length}
                 </span>
               </ToggleGroupItem>
@@ -630,7 +630,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
                     }
                   >
                     {category.label}
-                    <span className="text-[11px] font-normal text-muted-foreground tabular-nums">
+                    <span className="text-muted-foreground text-[11px] font-normal tabular-nums">
                       {count}
                     </span>
                   </ToggleGroupItem>
@@ -671,10 +671,10 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
                 onClick={copyCurrentView}
                 aria-label={copied ? "链接已复制" : "复制当前筛选链接"}
                 title={copied ? "链接已复制" : "复制当前筛选链接"}
-                className="size-10 shrink-0 text-muted-foreground"
+                className="text-muted-foreground size-10 shrink-0"
               >
                 {copied ? (
-                  <Check className="size-4 text-brand" aria-hidden />
+                  <Check className="text-brand size-4" aria-hidden />
                 ) : (
                   <Share2 className="size-4" aria-hidden />
                 )}
@@ -683,7 +683,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
           </div>
 
           {hasFilters ? (
-            <div className="flex flex-wrap items-center gap-1.5 border-b border-border py-3">
+            <div className="border-border flex flex-wrap items-center gap-1.5 border-b py-3">
               <span className="eyebrow mr-1">已筛选</span>
               {filters.categories.map((category) => (
                 <button
@@ -736,7 +736,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
               <button
                 type="button"
                 onClick={resetFilters}
-                className="ml-1 inline-flex min-h-8 items-center text-[11px] text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
+                className="text-muted-foreground decoration-border hover:text-foreground ml-1 inline-flex min-h-8 items-center text-[11px] underline underline-offset-4 transition-colors"
               >
                 清除全部
               </button>
@@ -748,7 +748,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
           <h2 className="text-[18px] font-semibold tracking-[-0.02em]">
             {resultLabel}
           </h2>
-          <p className="text-[11px] text-muted-foreground tabular-nums">
+          <p className="text-muted-foreground text-[11px] tabular-nums">
             {filtered.length} 个工具
           </p>
         </div>
@@ -760,20 +760,20 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
                 <ToolCard key={tool.id} tool={tool} />
               ))}
             </div>
-            <p className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted-foreground">
-              <span className="size-1 rounded-full bg-brand" aria-hidden />
+            <p className="text-muted-foreground mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px]">
+              <span className="bg-brand size-1 rounded-full" aria-hidden />
               人工编排，排序不代表热度；数据整理于 {DATA_UPDATED_LABEL}。
             </p>
           </>
         ) : (
-          <div className="mt-5 rounded-xl border border-dashed border-border py-20 text-center">
-            <span className="mx-auto flex size-12 items-center justify-center rounded-full border border-border text-muted-foreground">
+          <div className="border-border mt-5 rounded-xl border border-dashed py-20 text-center">
+            <span className="border-border text-muted-foreground mx-auto flex size-12 items-center justify-center rounded-full border">
               <SearchX className="size-5" aria-hidden />
             </span>
             <h2 className="mt-5 text-[17px] font-semibold">
               没有找到匹配的工具
             </h2>
-            <p className="mx-auto mt-2 max-w-sm text-[13px] leading-6 text-muted-foreground">
+            <p className="text-muted-foreground mx-auto mt-2 max-w-sm text-[13px] leading-6">
               换一个关键词，或者从下面这些常用筛选重新开始。
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-1.5">
@@ -785,7 +785,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
                     resetFilters();
                     applySuggestion(suggestion);
                   }}
-                  className="rounded-lg border border-border bg-card px-3 py-1.5 text-[12px] text-muted-foreground transition-colors hover:border-brand/30 hover:text-foreground"
+                  className="border-border bg-card text-muted-foreground hover:border-brand/30 hover:text-foreground rounded-lg border px-3 py-1.5 text-[12px] transition-colors"
                 >
                   {suggestion.label}
                 </button>

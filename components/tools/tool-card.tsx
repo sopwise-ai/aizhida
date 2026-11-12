@@ -28,10 +28,10 @@ export function ToolCard({ tool }: { tool: Tool }) {
       rel="noopener noreferrer"
       title={`打开 ${tool.name} 官网（${platformLabel(tool.platform)} · ${domain}）`}
       aria-label={`${tool.name}：${tool.desc}。${platformLabel(tool.platform)}工具，在新标签页打开 ${domain}`}
-      className="group relative flex min-h-[160px] flex-col rounded-xl border border-border bg-card p-4 transition-[border-color,box-shadow] duration-150 hover:border-foreground/20 hover:shadow-[0_12px_30px_-20px_rgba(15,23,42,0.24)] focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+      className="group border-border bg-card hover:border-foreground/20 focus-visible:ring-brand/40 focus-visible:ring-offset-background relative flex min-h-[160px] flex-col rounded-xl border p-4 transition-[border-color,box-shadow] duration-150 hover:shadow-[0_12px_30px_-20px_rgba(15,23,42,0.24)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
     >
       <div className="flex items-start gap-3">
-        <span className="relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-white">
+        <span className="border-border relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-white">
           {logo ? (
             // Local brand assets: no runtime favicon service, no third-party request.
             // biome-ignore lint/performance/noImgElement: local, fixed-size brand marks
@@ -45,7 +45,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
               className="size-[26px] object-contain"
             />
           ) : (
-            <span className="flex size-full items-center justify-center bg-foreground text-[12px] font-semibold text-background">
+            <span className="bg-foreground text-background flex size-full items-center justify-center text-[12px] font-semibold">
               {tool.name.slice(0, 1)}
             </span>
           )}
@@ -58,17 +58,17 @@ export function ToolCard({ tool }: { tool: Tool }) {
             </h3>
             <ArrowUpRight
               aria-hidden
-              className="mt-0.5 size-3.5 shrink-0 text-muted-foreground/50 transition-[color,transform] duration-150 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-brand"
+              className="text-muted-foreground/50 group-hover:text-brand mt-0.5 size-3.5 shrink-0 transition-[color,transform] duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
             />
           </div>
-          <p className="mt-1 line-clamp-2 min-h-10 text-[13px] leading-5 text-muted-foreground">
+          <p className="text-muted-foreground mt-1 line-clamp-2 min-h-10 text-[13px] leading-5">
             {tool.desc}
           </p>
         </div>
       </div>
 
       <div className="mt-auto flex items-center justify-between gap-3 pt-3 text-[11px] leading-4">
-        <span className="flex min-w-0 items-center gap-1.5 text-muted-foreground">
+        <span className="text-muted-foreground flex min-w-0 items-center gap-1.5">
           {categoryLabel(primaryCategory)}
           <span className="text-border" aria-hidden>
             /
@@ -76,7 +76,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
           <span
             className={
               tool.pricing === "free"
-                ? "font-medium text-foreground"
+                ? "text-foreground font-medium"
                 : undefined
             }
           >
@@ -91,7 +91,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
             </>
           ) : null}
         </span>
-        <span className="max-w-[44%] shrink-0 truncate text-[11px] text-muted-foreground">
+        <span className="text-muted-foreground max-w-[44%] shrink-0 truncate text-[11px]">
           {domain}
         </span>
       </div>

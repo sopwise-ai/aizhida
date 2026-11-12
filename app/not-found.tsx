@@ -11,14 +11,14 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center px-4 py-16 text-center">
-      <span className="flex size-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+      <span className="bg-muted text-muted-foreground flex size-14 items-center justify-center rounded-2xl">
         <Compass className="size-7" aria-hidden />
       </span>
-      <p className="mt-6 text-sm font-medium text-muted-foreground">404</p>
+      <p className="text-muted-foreground mt-6 text-sm font-medium">404</p>
       <h1 className="mt-2 text-3xl font-semibold tracking-tight">
         这个页面不存在
       </h1>
-      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+      <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
         链接可能已经失效，或者工具已经下架。回到首页继续浏览精选 AI 工具。
       </p>
       <div className="mt-7 flex flex-col gap-2 sm:flex-row">

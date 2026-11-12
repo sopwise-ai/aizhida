@@ -19,7 +19,7 @@ const Command = ({
 }: React.ComponentPropsWithoutRef<typeof CommandPrimitive>) => (
   <CommandPrimitive
     className={cn(
-      "flex h-full w-full flex-col overflow-hidden rounded-xl bg-popover text-popover-foreground",
+      "bg-popover text-popover-foreground flex h-full w-full flex-col overflow-hidden rounded-xl",
       className,
     )}
     {...props}
@@ -40,7 +40,7 @@ function CommandDialog({ open, onOpenChange, children }: CommandDialogProps) {
         <DialogDescription className="sr-only">
           输入名称或用途，选择一个工具直接打开官网。
         </DialogDescription>
-        <Command className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:size-4 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-2.5 [&_[cmdk-item]_svg]:size-4">
+        <Command className="[&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:size-4 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-2.5 [&_[cmdk-item]_svg]:size-4">
           {children}
         </Command>
       </DialogContent>
@@ -54,13 +54,13 @@ function CommandInput({
 }: React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>) {
   return (
     <div
-      className="flex items-center border-b border-border px-3"
+      className="border-border flex items-center border-b px-3"
       cmdk-input-wrapper=""
     >
-      <Search className="mr-2 size-4 shrink-0 text-muted-foreground" />
+      <Search className="text-muted-foreground mr-2 size-4 shrink-0" />
       <CommandPrimitive.Input
         className={cn(
-          "flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
+          "placeholder:text-muted-foreground flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-50",
           className,
         )}
         {...props}
@@ -98,7 +98,7 @@ function CommandEmpty(
 ) {
   return (
     <CommandPrimitive.Empty
-      className="py-8 text-center text-sm text-muted-foreground"
+      className="text-muted-foreground py-8 text-center text-sm"
       {...props}
     />
   );
@@ -111,7 +111,7 @@ function CommandGroup({
   return (
     <CommandPrimitive.Group
       className={cn(
-        "overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5",
+        "text-foreground overflow-hidden p-1 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5",
         className,
       )}
       {...props}
@@ -125,7 +125,7 @@ function CommandSeparator({
 }: React.ComponentPropsWithoutRef<typeof CommandPrimitive.Separator>) {
   return (
     <CommandPrimitive.Separator
-      className={cn("-mx-1 h-px bg-border", className)}
+      className={cn("bg-border -mx-1 h-px", className)}
       {...props}
     />
   );
@@ -138,7 +138,7 @@ function CommandItem({
   return (
     <CommandPrimitive.Item
       className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-md px-2 py-2.5 text-[13px] outline-none select-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
+        "aria-selected:bg-accent aria-selected:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-md px-2 py-2.5 text-[13px] outline-none select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
         className,
       )}
       {...props}
@@ -153,7 +153,7 @@ function CommandShortcut({
   return (
     <span
       className={cn(
-        "ml-auto text-[10px] tracking-widest text-muted-foreground",
+        "text-muted-foreground ml-auto text-[10px] tracking-widest",
         className,
       )}
       {...props}

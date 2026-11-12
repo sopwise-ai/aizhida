@@ -260,7 +260,7 @@ ${json}
   return (
     <div className="mt-8 grid gap-4 lg:grid-cols-[1.25fr_0.75fr] lg:items-start">
       <form
-        className="rounded-xl border border-border bg-card p-5 shadow-[0_1px_2px_rgba(15,23,42,0.035)] sm:p-6"
+        className="border-border bg-card rounded-xl border p-5 shadow-[0_1px_2px_rgba(15,23,42,0.035)] sm:p-6"
         onSubmit={(event) => {
           event.preventDefault();
           void copyJson();
@@ -271,7 +271,7 @@ ${json}
           <div>
             <label
               htmlFor="tool-name"
-              className="text-[12px] font-medium text-foreground"
+              className="text-foreground text-[12px] font-medium"
             >
               工具名称 <span className="text-brand">*</span>
             </label>
@@ -287,7 +287,7 @@ ${json}
               spellCheck={false}
             />
             {errors.name ? (
-              <p id="name-error" className="mt-1 text-[11px] text-destructive">
+              <p id="name-error" className="text-destructive mt-1 text-[11px]">
                 {errors.name}
               </p>
             ) : null}
@@ -296,7 +296,7 @@ ${json}
           <div>
             <label
               htmlFor="tool-url"
-              className="text-[12px] font-medium text-foreground"
+              className="text-foreground text-[12px] font-medium"
             >
               官网地址 <span className="text-brand">*</span>
             </label>
@@ -314,7 +314,7 @@ ${json}
               spellCheck={false}
             />
             {errors.url ? (
-              <p id="url-error" className="mt-1 text-[11px] text-destructive">
+              <p id="url-error" className="text-destructive mt-1 text-[11px]">
                 {errors.url}
               </p>
             ) : null}
@@ -325,11 +325,11 @@ ${json}
           <div className="flex items-center justify-between gap-2">
             <label
               htmlFor="tool-desc"
-              className="text-[12px] font-medium text-foreground"
+              className="text-foreground text-[12px] font-medium"
             >
               一句话说明 <span className="text-brand">*</span>
             </label>
-            <span className="font-mono text-[10px] text-muted-foreground tabular-nums">
+            <span className="text-muted-foreground font-mono text-[10px] tabular-nums">
               {form.desc.trim().length}/60
             </span>
           </div>
@@ -343,13 +343,13 @@ ${json}
             aria-invalid={Boolean(errors.desc)}
             aria-describedby={errors.desc ? "desc-error" : undefined}
             className={cn(
-              "mt-1.5 min-h-20 rounded-lg border-border bg-background text-[13px] shadow-none",
+              "border-border bg-background mt-1.5 min-h-20 rounded-lg text-[13px] shadow-none",
               errors.desc &&
                 "border-destructive focus-visible:border-destructive",
             )}
           />
           {errors.desc ? (
-            <p id="desc-error" className="mt-1 text-[11px] text-destructive">
+            <p id="desc-error" className="text-destructive mt-1 text-[11px]">
               {errors.desc}
             </p>
           ) : null}
@@ -361,10 +361,10 @@ ${json}
         >
           <legend className="sr-only">工具分类</legend>
           <div className="flex items-center justify-between gap-2">
-            <p className="text-[12px] font-medium text-foreground">
+            <p className="text-foreground text-[12px] font-medium">
               分类 <span className="text-brand">*</span>
             </p>
-            <span className="text-[10px] text-muted-foreground">最多 2 个</span>
+            <span className="text-muted-foreground text-[10px]">最多 2 个</span>
           </div>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {CATEGORIES.map((category) => {
@@ -383,7 +383,7 @@ ${json}
                   disabled={disabled}
                   onClick={() => toggleCategory(category.value)}
                   className={cn(
-                    "h-9 rounded-lg border px-2.5 text-[12px] transition-colors focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-40",
+                    "focus-visible:ring-brand/35 h-9 rounded-lg border px-2.5 text-[12px] transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-40",
                     active
                       ? "border-brand/40 bg-brand-soft text-brand"
                       : "border-border bg-background text-muted-foreground hover:border-brand/30 hover:text-foreground",
@@ -398,7 +398,7 @@ ${json}
             <p
               id="categories-error"
               role="alert"
-              className="mt-1 text-[11px] text-destructive"
+              className="text-destructive mt-1 text-[11px]"
             >
               {errors.categories}
             </p>
@@ -409,7 +409,7 @@ ${json}
           <div>
             <label
               htmlFor="tool-pricing"
-              className="text-[12px] font-medium text-foreground"
+              className="text-foreground text-[12px] font-medium"
             >
               定价
             </label>
@@ -420,7 +420,7 @@ ${json}
               <SelectTrigger
                 id="tool-pricing"
                 aria-label="定价"
-                className="mt-1.5 h-10 w-full rounded-lg border-border bg-background text-[13px] shadow-none"
+                className="border-border bg-background mt-1.5 h-10 w-full rounded-lg text-[13px] shadow-none"
               >
                 <SelectValue />
               </SelectTrigger>
@@ -436,7 +436,7 @@ ${json}
           <div>
             <label
               htmlFor="tool-platform"
-              className="text-[12px] font-medium text-foreground"
+              className="text-foreground text-[12px] font-medium"
             >
               主平台
             </label>
@@ -447,7 +447,7 @@ ${json}
               <SelectTrigger
                 id="tool-platform"
                 aria-label="主平台"
-                className="mt-1.5 h-10 w-full rounded-lg border-border bg-background text-[13px] shadow-none"
+                className="border-border bg-background mt-1.5 h-10 w-full rounded-lg text-[13px] shadow-none"
               >
                 <SelectValue />
               </SelectTrigger>
@@ -465,7 +465,7 @@ ${json}
         <div className="mt-4">
           <label
             htmlFor="tool-tags"
-            className="text-[12px] font-medium text-foreground"
+            className="text-foreground text-[12px] font-medium"
           >
             检索关键词
           </label>
@@ -477,12 +477,12 @@ ${json}
             className={cn("mt-1.5", fieldClass(false))}
             autoComplete="off"
           />
-          <p className="mt-1 text-[10px] text-muted-foreground">
+          <p className="text-muted-foreground mt-1 text-[10px]">
             用逗号分隔，最多 5 个；用于站内搜索。
           </p>
         </div>
 
-        <label className="mt-4 flex cursor-pointer items-start gap-2.5 rounded-lg border border-border bg-background p-3">
+        <label className="border-border bg-background mt-4 flex cursor-pointer items-start gap-2.5 rounded-lg border p-3">
           <input
             type="checkbox"
             checked={form.openSource}
@@ -493,13 +493,13 @@ ${json}
             <span className="block text-[12px] font-medium">
               这个工具是开源的
             </span>
-            <span className="mt-0.5 block text-[10px] leading-4 text-muted-foreground">
+            <span className="text-muted-foreground mt-0.5 block text-[10px] leading-4">
               仅在官网或仓库明确提供开放源代码时勾选。
             </span>
           </span>
         </label>
 
-        <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-border pt-4">
+        <div className="border-border mt-5 flex flex-wrap items-center gap-2 border-t pt-4">
           <Button type="submit" size="sm" className="h-10 rounded-lg px-4">
             {copied ? (
               <Check className="size-3.5" aria-hidden />
@@ -531,7 +531,7 @@ ${json}
             </a>
           ) : null}
         </div>
-        <p className="mt-3 text-[10px] leading-4 text-muted-foreground">
+        <p className="text-muted-foreground mt-3 text-[10px] leading-4">
           需要 GitHub 账号才能创建 Issue；没有账号可以先复制 JSON 保存，
           稍后通过你常用的渠道发给维护者。
         </p>
@@ -541,9 +541,9 @@ ${json}
         <div className="flex items-center justify-between gap-2 px-1">
           <p className="eyebrow">实时预览</p>
         </div>
-        <div className="mt-2 rounded-xl border border-border bg-card p-4 shadow-[0_1px_2px_rgba(15,23,42,0.035)]">
+        <div className="border-border bg-card mt-2 rounded-xl border p-4 shadow-[0_1px_2px_rgba(15,23,42,0.035)]">
           <div className="flex items-start gap-3">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/50 text-[12px] font-semibold">
+            <span className="border-border bg-muted/50 flex size-10 shrink-0 items-center justify-center rounded-lg border text-[12px] font-semibold">
               {(form.name.trim() || "A").slice(0, 1)}
             </span>
             <div className="min-w-0 flex-1">
@@ -552,17 +552,17 @@ ${json}
                   {form.name.trim() || "工具名称"}
                 </h2>
                 <ArrowUpRight
-                  className="mt-0.5 size-3.5 text-muted-foreground"
+                  className="text-muted-foreground mt-0.5 size-3.5"
                   aria-hidden
                 />
               </div>
-              <p className="mt-1 line-clamp-2 min-h-10 text-[13px] leading-5 text-muted-foreground">
+              <p className="text-muted-foreground mt-1 line-clamp-2 min-h-10 text-[13px] leading-5">
                 {form.desc.trim() || "一句话说明它做什么。"}
               </p>
             </div>
           </div>
-          <div className="mt-3 flex items-center justify-between gap-3 border-t border-border pt-3 text-[11px]">
-            <span className="flex items-center gap-1.5 text-muted-foreground">
+          <div className="border-border mt-3 flex items-center justify-between gap-3 border-t pt-3 text-[11px]">
+            <span className="text-muted-foreground flex items-center gap-1.5">
               {form.categories.length
                 ? form.categories.map(categoryLabel).join(" / ")
                 : "分类"}
@@ -575,7 +575,7 @@ ${json}
               </span>
               {platformLabel(form.platform)}
             </span>
-            <span className="max-w-[38%] truncate font-mono text-[10px] text-muted-foreground">
+            <span className="text-muted-foreground max-w-[38%] truncate font-mono text-[10px]">
               {form.url
                 ? (() => {
                     try {
@@ -589,23 +589,23 @@ ${json}
           </div>
         </div>
 
-        <div className="mt-4 rounded-xl border border-border bg-muted/30 p-4">
+        <div className="border-border bg-muted/30 mt-4 rounded-xl border p-4">
           <p className="flex items-center gap-1.5 text-[12px] font-medium">
-            <ShieldCheck className="size-3.5 text-brand" aria-hidden />
+            <ShieldCheck className="text-brand size-3.5" aria-hidden />
             提交前自检
           </p>
-          <ul className="mt-2 space-y-1.5 text-[11px] leading-5 text-muted-foreground">
+          <ul className="text-muted-foreground mt-2 space-y-1.5 text-[11px] leading-5">
             <li>官网能打开，且不是聚合页或镜像站。</li>
             <li>说明写「它能做什么」，不写「最强」「第一」。</li>
             <li>分类最多两个，定价与开源状态可核验。</li>
           </ul>
         </div>
 
-        <div className="mt-4 rounded-xl border border-border bg-card p-4">
+        <div className="border-border bg-card mt-4 rounded-xl border p-4">
           <p className="text-[12px] font-medium">JSON</p>
           <pre
             ref={jsonRef}
-            className="mt-2 max-h-72 overflow-auto rounded-md bg-muted/50 p-3 font-mono text-[10px] leading-5 text-muted-foreground"
+            className="bg-muted/50 text-muted-foreground mt-2 max-h-72 overflow-auto rounded-md p-3 font-mono text-[10px] leading-5"
           >
             <code>{json}</code>
           </pre>

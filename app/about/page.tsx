@@ -58,19 +58,19 @@ export default function AboutPage() {
         <h1 className="display-title mt-4 text-4xl font-bold tracking-[-0.045em] sm:text-5xl">
           只收王牌， 不收垃圾。
         </h1>
-        <p className="mt-5 max-w-2xl text-[15px] leading-7 text-muted-foreground">
+        <p className="text-muted-foreground mt-5 max-w-2xl text-[15px] leading-7">
           {SITE_NAME} 目前收录 {tools.length} 个 AI
           工具。我们不追求数量，也不做长篇评测，只把「这个工具能做什么、官网在哪里」讲清楚。
         </p>
       </div>
 
-      <dl className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-4">
+      <dl className="border-border bg-border mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-xl border sm:grid-cols-4">
         {stats.map((item) => (
           <div key={item.label} className="bg-card px-4 py-4">
             <dd className="font-mono text-xl font-medium tracking-[-0.03em] tabular-nums">
               {item.value}
             </dd>
-            <dt className="mt-1 text-[11px] text-muted-foreground">
+            <dt className="text-muted-foreground mt-1 text-[11px]">
               {item.label}
             </dt>
           </div>
@@ -78,9 +78,9 @@ export default function AboutPage() {
       </dl>
 
       <section id="criteria" className="mt-12">
-        <div className="flex items-end justify-between gap-4 border-b border-border pb-3">
+        <div className="border-border flex items-end justify-between gap-4 border-b pb-3">
           <h2 className="flex items-center gap-2 text-[17px] font-semibold tracking-[-0.02em]">
-            <ShieldCheck className="size-4 text-brand" aria-hidden />
+            <ShieldCheck className="text-brand size-4" aria-hidden />
             收录门槛
           </h2>
         </div>
@@ -88,15 +88,15 @@ export default function AboutPage() {
           {criteria.map((item, index) => (
             <section
               key={item.title}
-              className="rounded-xl border border-border bg-card p-5"
+              className="border-border bg-card rounded-xl border p-5"
             >
-              <span className="flex size-7 items-center justify-center rounded-md bg-brand font-mono text-[11px] font-semibold text-brand-foreground">
+              <span className="bg-brand text-brand-foreground flex size-7 items-center justify-center rounded-md font-mono text-[11px] font-semibold">
                 {String(index + 1).padStart(2, "0")}
               </span>
               <h3 className="mt-4 text-sm font-semibold tracking-[-0.01em]">
                 {item.title}
               </h3>
-              <p className="mt-2 text-[13px] leading-6 text-muted-foreground">
+              <p className="text-muted-foreground mt-2 text-[13px] leading-6">
                 {item.description}
               </p>
             </section>
@@ -104,19 +104,19 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mt-3 rounded-xl border border-border bg-card p-6 sm:p-8">
+      <section className="border-border bg-card mt-3 rounded-xl border p-6 sm:p-8">
         <h2 className="text-[17px] font-semibold tracking-[-0.02em]">
           明确不收录
         </h2>
-        <ul className="mt-4 grid gap-2 text-[13px] leading-6 text-muted-foreground sm:grid-cols-2">
+        <ul className="text-muted-foreground mt-4 grid gap-2 text-[13px] leading-6 sm:grid-cols-2">
           {rejected.map((item) => (
             <li key={item} className="flex items-start gap-2">
-              <span className="mt-2.5 size-1 shrink-0 rounded-full bg-brand" />
+              <span className="bg-brand mt-2.5 size-1 shrink-0 rounded-full" />
               {item}
             </li>
           ))}
         </ul>
-        <p className="mt-5 text-[11px] leading-5 text-muted-foreground">
+        <p className="text-muted-foreground mt-5 text-[11px] leading-5">
           本站没有任何付费收录、广告位或返佣链接。排序是人工编排，不代表热度排名。
         </p>
       </section>
@@ -124,10 +124,10 @@ export default function AboutPage() {
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <section
           id="data"
-          className="scroll-mt-24 rounded-xl border border-border bg-card p-5"
+          className="border-border bg-card scroll-mt-24 rounded-xl border p-5"
         >
           <h2 className="text-sm font-semibold">数据口径</h2>
-          <ul className="mt-3 space-y-2 text-[12px] leading-6 text-muted-foreground">
+          <ul className="text-muted-foreground mt-3 space-y-2 text-[12px] leading-6">
             <li>定价只标主要档位：免费、免费增值、付费、试用。</li>
             <li>平台只标最主要的使用方式；多端产品可能有取舍。</li>
             <li>不展示无法核验的 Star 数或热度排名。</li>
@@ -136,13 +136,13 @@ export default function AboutPage() {
         </section>
         <section
           id="privacy"
-          className="scroll-mt-24 rounded-xl border border-border bg-card p-5"
+          className="border-border bg-card scroll-mt-24 rounded-xl border p-5"
         >
           <h2 className="flex items-center gap-1.5 text-sm font-semibold">
             <LockKeyhole className="size-3.5" aria-hidden />
             隐私说明
           </h2>
-          <ul className="mt-3 space-y-2 text-[12px] leading-6 text-muted-foreground">
+          <ul className="text-muted-foreground mt-3 space-y-2 text-[12px] leading-6">
             <li>免费使用，无需注册或登录即可浏览、搜索和筛选。</li>
             <li>搜索与筛选在浏览器本地完成，不上报使用数据。</li>
             <li>本站不接入第三方统计，也不设置广告 Cookie。</li>
@@ -151,10 +151,10 @@ export default function AboutPage() {
         </section>
       </div>
 
-      <div className="mt-3 flex flex-col gap-3 rounded-xl border border-border bg-muted/30 p-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="border-border bg-muted/30 mt-3 flex flex-col gap-3 rounded-xl border p-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-semibold">发现了一个值得收录的工具？</p>
-          <p className="mt-1 text-[12px] leading-5 text-muted-foreground">
+          <p className="text-muted-foreground mt-1 text-[12px] leading-5">
             按提交页的模板准备信息，我们会按上面的标准核验。
           </p>
         </div>
