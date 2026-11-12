@@ -4,6 +4,8 @@ const isDev = process.env.NODE_ENV === "development";
 
 // App Router 静态优化与 nonce CSP 冲突，这里保留 'unsafe-inline' 的脚本策略基线，
 // 换取全站默认静态渲染；后续接入鉴权或服务端动态内容时再按路由收紧。
+// img-src 目前只放行本地与 blob/data：全站 logo 均为 /public 静态资产。
+// 引入外链图片时必须同步收紧清单（或改用 next/image 的 remotePatterns）。
 const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,

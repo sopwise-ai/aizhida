@@ -18,6 +18,7 @@ export const onRequestError: Instrumentation.onRequestError = (
     error instanceof Error ? error.message : String(error)
   ).slice(0, 1_000);
 
+  // 丢弃 query string：URL 参数可能携带令牌、邮箱等敏感信息。
   console.error(
     JSON.stringify({
       level: "error",
