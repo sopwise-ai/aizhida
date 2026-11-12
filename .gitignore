@@ -22,6 +22,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# git hooks（husky 运行时目录）
+.husky/_
+
 # misc
 .DS_Store
 *.pem

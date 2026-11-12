@@ -1,3 +1,3 @@
-# biome check 只读（lint），格式化统一交给 prettier，避免双格式化器打架。
-npx biome check --no-errors-on-unmatched --staged
-npx lint-staged
+# biome 只读 lint 暂存文件；格式化统一交给 prettier（lint-staged），避免双格式化器打架。
+pnpm exec biome check --no-errors-on-unmatched --staged
+pnpm exec lint-staged
