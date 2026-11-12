@@ -71,7 +71,7 @@ export function SearchCommand({ tools }: { tools: Tool[] }) {
         <CommandEmpty>
           没有找到匹配的工具，试试「视频」「免费」或「Agent」。
         </CommandEmpty>
-        <div className="px-2 py-1.5 text-[11px] font-medium text-muted-foreground">
+        <div className="text-muted-foreground px-2 py-1.5 text-[11px] font-medium">
           {query.trim() ? "搜索结果" : "快速进入"}
         </div>
         {results.map((tool) => {
@@ -83,7 +83,7 @@ export function SearchCommand({ tools }: { tools: Tool[] }) {
               onSelect={() => openTool(tool)}
               className="gap-3"
             >
-              <span className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-white">
+              <span className="border-border flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-md border bg-white">
                 {logo ? (
                   // biome-ignore lint/performance/noImgElement: local, fixed-size brand marks
                   <img
@@ -94,24 +94,24 @@ export function SearchCommand({ tools }: { tools: Tool[] }) {
                     className="size-[18px] object-contain"
                   />
                 ) : (
-                  <span className="size-1.5 rounded-full bg-muted-foreground/40" />
+                  <span className="bg-muted-foreground/40 size-1.5 rounded-full" />
                 )}
               </span>
               <span className="min-w-0 flex-1 truncate font-medium">
                 {tool.name}
               </span>
-              <span className="hidden max-w-[45%] truncate text-[11px] text-muted-foreground sm:block">
+              <span className="text-muted-foreground hidden max-w-[45%] truncate text-[11px] sm:block">
                 {tool.desc}
               </span>
               <CommandShortcut className="ml-0 hidden sm:inline">
                 {categoryLabel(tool.categories[0] ?? "productivity")}
               </CommandShortcut>
-              <ArrowUpRight className="size-3.5 text-muted-foreground" />
+              <ArrowUpRight className="text-muted-foreground size-3.5" />
             </CommandItem>
           );
         })}
-        <div className="my-1 h-px bg-border" aria-hidden />
-        <div className="px-2 py-1.5 text-[11px] font-medium text-muted-foreground">
+        <div className="bg-border my-1 h-px" aria-hidden />
+        <div className="text-muted-foreground px-2 py-1.5 text-[11px] font-medium">
           操作
         </div>
         <CommandItem
@@ -138,15 +138,15 @@ export function SearchCommand({ tools }: { tools: Tool[] }) {
           提交一个工具
         </CommandItem>
       </CommandList>
-      <div className="hidden items-center justify-between border-t border-border px-3 py-2 text-[10px] text-muted-foreground sm:flex">
+      <div className="border-border text-muted-foreground hidden items-center justify-between border-t px-3 py-2 text-[10px] sm:flex">
         <span className="flex items-center gap-2">
-          <kbd className="rounded border border-border px-1 py-0.5">↑↓</kbd>
+          <kbd className="border-border rounded border px-1 py-0.5">↑↓</kbd>
           选择
-          <kbd className="rounded border border-border px-1 py-0.5">↵</kbd>
+          <kbd className="border-border rounded border px-1 py-0.5">↵</kbd>
           打开
         </span>
         <span className="flex items-center gap-2">
-          <kbd className="rounded border border-border px-1 py-0.5">esc</kbd>
+          <kbd className="border-border rounded border px-1 py-0.5">esc</kbd>
           关闭
         </span>
       </div>

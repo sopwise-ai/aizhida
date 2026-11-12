@@ -71,7 +71,7 @@ export function FilterSheet({
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="w-[min(22rem,calc(100%-2rem))]">
-        <SheetHeader className="border-b border-border p-5">
+        <SheetHeader className="border-border border-b p-5">
           <SheetTitle>筛选工具</SheetTitle>
           <SheetDescription>
             按定价和授权方式缩小范围，结果会立即更新。
@@ -80,7 +80,7 @@ export function FilterSheet({
 
         <div className="flex-1 overflow-y-auto p-5">
           <section>
-            <h3 className="text-[12px] font-medium text-muted-foreground">
+            <h3 className="text-muted-foreground text-[12px] font-medium">
               定价
             </h3>
             <div className="mt-2 grid grid-cols-2 gap-1.5">
@@ -95,7 +95,7 @@ export function FilterSheet({
                     aria-pressed={active}
                     onClick={() => onPricingChange(value)}
                     className={cn(
-                      "flex h-10 items-center justify-between rounded-lg border px-3 text-[12px] transition-colors focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:outline-none",
+                      "focus-visible:ring-brand/35 flex h-10 items-center justify-between rounded-lg border px-3 text-[12px] transition-colors focus-visible:ring-2 focus-visible:outline-none",
                       active
                         ? "border-brand/40 bg-brand-soft text-brand"
                         : "border-border hover:bg-muted/60",
@@ -104,7 +104,7 @@ export function FilterSheet({
                     <span>
                       {value === "all" ? "全部定价" : pricingLabel(value)}
                     </span>
-                    <span className="text-[10px] text-muted-foreground tabular-nums">
+                    <span className="text-muted-foreground text-[10px] tabular-nums">
                       {value === "all"
                         ? pricingTotal
                         : (pricingCounts.get(value) ?? 0)}
@@ -118,7 +118,7 @@ export function FilterSheet({
           <Separator className="my-5" />
 
           <section>
-            <h3 className="text-[12px] font-medium text-muted-foreground">
+            <h3 className="text-muted-foreground text-[12px] font-medium">
               授权
             </h3>
             <div className="mt-2 grid gap-1.5">
@@ -141,14 +141,14 @@ export function FilterSheet({
                     aria-pressed={active}
                     onClick={() => onOpenSourceChange(item.value)}
                     className={cn(
-                      "flex h-10 items-center justify-between rounded-lg border px-3 text-[12px] transition-colors focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:outline-none",
+                      "focus-visible:ring-brand/35 flex h-10 items-center justify-between rounded-lg border px-3 text-[12px] transition-colors focus-visible:ring-2 focus-visible:outline-none",
                       active
                         ? "border-brand/40 bg-brand-soft text-brand"
                         : "border-border hover:bg-muted/60",
                     )}
                   >
                     <span>{item.label}</span>
-                    <span className="text-[10px] text-muted-foreground tabular-nums">
+                    <span className="text-muted-foreground text-[10px] tabular-nums">
                       {item.count}
                     </span>
                   </button>
@@ -158,14 +158,14 @@ export function FilterSheet({
           </section>
         </div>
 
-        <div className="border-t border-border p-4">
+        <div className="border-border border-t p-4">
           <div className="flex items-center gap-2">
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={onReset}
-              className="h-10 px-3 text-[12px] text-muted-foreground"
+              className="text-muted-foreground h-10 px-3 text-[12px]"
             >
               重置
             </Button>

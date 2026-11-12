@@ -53,10 +53,10 @@ export function SiteHeader({ toolCount }: { toolCount: number }) {
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4 sm:h-20 sm:px-6 lg:px-8">
         <Link
           href="/"
-          className="group flex shrink-0 items-center gap-2.5 rounded-md focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+          className="group focus-visible:ring-ring/50 focus-visible:ring-offset-background flex shrink-0 items-center gap-2.5 rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           aria-label={`${SITE_NAME}首页`}
         >
-          <BrandMark className="size-7 text-brand transition-transform duration-200 group-hover:-rotate-3 sm:size-8" />
+          <BrandMark className="text-brand size-7 transition-transform duration-200 group-hover:-rotate-3 sm:size-8" />
           <span className="text-[15px] font-semibold tracking-[-0.025em] sm:text-[17px]">
             {SITE_NAME}
           </span>
@@ -71,7 +71,7 @@ export function SiteHeader({ toolCount }: { toolCount: number }) {
                 href={link.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "relative rounded-md px-3 py-2.5 text-[13px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none",
+                  "focus-visible:ring-ring/50 relative rounded-md px-3 py-2.5 text-[13px] font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none",
                   active
                     ? "text-foreground"
                     : "text-muted-foreground hover:bg-accent hover:text-foreground",
@@ -81,7 +81,7 @@ export function SiteHeader({ toolCount }: { toolCount: number }) {
                 {active ? (
                   <span
                     aria-hidden
-                    className="absolute inset-x-3 -bottom-[13px] h-px bg-brand"
+                    className="bg-brand absolute inset-x-3 -bottom-[13px] h-px"
                   />
                 ) : null}
               </Link>
@@ -94,7 +94,7 @@ export function SiteHeader({ toolCount }: { toolCount: number }) {
             type="button"
             onClick={() => window.dispatchEvent(new Event("open-search"))}
             aria-label="快速搜索工具"
-            className="flex size-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:outline-none md:hidden"
+            className="text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-brand/35 flex size-10 items-center justify-center rounded-md transition-colors focus-visible:ring-2 focus-visible:outline-none md:hidden"
           >
             <Search className="size-4" aria-hidden />
           </button>
@@ -132,9 +132,9 @@ export function SiteHeader({ toolCount }: { toolCount: number }) {
               side="right"
               className="w-[min(20rem,calc(100%-2rem))] p-0"
             >
-              <SheetHeader className="border-b border-border p-5">
+              <SheetHeader className="border-border border-b p-5">
                 <SheetTitle className="flex items-center gap-2.5">
-                  <BrandMark className="size-7 text-brand" />
+                  <BrandMark className="text-brand size-7" />
                   {SITE_NAME}
                 </SheetTitle>
                 <SheetDescription>
@@ -150,7 +150,7 @@ export function SiteHeader({ toolCount }: { toolCount: number }) {
                       onClick={() =>
                         window.dispatchEvent(new Event("open-search"))
                       }
-                      className="mb-4 flex h-11 w-full items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 text-[13px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand/35 focus-visible:outline-none"
+                      className="border-border bg-muted/40 text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-brand/35 mb-4 flex h-11 w-full items-center gap-2 rounded-lg border px-3 text-[13px] transition-colors focus-visible:ring-2 focus-visible:outline-none"
                     >
                       <Search className="size-4" aria-hidden />
                       搜索所有工具…
@@ -196,7 +196,7 @@ export function SiteHeader({ toolCount }: { toolCount: number }) {
                     </Link>
                   </SheetClose>
                   <div className="flex h-11 items-center justify-between rounded-lg px-3">
-                    <span className="text-[14px] text-muted-foreground">
+                    <span className="text-muted-foreground text-[14px]">
                       外观
                     </span>
                     <ThemeToggle />

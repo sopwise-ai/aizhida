@@ -36,13 +36,13 @@ export default function SubmitPage() {
         <h1 className="display-title mt-4 text-4xl font-bold tracking-[-0.045em] sm:text-5xl">
           推荐一个值得收录的工具
         </h1>
-        <p className="mt-5 max-w-2xl text-[15px] leading-7 text-muted-foreground">
+        <p className="text-muted-foreground mt-5 max-w-2xl text-[15px] leading-7">
           {SITE_NAME}{" "}
           不接受付费收录，也没有广告位。提交不等于收录，最终以官网信息和收录标准为准。
         </p>
-        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-muted-foreground">
+        <div className="text-muted-foreground mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px]">
           <span className="inline-flex items-center gap-1.5">
-            <span className="size-1.5 rounded-full bg-brand" aria-hidden />
+            <span className="bg-brand size-1.5 rounded-full" aria-hidden />
             人工核验
           </span>
           <span aria-hidden className="text-border">
@@ -59,9 +59,9 @@ export default function SubmitPage() {
       <SubmitForm />
 
       <section className="mt-12">
-        <div className="flex items-end justify-between gap-4 border-b border-border pb-3">
+        <div className="border-border flex items-end justify-between gap-4 border-b pb-3">
           <h2 className="flex items-center gap-2 text-[17px] font-semibold tracking-[-0.02em]">
-            <ListChecks className="size-4 text-brand" aria-hidden />
+            <ListChecks className="text-brand size-4" aria-hidden />
             提交后会发生什么
           </h2>
         </div>
@@ -69,13 +69,13 @@ export default function SubmitPage() {
           {steps.map((step, index) => (
             <div
               key={step.title}
-              className="rounded-xl border border-border bg-card p-5"
+              className="border-border bg-card rounded-xl border p-5"
             >
-              <span className="flex size-7 items-center justify-center rounded-md bg-brand font-mono text-[11px] font-semibold text-brand-foreground">
+              <span className="bg-brand text-brand-foreground flex size-7 items-center justify-center rounded-md font-mono text-[11px] font-semibold">
                 {String(index + 1).padStart(2, "0")}
               </span>
               <h3 className="mt-4 text-sm font-semibold">{step.title}</h3>
-              <p className="mt-2 text-[12px] leading-5 text-muted-foreground">
+              <p className="text-muted-foreground mt-2 text-[12px] leading-5">
                 {step.description}
               </p>
             </div>
@@ -83,16 +83,16 @@ export default function SubmitPage() {
         </div>
       </section>
 
-      <div className="mt-6 flex flex-col gap-3 rounded-xl border border-border bg-muted/30 p-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="border-border bg-muted/30 mt-6 flex flex-col gap-3 rounded-xl border p-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-semibold">先看看收录标准？</p>
-          <p className="mt-1 text-[12px] leading-5 text-muted-foreground">
+          <p className="text-muted-foreground mt-1 text-[12px] leading-5">
             了解什么会被收录、什么不会，再提交可以少走一步。
           </p>
         </div>
         <Link
           href="/about"
-          className="inline-flex items-center gap-1.5 text-[12px] font-medium text-brand hover:underline"
+          className="text-brand inline-flex items-center gap-1.5 text-[12px] font-medium hover:underline"
         >
           查看收录标准
           <ArrowUpRight className="size-3.5" aria-hidden />

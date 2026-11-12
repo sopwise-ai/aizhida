@@ -18,7 +18,7 @@ function SheetOverlay({
   return (
     <SheetPrimitive.Overlay
       className={cn(
-        "fixed inset-0 z-50 bg-black/35 backdrop-blur-[2px] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0",
+        "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/35 backdrop-blur-[2px]",
         className,
       )}
       {...props}
@@ -39,16 +39,16 @@ function SheetContent({
       <SheetOverlay />
       <SheetPrimitive.Content
         className={cn(
-          "fixed top-0 z-50 flex h-full w-[min(22rem,calc(100%-2rem))] flex-col border-border bg-background shadow-2xl data-[state=closed]:animate-out data-[state=open]:animate-in",
+          "border-border bg-background data-[state=closed]:animate-out data-[state=open]:animate-in fixed top-0 z-50 flex h-full w-[min(22rem,calc(100%-2rem))] flex-col shadow-2xl",
           side === "right"
-            ? "right-0 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right"
-            : "left-0 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left",
+            ? "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right right-0 border-l"
+            : "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left left-0 border-r",
           className,
         )}
         {...props}
       >
         {children}
-        <SheetPrimitive.Close className="absolute top-4 right-4 rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:outline-none">
+        <SheetPrimitive.Close className="text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-brand/40 absolute top-4 right-4 rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:outline-none">
           <X className="size-4" />
           <span className="sr-only">关闭</span>
         </SheetPrimitive.Close>
@@ -82,7 +82,7 @@ function SheetDescription({
 }: React.ComponentPropsWithoutRef<typeof SheetPrimitive.Description>) {
   return (
     <SheetPrimitive.Description
-      className={cn("text-sm text-muted-foreground", className)}
+      className={cn("text-muted-foreground text-sm", className)}
       {...props}
     />
   );

@@ -18,11 +18,11 @@ export default function ErrorPage({
 
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center px-4 py-16 text-center">
-      <p className="text-sm font-medium text-muted-foreground">出错了</p>
+      <p className="text-muted-foreground text-sm font-medium">出错了</p>
       <h1 className="mt-2 text-3xl font-semibold tracking-tight">
         页面暂时无法加载
       </h1>
-      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+      <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
         可以刷新重试。如果问题持续出现，请稍后再访问。
       </p>
       <Button type="button" size="lg" onClick={reset} className="mt-7 gap-2">
