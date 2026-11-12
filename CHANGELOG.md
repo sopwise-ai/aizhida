@@ -30,3 +30,15 @@
 - 服务端错误结构化日志：`instrumentation.ts`（`onRequestError`）。
 - 基础配置：`.editorconfig`、`.gitattributes`、`.npmrc`（engine-strict）、
   `.nvmrc`、`.vscode/` 工作区设置。
+- 工程文档：README、ARCHITECTURE、CONTRIBUTING、SECURITY、CHANGELOG、
+  MIT LICENSE。
+
+### Fixed
+
+- `packageManager` 与 `repository` 字段补齐，CI 的 pnpm 版本改由该字段提供。
+- e2e 断言与真实 DOM 对齐（搜索结果标题、sitemap 内容、移动菜单标签）。
+- 移除 `.gitignore` 重复的 `*.tsbuildinfo`；统一日志忽略模式。
+- lint-staged 与 biome 的双格式化冲突：格式化统一由 prettier 决定，
+  biome 以只读 `--staged` 模式前置。
+- `noUncheckedIndexedAccess` 启用后修复 `tools-explorer.tsx` 的键盘导航
+  索引访问。

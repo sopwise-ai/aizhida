@@ -34,20 +34,20 @@ pnpm run dev
 
 ## 脚本
 
-| 命令                     | 说明                                 |
-| ------------------------ | ------------------------------------ |
-| `pnpm run dev`           | 启动开发服务器                       |
-| `pnpm run build`         | 生产构建                             |
-| `pnpm run start`         | 启动生产服务器                       |
-| `pnpm run lint`          | Biome 检查（格式 + lint）            |
-| `pnpm run format`        | Prettier 写入格式                    |
-| `pnpm run format:check`  | 校验格式                             |
-| `pnpm run typecheck`     | TypeScript 类型检查                  |
-| `pnpm run knip`          | 死代码 / 未用导出 / 多余依赖检测     |
-| `pnpm run test`          | 运行单元测试                         |
-| `pnpm run test:watch`    | 测试观察模式                         |
-| `pnpm run test:coverage` | 测试 + 覆盖率阈值（70/70/60/70）     |
-| `pnpm run test:e2e`      | Playwright 端到端测试（桌面 + 移动） |
+| 命令                     | 说明                                            |
+| ------------------------ | ----------------------------------------------- |
+| `pnpm run dev`           | 启动开发服务器                                  |
+| `pnpm run build`         | 生产构建                                        |
+| `pnpm run start`         | 启动生产服务器                                  |
+| `pnpm run lint`          | Biome 检查（格式 + lint）                       |
+| `pnpm run format`        | Prettier 写入格式                               |
+| `pnpm run format:check`  | 校验格式                                        |
+| `pnpm run typecheck`     | TypeScript 类型检查                             |
+| `pnpm run knip`          | 死代码 / 未用导出 / 多余依赖检测                |
+| `pnpm run test`          | 运行单元测试                                    |
+| `pnpm run test:watch`    | 测试观察模式                                    |
+| `pnpm run test:coverage` | 测试 + 覆盖率阈值（行/语句/分支 70%，函数 60%） |
+| `pnpm run test:e2e`      | Playwright 端到端测试（桌面 + 移动）            |
 
 ## 环境变量
 
@@ -82,14 +82,14 @@ pnpm run dev
 
 ## Git 钩子
 
-Husky + lint-staged：提交时对暂存文件跑 `biome check --write` 与 `prettier --write`；commit message 由 commitlint 按 Conventional Commits 校验。CI 中用 `HUSKY=0` 跳过。
+Husky + lint-staged：提交时先以只读模式跑 biome lint（暂存文件），再由 prettier 格式化；commit message 由 commitlint 按 Conventional Commits 校验。CI 中用 `HUSKY=0` 跳过。
 
 ## 参与贡献
 
-- 贡献流程与提交规范见 [CONTRIBUTING.md](CONTRIBUTING.md)
-- 更新记录见 [CHANGELOG.md](CHANGELOG.md)
-- 安全漏洞报告见 [SECURITY.md](SECURITY.md)（请勿公开 Issue）
-- 项目协议：[MIT](LICENSE)
+`main` 受分支规则保护（禁止直接推送），所有变更走 Pull Request。
+流程与提交规范见 [CONTRIBUTING.md](CONTRIBUTING.md)；更新记录见
+[CHANGELOG.md](CHANGELOG.md)；安全漏洞见 [SECURITY.md](SECURITY.md)
+（请勿公开 Issue）；项目协议 [MIT](LICENSE)。
 
 ## 部署
 
