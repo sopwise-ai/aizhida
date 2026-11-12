@@ -29,7 +29,11 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "pnpm run build && pnpm run start",
+    // CI 的 e2e job 已完成生产构建（PLAYWRIGHT_SKIP_BUILD=1 时只启动）；
+    // 本地单独跑 test:e2e 时仍会先构建，保证开箱即用。
+    command: process.env.PLAYWRIGHT_SKIP_BUILD
+      ? "pnpm run start"
+      : "pnpm run build && pnpm run start",
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
