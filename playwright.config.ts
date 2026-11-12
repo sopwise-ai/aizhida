@@ -34,7 +34,9 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
     env: {
-      NEXT_PUBLIC_SITE_URL: `http://127.0.0.1:${port}`,
+      // 本地 e2e 的构建不能走生产域名校验，也不能落到默认 localhost 值，
+      // 用保留域 example.com 满足“生产 URL 必填且非 localhost”。
+      NEXT_PUBLIC_SITE_URL: "https://e2e.example.com",
       PORT: String(port),
       NEXT_TELEMETRY_DISABLED: "1",
     },
