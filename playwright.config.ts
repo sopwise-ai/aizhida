@@ -1,4 +1,3 @@
-/// <reference types="vitest/config" />
 import { defineConfig, devices } from "@playwright/test";
 
 const port = 3123;
@@ -30,11 +29,14 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "pnpm run start",
+    command: "pnpm run build && pnpm run start",
     url: baseURL,
     reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
+    timeout: 180_000,
     env: {
+      // 本地 e2e 的构建不能走生产域名校验，也不能落到默认 localhost 值，
+      // 用保留域 example.com 满足“生产 URL 必填且非 localhost”。
+      NEXT_PUBLIC_SITE_URL: "https://e2e.example.com",
       PORT: String(port),
       NEXT_TELEMETRY_DISABLED: "1",
     },

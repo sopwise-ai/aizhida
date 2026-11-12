@@ -5,7 +5,6 @@
   "ignoreIssues": {
     "components/ui/*.tsx": ["exports"],
   },
-  // prettier 插件由 .prettierrc.json 加载、shadcn CLI 只在本地手动调用，
-  // knip 静态分析都看不到。
-  "ignoreDependencies": ["prettier-plugin-tailwindcss", "shadcn"],
+  // shadcn CLI 经 pnpm exec 手动调用，knip 静态分析看不到。
+  "ignoreDependencies": ["shadcn"],
 }

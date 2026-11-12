@@ -12,9 +12,14 @@ app/                  App Router 路由与元数据文件
   loading.tsx         路由段加载态
   not-found.tsx       404
   manifest.ts         PWA manifest（/manifest.webmanifest）
-  robots.ts sitemap.ts
+  robots.ts           爬虫规则
+  sitemap.ts          站点地图
+  globals.css         Tailwind 4 主题令牌（@theme inline + shadcn 变量）
 components/
   ui/                 shadcn/ui 原语（vendored，不写业务逻辑）
+  app-providers.tsx   next-themes + Tooltip + sonner 的 provider 组合
+  brand-mark.tsx      品牌 SVG 标识
+  theme-toggle.tsx    明暗切换
   layout/             SiteHeader / SiteFooter
   tools/              ToolsExplorer（搜索、分类、筛选、URL 同步）、ToolCard、FilterSheet、SearchCommand（⌘K）
   submit/             SubmitForm（本地校验 + JSON 生成）
@@ -24,8 +29,10 @@ lib/
   tools.ts            zod 校验 data/tools.json（非法数据直接让构建失败）
   tool-meta.ts        分类/定价/平台枚举与标签
   filter-tools.ts     纯函数搜索、同义词扩展、多维筛选与评分排序
-  tool-logos.ts       本地 logo 资产映射
+  tool-logos.ts       本地 logo 资产映射（public/logos/）
+  utils.ts            cn() 类名合并
 data/tools.json       工具数据（唯一数据源，构建期校验）
+public/               icon.svg、og.png、logos/（本地品牌图，无第三方请求）
 e2e/                  Playwright：home.spec.ts（桌面）、mobile.spec.ts（Pixel 7）
 ```
 
@@ -56,6 +63,13 @@ data/tools.json ──zod 校验（构建期）──> lib/tools.ts ──props�
 
 - `lib/env.ts` 用 t3-env 划分 client/server 变量；生产构建缺少 `NEXT_PUBLIC_SITE_URL` 或指向 localhost 时直接失败。
 - 全站安全响应头由 `next.config.ts` 统一注入；CSP 采用静态优化友好的基线（`unsafe-inline` 脚本），后续接鉴权再按路由收紧。
+- `instrumentation.ts`（`onRequestError`）输出结构化错误日志，路径丢弃 query string 以避免泄露敏感参数。
+- CSP 的 `img-src` 只放行本地/blob/data：全站 logo 均为 `public/logos/` 静态资产，无第三方图片请求。
+
+## 部署与运行
+
+- 部署在 Vercel：`SITE_URL` 自动取生产域名，无需设置环境变量。
+- 自托管：参考 cikuku 的 `output: "standalone"` + Docker 方案，需要时再引入。
 
 ## 有意与 cikuku 保持的差异
 

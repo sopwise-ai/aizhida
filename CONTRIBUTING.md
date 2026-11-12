@@ -16,7 +16,8 @@
 
    `pnpm install` 会通过 husky 安装钩子：
 
-   - `pre-commit` 运行 lint-staged，只处理暂存文件（biome + prettier）。
+   - `pre-commit` 先以只读模式对暂存文件跑 biome lint，再由 lint-staged
+     用 prettier 格式化（格式化的唯一决定权在 prettier，避免双格式化器打架）。
    - `commit-msg` 运行 commitlint，拒绝不合规范的提交信息。
 
    `git commit --no-verify` 可以绕过钩子，但 CI 会执行相同的检查。
@@ -39,6 +40,7 @@
 
 4. 发起 Pull Request，标题遵循 Conventional Commits
    （CI 会校验 squash 合并时的 PR 标题），确保 CI 通过。
+   `main` 受分支规则保护，**不接受直接推送**，所有变更一律走 PR。
 
 ## 新增 UI 组件
 
