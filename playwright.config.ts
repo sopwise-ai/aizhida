@@ -1,4 +1,3 @@
-/// <reference types="vitest/config" />
 import { defineConfig, devices } from "@playwright/test";
 
 const port = 3123;
@@ -30,11 +29,12 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "pnpm run start",
+    command: "pnpm run build && pnpm run start",
     url: baseURL,
     reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
+    timeout: 180_000,
     env: {
+      NEXT_PUBLIC_SITE_URL: `http://127.0.0.1:${port}`,
       PORT: String(port),
       NEXT_TELEMETRY_DISABLED: "1",
     },

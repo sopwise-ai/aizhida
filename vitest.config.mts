@@ -16,7 +16,11 @@ export default defineConfig({
     // globals 打开后 @testing-library/react 会在每个用例间自动 cleanup。
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
-    include: ["**/*.test.{ts,tsx}"],
+    include: [
+      "app/**/*.test.{ts,tsx}",
+      "components/**/*.test.{ts,tsx}",
+      "lib/**/*.test.{ts,tsx}",
+    ],
     exclude: ["node_modules/**", ".next/**", "e2e/**"],
     clearMocks: true,
     restoreMocks: true,

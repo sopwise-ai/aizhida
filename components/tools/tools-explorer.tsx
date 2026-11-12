@@ -405,7 +405,8 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
         '[data-slot="toggle-group-item"]',
       );
     buttons?.[next]?.focus();
-    selectCategory(values[next]);
+    const value = values[next];
+    if (value !== undefined) selectCategory(value);
   }
 
   function applySuggestion(suggestion: (typeof SEARCH_SUGGESTIONS)[number]) {
