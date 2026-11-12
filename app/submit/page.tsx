@@ -15,7 +15,8 @@ export const metadata: Metadata = {
 const steps = [
   {
     title: "填写真实信息",
-    description: "名称、官网、一句话说明；分类最多两个，定价与授权方式可核验。",
+    description:
+      "名称、官网、一句话说明；分类最多三个，平台、特性、定价与授权方式可核验。",
   },
   {
     title: "复制 JSON",
@@ -33,8 +34,8 @@ export default function SubmitPage() {
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
       <div className="max-w-3xl">
         <p className="eyebrow">提交工具 · Community submission</p>
-        <h1 className="display-title mt-4 text-4xl font-bold tracking-[-0.045em] sm:text-5xl">
-          推荐一个值得收录的工具
+        <h1 className="display-title text-foreground mt-4 text-4xl font-bold tracking-[-0.045em] sm:text-5xl">
+          推荐一个<span className="text-gradient">值得收录</span>的工具
         </h1>
         <p className="text-muted-foreground mt-5 max-w-2xl text-[15px] leading-7">
           {SITE_NAME}{" "}
@@ -58,9 +59,12 @@ export default function SubmitPage() {
 
       <SubmitForm />
 
-      <section className="mt-12">
+      <section aria-labelledby="submit-steps" className="mt-12">
         <div className="border-border flex items-end justify-between gap-4 border-b pb-3">
-          <h2 className="flex items-center gap-2 text-[17px] font-semibold tracking-[-0.02em]">
+          <h2
+            id="submit-steps"
+            className="flex items-center gap-2 text-[17px] font-semibold tracking-[-0.02em]"
+          >
             <ListChecks className="text-brand size-4" aria-hidden />
             提交后会发生什么
           </h2>
@@ -69,7 +73,7 @@ export default function SubmitPage() {
           {steps.map((step, index) => (
             <div
               key={step.title}
-              className="border-border bg-card rounded-xl border p-5"
+              className="border-border bg-card relative rounded-xl border p-5 shadow-sm transition-shadow hover:shadow-md"
             >
               <span className="bg-brand text-brand-foreground flex size-7 items-center justify-center rounded-md font-mono text-[11px] font-semibold">
                 {String(index + 1).padStart(2, "0")}
@@ -78,6 +82,12 @@ export default function SubmitPage() {
               <p className="text-muted-foreground mt-2 text-[12px] leading-5">
                 {step.description}
               </p>
+              {index < steps.length - 1 ? (
+                <ArrowUpRight
+                  aria-hidden
+                  className="text-border absolute top-6 right-5 size-4 rotate-45"
+                />
+              ) : null}
             </div>
           ))}
         </div>

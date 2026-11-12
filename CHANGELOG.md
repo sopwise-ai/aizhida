@@ -33,6 +33,25 @@
 - 工程文档：README、ARCHITECTURE、CONTRIBUTING、SECURITY、CHANGELOG、
   MIT LICENSE。
 
+### Changed
+
+- 工具数据模型升级到 v2（85 条记录全部迁移）：
+  - `platform` 单值改为 `platforms` 多值，并新增 `type`（应用/模型/编辑器/
+    插件/平台/框架/API 服务/运行时）区分「产品形态」与「交付渠道」。
+  - 分类从 6 个扩展到 11 个（新增对话助手、语音、搜索、设计、基础设施）。
+  - 自由标签拆为受控 `features`（59 项词表，2–6 个）与自由 `keywords`；
+    卡片、搜索与筛选统一使用词表 label。
+  - `desc` 拆为卡片用 `tagline`（≤60）与详情页/SEO 用 `description`
+    （120–300 字），85 条全部补齐。
+  - 新增 `vendorId` + `data/vendors.json` 厂商注册表，构建期做外键校验。
+  - 新增 `status`、`addedAt`、`updatedAt`、`verifiedAt` 生命周期字段。
+  - `url` 扩为 `links{website,github,docs,pricing,store}`，并预留
+    `affiliateUrl` / `sponsored`。
+  - 新增跨记录校验：id 唯一、官网唯一、日期先后关系、数组去重。
+- 分类条改为单行横向滚动，避免 11 个分类把粘性工具栏折成多行。
+- 提交表单同步 v2：分类最多 3 个、平台与特性多选、新增厂商/形态字段，
+  生成的 JSON 预览直接对应新结构。
+
 ### Fixed
 
 - `packageManager` 与 `repository` 字段补齐，CI 的 pnpm 版本改由该字段提供。

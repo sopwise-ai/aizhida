@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   CommandDialog,
   CommandEmpty,
+  CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
@@ -49,7 +50,7 @@ export function SearchCommand({ tools }: { tools: Tool[] }) {
   }, [query, tools]);
 
   function openTool(tool: Tool) {
-    window.open(tool.url, "_blank", "noopener,noreferrer");
+    window.open(tool.links.website, "_blank", "noopener,noreferrer");
     setOpen(false);
   }
 
@@ -71,72 +72,69 @@ export function SearchCommand({ tools }: { tools: Tool[] }) {
         <CommandEmpty>
           没有找到匹配的工具，试试「视频」「免费」或「Agent」。
         </CommandEmpty>
-        <div className="text-muted-foreground px-2 py-1.5 text-[11px] font-medium">
-          {query.trim() ? "搜索结果" : "快速进入"}
-        </div>
-        {results.map((tool) => {
-          const logo = getToolLogo(tool.id);
-          return (
-            <CommandItem
-              key={tool.id}
-              value={`${tool.name} ${tool.desc} ${tool.tags.join(" ")}`}
-              onSelect={() => openTool(tool)}
-              className="gap-3"
-            >
-              <span className="border-border flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-md border bg-white">
-                {logo ? (
-                  // biome-ignore lint/performance/noImgElement: local, fixed-size brand marks
-                  <img
-                    src={logo}
-                    alt=""
-                    width={18}
-                    height={18}
-                    className="size-[18px] object-contain"
-                  />
-                ) : (
-                  <span className="bg-muted-foreground/40 size-1.5 rounded-full" />
-                )}
-              </span>
-              <span className="min-w-0 flex-1 truncate font-medium">
-                {tool.name}
-              </span>
-              <span className="text-muted-foreground hidden max-w-[45%] truncate text-[11px] sm:block">
-                {tool.desc}
-              </span>
-              <CommandShortcut className="ml-0 hidden sm:inline">
-                {categoryLabel(tool.categories[0] ?? "productivity")}
-              </CommandShortcut>
-              <ArrowUpRight className="text-muted-foreground size-3.5" />
-            </CommandItem>
-          );
-        })}
-        <div className="bg-border my-1 h-px" aria-hidden />
-        <div className="text-muted-foreground px-2 py-1.5 text-[11px] font-medium">
-          操作
-        </div>
-        <CommandItem
-          value="浏览全部工具"
-          onSelect={() => {
-            setOpen(false);
-            document.getElementById("all-tools")?.scrollIntoView({
-              behavior: "smooth",
-              block: "start",
-            });
-          }}
-        >
-          <Command className="size-3.5" />
-          浏览全部工具
-          <CommandShortcut>↵</CommandShortcut>
-        </CommandItem>
-        <CommandItem
-          value="提交工具"
-          onSelect={() => {
-            window.location.href = "/submit";
-          }}
-        >
-          <ArrowUpRight className="size-3.5" />
-          提交一个工具
-        </CommandItem>
+        <CommandGroup heading={query.trim() ? "搜索结果" : "快速进入"}>
+          {results.map((tool) => {
+            const logo = getToolLogo(tool.id);
+            return (
+              <CommandItem
+                key={tool.id}
+                value={`${tool.name} ${tool.tagline} ${tool.features.join(" ")} ${tool.keywords.join(" ")}`}
+                onSelect={() => openTool(tool)}
+                className="gap-3"
+              >
+                <span className="border-border bg-background flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-md border">
+                  {logo ? (
+                    // biome-ignore lint/performance/noImgElement: local, fixed-size brand marks
+                    <img
+                      src={logo}
+                      alt=""
+                      width={18}
+                      height={18}
+                      className="size-[18px] object-contain"
+                    />
+                  ) : (
+                    <span className="bg-muted-foreground/30 size-1.5 rounded-full" />
+                  )}
+                </span>
+                <span className="min-w-0 flex-1 truncate font-medium">
+                  {tool.name}
+                </span>
+                <span className="text-muted-foreground hidden max-w-[45%] truncate text-[11px] sm:block">
+                  {tool.tagline}
+                </span>
+                <CommandShortcut className="ml-0 hidden sm:inline">
+                  {categoryLabel(tool.categories[0] ?? "assistant")}
+                </CommandShortcut>
+                <ArrowUpRight className="text-muted-foreground size-3.5" />
+              </CommandItem>
+            );
+          })}
+        </CommandGroup>
+        <CommandGroup heading="操作">
+          <CommandItem
+            value="浏览全部工具"
+            onSelect={() => {
+              setOpen(false);
+              document.getElementById("all-tools")?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
+            }}
+          >
+            <Command className="size-3.5" />
+            浏览全部工具
+            <CommandShortcut>↵</CommandShortcut>
+          </CommandItem>
+          <CommandItem
+            value="提交工具"
+            onSelect={() => {
+              window.location.href = "/submit";
+            }}
+          >
+            <ArrowUpRight className="size-3.5" />
+            提交一个工具
+          </CommandItem>
+        </CommandGroup>
       </CommandList>
       <div className="border-border text-muted-foreground hidden items-center justify-between border-t px-3 py-2 text-[10px] sm:flex">
         <span className="flex items-center gap-2">

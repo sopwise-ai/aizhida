@@ -72,7 +72,14 @@ export function FilterSheet({
       </SheetTrigger>
       <SheetContent side="right" className="w-[min(22rem,calc(100%-2rem))]">
         <SheetHeader className="border-border border-b p-5">
-          <SheetTitle>筛选工具</SheetTitle>
+          <SheetTitle className="flex items-center gap-2">
+            筛选工具
+            {activeCount > 0 ? (
+              <Badge className="bg-brand-soft text-brand h-5 rounded-full px-1.5 text-[10px]">
+                已启用 {activeCount} 项
+              </Badge>
+            ) : null}
+          </SheetTitle>
           <SheetDescription>
             按定价和授权方式缩小范围，结果会立即更新。
           </SheetDescription>
@@ -97,12 +104,13 @@ export function FilterSheet({
                     className={cn(
                       "focus-visible:ring-brand/35 flex h-10 items-center justify-between rounded-lg border px-3 text-[12px] transition-colors focus-visible:ring-2 focus-visible:outline-none",
                       active
-                        ? "border-brand/40 bg-brand-soft text-brand"
+                        ? "border-brand/40 bg-brand-soft text-brand font-medium"
                         : "border-border hover:bg-muted/60",
                     )}
                   >
-                    <span>
+                    <span className="flex items-center gap-1.5">
                       {value === "all" ? "全部定价" : pricingLabel(value)}
+                      {active ? <Check className="size-3" aria-hidden /> : null}
                     </span>
                     <span className="text-muted-foreground text-[10px] tabular-nums">
                       {value === "all"
@@ -143,11 +151,14 @@ export function FilterSheet({
                     className={cn(
                       "focus-visible:ring-brand/35 flex h-10 items-center justify-between rounded-lg border px-3 text-[12px] transition-colors focus-visible:ring-2 focus-visible:outline-none",
                       active
-                        ? "border-brand/40 bg-brand-soft text-brand"
+                        ? "border-brand/40 bg-brand-soft text-brand font-medium"
                         : "border-border hover:bg-muted/60",
                     )}
                   >
-                    <span>{item.label}</span>
+                    <span className="flex items-center gap-1.5">
+                      {item.label}
+                      {active ? <Check className="size-3" aria-hidden /> : null}
+                    </span>
                     <span className="text-muted-foreground text-[10px] tabular-nums">
                       {item.count}
                     </span>
@@ -158,19 +169,23 @@ export function FilterSheet({
           </section>
         </div>
 
-        <div className="border-border border-t p-4">
+        <div className="border-border bg-card/80 border-t p-4 backdrop-blur">
           <div className="flex items-center gap-2">
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={onReset}
-              className="text-muted-foreground h-10 px-3 text-[12px]"
+              className="text-muted-foreground hover:text-foreground h-10 px-3 text-[12px]"
             >
               重置
             </Button>
             <SheetClose asChild>
-              <Button type="button" className="h-10 flex-1">
+              <Button
+                type="button"
+                className="h-10 flex-1"
+                aria-label={`关闭筛选面板，查看 ${resultCount} 个工具`}
+              >
                 <Check className="size-3.5" aria-hidden />
                 查看 {resultCount} 个工具
               </Button>

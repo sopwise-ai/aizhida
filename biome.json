@@ -26,9 +26,17 @@
   },
   "overrides": [
     {
-      "includes": ["knip.jsonc"],
+      "includes": ["knip.jsonc", "app/globals.css"],
+      "linter": {
+        "enabled": true
+      },
       "formatter": {
         "enabled": false
+      },
+      "css": {
+        "parser": {
+          "tailwindDirectives": true
+        }
       }
     }
   ],

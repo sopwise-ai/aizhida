@@ -27,11 +27,13 @@ lib/
   env.ts              zod + t3-env 环境变量校验（构建期失败）
   site.ts             站点常量 + 生产 URL 断言
   tools.ts            zod 校验 data/tools.json（非法数据直接让构建失败）
-  tool-meta.ts        分类/定价/平台枚举与标签
-  filter-tools.ts     纯函数搜索、同义词扩展、多维筛选与评分排序
+  tool-meta.ts        分类/形态/平台/特性/状态/定价词表与标签
+  vendors.ts          厂商注册表（vendorId 外键，客户端安全）
   tool-logos.ts       本地 logo 资产映射（public/logos/）
+  filter-tools.ts     纯函数搜索、同义词扩展、多维筛选与评分排序
   utils.ts            cn() 类名合并
 data/tools.json       工具数据（唯一数据源，构建期校验）
+data/vendors.json     厂商注册表（与 tools.json 的 vendorId 对应）
 public/               icon.svg、og.png、logos/（本地品牌图，无第三方请求）
 e2e/                  Playwright：home.spec.ts（桌面）、mobile.spec.ts（Pixel 7）
 ```
@@ -46,11 +48,33 @@ e2e/                  Playwright：home.spec.ts（桌面）、mobile.spec.ts（P
 
 ```text
 data/tools.json ──zod 校验（构建期）──> lib/tools.ts ──props──> ToolsExplorer
+data/vendors.json ──外键校验──────────> lib/tools.ts
                                                       │
              filter-tools.ts（纯函数，单测覆盖）<──────┘
 ```
 
 数据更新只改 `data/tools.json`；字段非法时 `next build` 失败，保证线上数据始终合法。
+
+### 数据模型（v2）
+
+一条工具记录同时承载三类信息，字段名刻意保持正交：
+
+| 维度     | 字段                                                      | 说明                                                       |
+| -------- | --------------------------------------------------------- | ---------------------------------------------------------- |
+| 身份     | `id` / `name` / `vendorId`                                | `id` 发布后不可变；`vendorId` 外键指向 `data/vendors.json` |
+| 归类     | `categories`（1–3）/ `type` / `platforms`（多值）         | 干什么 / 什么形态 / 跑在哪，三者不互相替代                 |
+| 特性     | `features`（2–6，受控）                                   | 筛选词表，见 `FEATURES`；同义词只进 `keywords`             |
+| 商业     | `pricing` / `openSource` / `affiliateUrl` / `sponsored`   | 联盟链接与官网分离                                         |
+| 内容     | `tagline`（≤60）/ `description`（120–300）                | 卡片用 tagline，详情页与 SEO 用 description                |
+| 链接     | `links.website` / `github` / `docs` / `pricing` / `store` | 官网与仓库分离                                             |
+| 生命周期 | `status` / `addedAt` / `updatedAt` / `verifiedAt`         | `verifiedAt` 为最近一次人工核对日期                        |
+
+构建期额外做跨记录校验：id 唯一、官网唯一、vendorId 必须存在、
+日期先后关系（`addedAt ≤ updatedAt`、`verifiedAt ≤ updatedAt`）、
+分类/特性/平台数组去重。
+
+`features` 与 `keywords` 的分工是 500 条以后不崩的关键：前者是封闭词表
+（可筛选、可翻译），后者是自由检索词（不进筛选 UI、不建索引）。
 
 ## 测试策略
 
