@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
 import { DATA_UPDATED_LABEL, SITE_NAME } from "@/lib/site";
+import { CATEGORIES } from "@/lib/tool-meta";
 import { tools } from "@/lib/tools";
 
 export const metadata: Metadata = {
@@ -32,7 +33,7 @@ const criteria = [
   {
     title: "在分类中有稳定价值",
     description:
-      "工具需要在写作、绘画、编程、办公、视频或 Agent 中解决一个明确问题，并在公开渠道有真实使用场景或社区反馈。",
+      "工具需要在对话助手、写作、绘画、视频、语音、编程、办公、搜索、设计、智能体或基础设施分类中解决一个明确问题，并在公开渠道有真实使用场景或社区反馈。",
   },
   {
     title: "信息可核验且愿意维护",
@@ -50,7 +51,7 @@ const rejected = [
 
 const stats = [
   { value: String(tools.length), label: "当前收录" },
-  { value: "06", label: "工具分类" },
+  { value: String(CATEGORIES.length).padStart(2, "0"), label: "工具分类" },
   { value: "00", label: "广告位" },
   { value: "2026.11", label: "最近整理" },
 ];

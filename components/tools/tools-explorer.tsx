@@ -150,7 +150,7 @@ function FeaturedPanel({ tools }: { tools: Tool[] }) {
         </div>
 
         <a
-          href={primary.url}
+          href={primary.links.website}
           target="_blank"
           rel="noopener noreferrer"
           className="group hover:bg-accent/30 focus-visible:ring-brand/35 relative block p-4 transition-colors focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
@@ -184,7 +184,7 @@ function FeaturedPanel({ tools }: { tools: Tool[] }) {
                 {primary.name}
               </h2>
               <p className="text-muted-foreground mt-0.5 truncate text-[11px]">
-                {categoryLabel(primary.categories[0] ?? "productivity")} ·{" "}
+                {categoryLabel(primary.categories[0] ?? "assistant")} ·{" "}
                 {pricingLabel(primary.pricing)}
                 {primary.openSource ? " · 开源" : ""}
               </p>
@@ -195,7 +195,7 @@ function FeaturedPanel({ tools }: { tools: Tool[] }) {
             />
           </div>
           <p className="text-muted-foreground mt-3 line-clamp-2 text-[13px] leading-5">
-            {primary.desc}
+            {primary.tagline}
           </p>
           <div className="border-border mt-3 flex items-center justify-end gap-3 border-t pt-3">
             <span className="bg-primary text-primary-foreground group-hover:bg-brand inline-flex h-7 items-center gap-1 rounded-md px-2 text-[11px] font-medium transition-colors">
@@ -211,7 +211,7 @@ function FeaturedPanel({ tools }: { tools: Tool[] }) {
             return (
               <a
                 key={tool.id}
-                href={tool.url}
+                href={tool.links.website}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="border-border hover:bg-accent/30 focus-visible:ring-brand/35 flex items-center gap-2.5 border-b px-4 py-2.5 transition-colors last:border-b-0 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
@@ -236,7 +236,7 @@ function FeaturedPanel({ tools }: { tools: Tool[] }) {
                   {tool.name}
                 </span>
                 <span className="text-muted-foreground hidden text-[10px] sm:inline">
-                  {categoryLabel(tool.categories[0] ?? "productivity")}
+                  {categoryLabel(tool.categories[0] ?? "assistant")}
                 </span>
                 <span className="text-muted-foreground text-[10px]">
                   {pricingLabel(tool.pricing)}
@@ -551,7 +551,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
                 </Link>
                 {tools[0] ? (
                   <a
-                    href={tools[0].url}
+                    href={tools[0].links.website}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 transition-colors lg:hidden"
@@ -649,7 +649,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
               value={activeCategory ?? "all"}
               onValueChange={selectCategory}
               aria-label="按分类筛选"
-              className="hidden min-w-0 flex-1 flex-wrap items-center gap-1.5 sm:flex"
+              className="hidden min-w-0 flex-1 [scrollbar-width:none] flex-nowrap items-center gap-1.5 overflow-x-auto sm:flex"
             >
               <ToggleGroupItem
                 value="all"

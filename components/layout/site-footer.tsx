@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { BrandMark } from "@/components/brand-mark";
 import { DATA_UPDATED_LABEL, SITE_NAME, SITE_TAGLINE } from "@/lib/site";
+import { CATEGORIES } from "@/lib/tool-meta";
 import { tools } from "@/lib/tools";
 
 export function SiteFooter() {
@@ -66,7 +67,7 @@ export function SiteFooter() {
             <p className="eyebrow">数据</p>
             <ul className="text-muted-foreground mt-4 flex flex-col gap-2.5 text-[13px]">
               <li>{tools.length} 个工具</li>
-              <li>6 个分类</li>
+              <li>{`${CATEGORIES.length} 个分类`}</li>
               <li>0 个广告位</li>
               <li>
                 <Link

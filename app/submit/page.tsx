@@ -15,7 +15,8 @@ export const metadata: Metadata = {
 const steps = [
   {
     title: "填写真实信息",
-    description: "名称、官网、一句话说明；分类最多两个，定价与授权方式可核验。",
+    description:
+      "名称、官网、一句话说明；分类最多三个，平台、特性、定价与授权方式可核验。",
   },
   {
     title: "复制 JSON",

@@ -28,7 +28,7 @@ export const SITE_URL = (url ?? fallbackUrl).replace(/\/+$/, "");
 export const SITE_NAME = "AI 直达";
 export const SITE_TAGLINE = "只收王牌，一键直达官网";
 export const SITE_DESCRIPTION =
-  "精选 AI 工具导航：写作、绘画、编程、办公、视频与 Agent 分类，按定价与是否开源筛选，一键直达官网。无需登录，搜索与筛选在浏览器本地完成。";
+  "精选 AI 工具导航：对话助手、写作、绘画、视频、语音、编程、办公、搜索、设计、智能体与基础设施分类，按定价、平台与是否开源筛选，一键直达官网。无需登录，搜索与筛选在浏览器本地完成。";
 export const REPO_URL = "https://github.com/sopwise-ai/aizhida";
 export const DATA_UPDATED_AT = "2026-11";
 export const DATA_UPDATED_LABEL = "2026 年 11 月";

@@ -19,15 +19,16 @@ function domainOf(url: string): string {
 export function ToolCard({ tool }: { tool: Tool }) {
   const logo = getToolLogo(tool.id);
   const primaryCategory = tool.categories[0] ?? "writing";
-  const domain = domainOf(tool.url);
+  const platformText = tool.platforms.map(platformLabel).join(" · ");
+  const domain = domainOf(tool.links.website);
 
   return (
     <a
-      href={tool.url}
+      href={tool.links.website}
       target="_blank"
       rel="noopener noreferrer"
-      title={`打开 ${tool.name} 官网（${platformLabel(tool.platform)} · ${domain}）`}
-      aria-label={`${tool.name}：${tool.desc}。${platformLabel(tool.platform)}工具，在新标签页打开 ${domain}`}
+      title={`打开 ${tool.name} 官网（${platformText} · ${domain}）`}
+      aria-label={`${tool.name}：${tool.tagline}。${platformText}工具，在新标签页打开 ${domain}`}
       data-slot="card"
       data-size="default"
       className="group border-border bg-card text-card-foreground hover:border-brand/40 focus-visible:ring-brand/40 focus-visible:ring-offset-background ring-foreground/10 relative flex min-h-[160px] flex-col gap-4 overflow-hidden rounded-xl py-4 ring-1 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-[0_20px_44px_-24px_rgba(76,29,149,0.28)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none motion-reduce:transition-none motion-reduce:hover:translate-y-0"
@@ -70,7 +71,7 @@ export function ToolCard({ tool }: { tool: Tool }) {
             />
           </div>
           <p className="text-muted-foreground mt-1 line-clamp-2 min-h-10 text-[13px] leading-5">
-            {tool.desc}
+            {tool.tagline}
           </p>
         </div>
       </div>

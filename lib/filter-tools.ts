@@ -2,14 +2,18 @@ import {
   CATEGORY_VALUES,
   type Category,
   categoryLabel,
+  featureLabel,
   type OpenSourceFilter,
-  PLATFORM_OPTIONS,
+  PLATFORM_VALUES,
   type Platform,
   type Pricing,
   platformLabel,
   pricingLabel,
+  statusLabel,
   type Tool,
+  typeLabel,
 } from "./tool-meta";
+import { vendorName } from "./vendors";
 
 export interface ToolFilters {
   query: string;
@@ -46,10 +50,13 @@ const ALIAS_GROUPS: readonly (readonly string[])[] = [
     "ppt",
     "productivity",
   ],
-  ["视频", "剪辑", "短视频", "数字人", "配音", "字幕", "video", "film"],
-  ["agent", "智能体", "代理", "自动化", "工作流", "workflow", "自动化"],
+  ["视频", "剪辑", "短视频", "数字人", "字幕", "video", "film"],
+  ["语音", "声音", "配音", "朗读", "tts", "audio", "voice"],
+  ["agent", "智能体", "代理", "自动化", "工作流", "workflow"],
+  ["搜索", "检索", "research", "search", "资料"],
+  ["基础设施", "模型", "框架", "部署", "infrastructure", "llm"],
   ["免费", "free", "白嫖", "免费使用"],
-  ["开源", "open source", "oss", "开放源代码"],
+  ["开源", "open source", "oss", "开放源代码", "本地部署"],
   ["中文", "国产", "中国", "chinese"],
   ["api", "接口", "开发者"],
   ["插件", "plugin", "扩展"],
@@ -79,21 +86,32 @@ function searchHaystack(tool: Tool): string {
     category,
     categoryLabel(category),
   ]);
-  const platform = PLATFORM_OPTIONS.find(
-    (option) => option.value === tool.platform,
-  );
+  const featureTerms = tool.features.flatMap((feature) => [
+    feature,
+    featureLabel(feature),
+  ]);
+  const platformTerms = tool.platforms.flatMap((platform) => [
+    platform,
+    platformLabel(platform),
+  ]);
 
   return normalize(
     [
       tool.name,
-      tool.desc,
-      ...tool.tags,
+      tool.tagline,
+      tool.description,
+      tool.vendorId,
+      vendorName(tool.vendorId),
+      ...tool.keywords,
+      ...featureTerms,
       ...categoryTerms,
+      ...platformTerms,
+      tool.type,
+      typeLabel(tool.type),
       pricingLabel(tool.pricing),
-      platformLabel(tool.platform),
-      platform?.label ?? "",
+      statusLabel(tool.status),
       tool.openSource ? "开源 open source" : "闭源 closed source",
-      new URL(tool.url).hostname,
+      new URL(tool.links.website).hostname,
     ].join(" "),
   );
 }
@@ -109,8 +127,8 @@ function matchScore(tool: Tool, rawQuery: string): number {
   }
 
   const name = normalize(tool.name);
-  const tags = tool.tags.map(normalize);
-  const desc = normalize(tool.desc);
+  const attributes = [...tool.features, ...tool.keywords].map(normalize);
+  const desc = normalize(`${tool.tagline} ${tool.description}`);
   const haystack = searchHaystack(tool);
 
   const terms = query.split(/\s+/).filter(Boolean);
@@ -125,7 +143,7 @@ function matchScore(tool: Tool, rawQuery: string): number {
   if (name === query) score += 120;
   else if (name.startsWith(query)) score += 80;
   else if (name.includes(query)) score += 50;
-  if (tags.some((tag) => tag === query)) score += 40;
+  if (attributes.some((attribute) => attribute === query)) score += 40;
   if (desc.includes(query)) score += 15;
   score += terms.length * 2;
   return score;
@@ -185,11 +203,5 @@ export function isPricing(value: string | null): value is Pricing {
 }
 
 export function isPlatform(value: string | null): value is Platform {
-  return (
-    value === "web" ||
-    value === "desktop" ||
-    value === "api" ||
-    value === "plugin" ||
-    value === "mobile"
-  );
+  return value !== null && PLATFORM_VALUES.includes(value as Platform);
 }

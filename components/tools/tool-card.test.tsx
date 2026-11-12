@@ -18,10 +18,10 @@ describe("tool card", () => {
     render(<ToolCard tool={chatgpt} />);
 
     const link = screen.getByRole("link");
-    expect(link).toHaveAttribute("href", chatgpt.url);
+    expect(link).toHaveAttribute("href", chatgpt.links.website);
     expect(link.getAttribute("rel")).toContain("noopener");
     expect(screen.getByText("ChatGPT")).toBeInTheDocument();
-    expect(screen.getByText(chatgpt.desc)).toBeInTheDocument();
+    expect(screen.getByText(chatgpt.tagline)).toBeInTheDocument();
   });
 
   it("renders the local logo asset for a known tool", () => {
@@ -32,7 +32,9 @@ describe("tool card", () => {
   });
 
   it("renders a fallback for tools without a logo asset", () => {
-    const withoutLogo = tools.find((tool) => !tool.url.includes("chatgpt"));
+    const withoutLogo = tools.find(
+      (tool) => !tool.links.website.includes("chatgpt"),
+    );
     if (!withoutLogo) throw new Error("dataset unexpectedly empty");
 
     // 直接渲染一个 logo 缺失的最小工具，验证首字母占位。

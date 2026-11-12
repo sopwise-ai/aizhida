@@ -3,6 +3,34 @@ import { describe, expect, it } from "vitest";
 import { getToolLogo } from "./tool-logos";
 import { getTool, toolSchema, tools } from "./tools";
 
+const minimalTool = {
+  id: "x-tool",
+  name: "X Tool",
+  vendorId: "openai",
+  categories: ["writing"],
+  type: "app",
+  platforms: ["web"],
+  pricing: "free",
+  openSource: false,
+  status: "active",
+  tagline: "一个足够长的说明文字，用来描述这个工具。",
+  description: "这是一段用于测试 schema 的详情描述。".repeat(10),
+  features: ["chat", "rewrite"],
+  keywords: ["测试"],
+  links: {
+    website: "https://example.com",
+    github: null,
+    docs: null,
+    pricing: null,
+    store: null,
+  },
+  affiliateUrl: null,
+  sponsored: false,
+  addedAt: "2026-11-11",
+  updatedAt: "2026-11-11",
+  verifiedAt: "2026-11-11",
+};
+
 describe("tools dataset", () => {
   it("parses every tool against the zod schema", () => {
     expect(tools.length).toBeGreaterThan(0);
@@ -13,6 +41,14 @@ describe("tools dataset", () => {
     expect(ids.size).toBe(tools.length);
   });
 
+  it("has unique canonical websites", () => {
+    const sites = tools.map((tool) => {
+      const url = new URL(tool.links.website);
+      return `${url.hostname.replace(/^www\./, "")}${url.pathname.replace(/\/+$/, "")}`;
+    });
+    expect(new Set(sites).size).toBe(tools.length);
+  });
+
   it("has a logo asset for most tools", () => {
     const withLogo = tools.filter((tool) => getToolLogo(tool.id));
     // 允许少量工具缺少 logo，但缺图比例不能过高（阈值按当前数据放宽）。
@@ -21,7 +57,27 @@ describe("tools dataset", () => {
 
   it("only uses https urls", () => {
     for (const tool of tools) {
-      expect(tool.url).toMatch(/^https:\/\//);
+      expect(tool.links.website).toMatch(/^https:\/\//);
+      for (const link of Object.values(tool.links)) {
+        if (link) expect(link).toMatch(/^https:\/\//);
+      }
+    }
+  });
+
+  it("keeps descriptions within the detail-page budget", () => {
+    for (const tool of tools) {
+      expect(tool.tagline.length).toBeLessThanOrEqual(60);
+      expect(tool.description.length).toBeGreaterThanOrEqual(120);
+      expect(tool.description.length).toBeLessThanOrEqual(300);
+      expect(tool.features.length).toBeGreaterThanOrEqual(2);
+      expect(tool.features.length).toBeLessThanOrEqual(6);
+    }
+  });
+
+  it("dates stay coherent", () => {
+    for (const tool of tools) {
+      expect(tool.addedAt <= tool.updatedAt).toBe(true);
+      expect(tool.verifiedAt <= tool.updatedAt).toBe(true);
     }
   });
 
@@ -30,17 +86,32 @@ describe("tools dataset", () => {
     expect(getTool("does-not-exist")).toBeUndefined();
   });
 
+  it("accepts a well-formed v2 record", () => {
+    expect(toolSchema.safeParse(minimalTool).success).toBe(true);
+  });
+
   it("rejects non-https submissions", () => {
     const result = toolSchema.safeParse({
-      id: "x-tool",
-      name: "X",
-      url: "http://example.com",
-      desc: "一个足够长的说明文字。",
-      categories: ["writing"],
-      pricing: "free",
-      openSource: false,
-      platform: "web",
-      tags: ["测试"],
+      ...minimalTool,
+      links: { ...minimalTool.links, website: "http://example.com" },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects unknown enum values", () => {
+    expect(
+      toolSchema.safeParse({ ...minimalTool, type: "banana" }).success,
+    ).toBe(false);
+    expect(
+      toolSchema.safeParse({ ...minimalTool, features: ["not-a-feature"] })
+        .success,
+    ).toBe(false);
+  });
+
+  it("rejects descriptions that are too short", () => {
+    const result = toolSchema.safeParse({
+      ...minimalTool,
+      description: "太短了。",
     });
     expect(result.success).toBe(false);
   });
