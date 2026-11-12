@@ -5,6 +5,8 @@
   "ignoreIssues": {
     "components/ui/*.tsx": ["exports"],
   },
+  // 新增的 shadcn 原语先行入库，页面随后的改版会引用。
+  "ignore": ["components/ui/card.tsx", "components/ui/skeleton.tsx"],
   // shadcn CLI 经 pnpm exec 手动调用，knip 静态分析看不到。
   "ignoreDependencies": ["shadcn"],
 }
