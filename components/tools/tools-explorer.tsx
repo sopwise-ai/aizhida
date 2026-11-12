@@ -19,8 +19,15 @@ import {
 } from "react";
 import { toast } from "sonner";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -131,8 +138,8 @@ function FeaturedPanel({ tools }: { tools: Tool[] }) {
   const primaryLogo = getToolLogo(primary.id);
 
   return (
-    <div className="border-border bg-background w-full max-w-[420px] rounded-2xl border p-2 shadow-[0_0_0_1px_rgba(25,23,33,0.03),0_1px_2px_rgba(25,23,33,0.04)] lg:ml-auto">
-      <div className="border-border bg-card overflow-hidden rounded-xl border">
+    <div className="border-border bg-card w-full max-w-[420px] rounded-2xl border p-2 shadow-[0_0_0_1px_rgba(25,23,33,0.03),0_24px_60px_-30px_rgba(76,29,149,0.18)] lg:ml-auto">
+      <div className="border-border bg-card/90 overflow-hidden rounded-xl border backdrop-blur">
         <div className="border-border flex items-center justify-between border-b px-4 py-3">
           <span className="text-muted-foreground font-mono text-[9px] tracking-[0.16em] uppercase">
             本期精选
@@ -170,12 +177,17 @@ function FeaturedPanel({ tools }: { tools: Tool[] }) {
               )}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-brand font-mono text-[9px] tracking-[0.12em]">
+              <p className="bg-brand-soft text-brand inline-flex h-5 items-center rounded-md px-1.5 text-[10px] font-medium tracking-[0.06em]">
                 编辑推荐
               </p>
-              <h2 className="mt-0.5 truncate text-[18px] font-semibold tracking-[-0.025em]">
+              <h2 className="mt-1.5 truncate text-[18px] font-semibold tracking-[-0.025em]">
                 {primary.name}
               </h2>
+              <p className="text-muted-foreground mt-0.5 truncate text-[11px]">
+                {categoryLabel(primary.categories[0] ?? "productivity")} ·{" "}
+                {pricingLabel(primary.pricing)}
+                {primary.openSource ? " · 开源" : ""}
+              </p>
             </div>
             <ArrowUpRight
               aria-hidden
@@ -185,24 +197,10 @@ function FeaturedPanel({ tools }: { tools: Tool[] }) {
           <p className="text-muted-foreground mt-3 line-clamp-2 text-[13px] leading-5">
             {primary.desc}
           </p>
-          <div className="border-border mt-3 flex items-center justify-between gap-3 border-t pt-3">
-            <span className="text-muted-foreground flex items-center gap-1.5 text-[11px]">
-              {categoryLabel(primary.categories[0] ?? "productivity")}
-              <span className="text-border" aria-hidden>
-                /
-              </span>
-              <Badge
-                variant="secondary"
-                className={cn(
-                  "h-5 rounded-md px-1.5 text-[10px]",
-                  primary.pricing === "free" && "bg-brand-soft text-brand",
-                )}
-              >
-                {pricingLabel(primary.pricing)}
-              </Badge>
-            </span>
-            <span className="text-muted-foreground text-[11px]">
-              打开官网 ↗
+          <div className="border-border mt-3 flex items-center justify-end gap-3 border-t pt-3">
+            <span className="bg-primary text-primary-foreground group-hover:bg-brand inline-flex h-7 items-center gap-1 rounded-md px-2 text-[11px] font-medium transition-colors">
+              打开官网
+              <ArrowUpRight className="size-3" aria-hidden />
             </span>
           </div>
         </a>
@@ -237,8 +235,11 @@ function FeaturedPanel({ tools }: { tools: Tool[] }) {
                 <span className="min-w-0 flex-1 truncate text-[13px] font-medium">
                   {tool.name}
                 </span>
-                <span className="text-muted-foreground text-[10px]">
+                <span className="text-muted-foreground hidden text-[10px] sm:inline">
                   {categoryLabel(tool.categories[0] ?? "productivity")}
+                </span>
+                <span className="text-muted-foreground text-[10px]">
+                  {pricingLabel(tool.pricing)}
                 </span>
                 <ArrowUpRight
                   className="text-muted-foreground size-3"
@@ -464,11 +465,18 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
           <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
             <div className="lg:col-span-7">
               <span className="border-border bg-background/70 text-muted-foreground inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[12px] backdrop-blur">
-                <span className="bg-brand size-1.5 rounded-full" aria-hidden />
+                <span
+                  className="bg-brand relative flex size-1.5 rounded-full"
+                  aria-hidden
+                >
+                  <span className="bg-brand absolute inset-0 animate-ping rounded-full opacity-60" />
+                </span>
                 人工编排 · 无需登录
               </span>
-              <h1 className="display-title text-foreground mt-5 text-[clamp(1.9rem,9.5vw,3.75rem)] leading-[1.06] font-bold tracking-[-0.02em]">
-                只收王牌，一键直达
+              <h1 className="display-title text-foreground mt-5 text-[clamp(2.1rem,8vw,4.25rem)] leading-[1.04] font-bold tracking-[-0.035em]">
+                只收<span className="text-gradient">王牌</span>，
+                <br />
+                一键直达
               </h1>
               <p className="text-muted-foreground mt-4 max-w-[34rem] text-[14px] leading-6 text-pretty sm:text-[15px] sm:leading-7">
                 精选真正值得用的 AI
@@ -476,7 +484,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
               </p>
 
               <div className="relative mt-7 max-w-[560px]">
-                <div className="border-border bg-card focus-within:ring-brand/35 focus-within:ring-offset-background relative flex h-14 items-center rounded-xl border shadow-[0_24px_60px_-30px_rgba(15,23,42,0.35)] transition-shadow focus-within:ring-2 focus-within:ring-offset-2">
+                <div className="border-border bg-card focus-within:ring-brand/35 focus-within:ring-offset-background focus-within:border-brand/50 relative flex h-14 items-center rounded-xl border shadow-[0_24px_60px_-30px_rgba(15,23,42,0.35)] transition-[border-color,box-shadow] focus-within:shadow-[0_24px_70px_-28px_var(--brand-soft)] focus-within:ring-2 focus-within:ring-offset-2">
                   <Search
                     className="text-muted-foreground pointer-events-none absolute left-4 size-4"
                     aria-hidden
@@ -529,7 +537,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
               <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px]">
                 <a
                   href="#all-tools"
-                  className="text-foreground hover:text-brand focus-visible:ring-brand/35 inline-flex items-center gap-1.5 font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                  className="border-border bg-card hover:border-brand/40 focus-visible:ring-brand/35 inline-flex h-8 items-center gap-1.5 rounded-full border px-3.5 font-medium shadow-xs transition-colors focus-visible:ring-2 focus-visible:outline-none"
                 >
                   浏览全部工具
                   <ArrowDown className="size-3.5" aria-hidden />
@@ -561,6 +569,47 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
           </div>
         </div>
       </section>
+
+      {tools.length > 8 ? (
+        <div
+          aria-hidden
+          className="border-border relative overflow-hidden border-b py-5"
+        >
+          <div className="from-background pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r to-transparent" />
+          <div className="from-background pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l to-transparent" />
+          <div className="animate-marquee flex w-max items-center gap-3">
+            {tools
+              .slice(0, 16)
+              .flatMap((tool) => [tool, tool])
+              .map((tool) => {
+                const logo = getToolLogo(tool.id);
+                return (
+                  <span
+                    key={tool.id}
+                    className="border-border bg-card flex size-10 shrink-0 items-center justify-center rounded-xl border shadow-xs"
+                  >
+                    {logo ? (
+                      // biome-ignore lint/performance/noImgElement: local brand mark
+                      <img
+                        src={logo}
+                        alt=""
+                        width={20}
+                        height={20}
+                        loading="lazy"
+                        decoding="async"
+                        className="size-5 object-contain"
+                      />
+                    ) : (
+                      <span className="text-muted-foreground text-[11px] font-semibold">
+                        {tool.name.slice(0, 1)}
+                      </span>
+                    )}
+                  </span>
+                );
+              })}
+          </div>
+        </div>
+      ) : null}
 
       <section
         id="all-tools"
@@ -746,8 +795,11 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
         </div>
 
         <div className="mt-4 flex items-center justify-between gap-4">
-          <h2 className="text-[18px] font-semibold tracking-[-0.02em]">
+          <h2 className="flex items-center gap-2.5 text-[18px] font-semibold tracking-[-0.02em]">
             {resultLabel}
+            <span className="bg-brand-soft text-brand inline-flex h-5 items-center rounded-md px-1.5 font-mono text-[11px] font-medium tabular-nums">
+              {filtered.length}
+            </span>
           </h2>
           <p className="text-muted-foreground text-[11px] tabular-nums">
             {filtered.length} 个工具
@@ -767,17 +819,19 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
             </p>
           </>
         ) : (
-          <div className="border-border mt-5 rounded-xl border border-dashed py-20 text-center">
-            <span className="border-border text-muted-foreground mx-auto flex size-12 items-center justify-center rounded-full border">
-              <SearchX className="size-5" aria-hidden />
-            </span>
-            <h2 className="mt-5 text-[17px] font-semibold">
-              没有找到匹配的工具
-            </h2>
-            <p className="text-muted-foreground mx-auto mt-2 max-w-sm text-[13px] leading-6">
-              换一个关键词，或者从下面这些常用筛选重新开始。
-            </p>
-            <div className="mt-5 flex flex-wrap justify-center gap-1.5">
+          <Empty className="border-border bg-card/50 mt-5 min-h-80 rounded-xl border border-dashed py-16">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <SearchX className="size-4" aria-hidden />
+              </EmptyMedia>
+              <EmptyTitle className="text-[16px] font-semibold">
+                没有找到匹配的工具
+              </EmptyTitle>
+              <EmptyDescription>
+                换一个关键词，或者从下面这些常用筛选重新开始。
+              </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent className="flex-row flex-wrap justify-center">
               {SEARCH_SUGGESTIONS.map((suggestion) => (
                 <button
                   key={suggestion.label}
@@ -786,22 +840,22 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
                     resetFilters();
                     applySuggestion(suggestion);
                   }}
-                  className="border-border bg-card text-muted-foreground hover:border-brand/30 hover:text-foreground rounded-lg border px-3 py-1.5 text-[12px] transition-colors"
+                  className="border-border bg-card text-muted-foreground hover:border-brand/40 hover:text-brand rounded-lg border px-3 py-1.5 text-[12px] transition-colors"
                 >
                   {suggestion.label}
                 </button>
               ))}
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={resetFilters}
-              className="mt-5"
-            >
-              清除全部筛选
-            </Button>
-          </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={resetFilters}
+                className="mt-1"
+              >
+                清除全部筛选
+              </Button>
+            </EmptyContent>
+          </Empty>
         )}
       </section>
     </div>

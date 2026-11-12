@@ -12,6 +12,14 @@ import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSet,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -267,240 +275,242 @@ ${json}
         }}
         noValidate
       >
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label
-              htmlFor="tool-name"
-              className="text-foreground text-[12px] font-medium"
-            >
-              工具名称 <span className="text-brand">*</span>
-            </label>
-            <Input
-              id="tool-name"
-              value={form.name}
-              onChange={(event) => setField("name", event.target.value)}
-              placeholder="例如 Cursor"
-              aria-invalid={Boolean(errors.name)}
-              aria-describedby={errors.name ? "name-error" : undefined}
-              className={cn("mt-1.5", fieldClass(Boolean(errors.name)))}
-              autoComplete="off"
-              spellCheck={false}
+        <FieldGroup>
+          <FieldSet>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field data-invalid={Boolean(errors.name) || undefined}>
+                <FieldLabel htmlFor="tool-name">
+                  工具名称 <span className="text-brand">*</span>
+                </FieldLabel>
+                <Input
+                  id="tool-name"
+                  value={form.name}
+                  onChange={(event) => setField("name", event.target.value)}
+                  placeholder="例如 Cursor"
+                  aria-invalid={Boolean(errors.name)}
+                  aria-describedby={errors.name ? "name-error" : undefined}
+                  className={cn("mt-1.5", fieldClass(Boolean(errors.name)))}
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+                {errors.name ? (
+                  <FieldError id="name-error">{errors.name}</FieldError>
+                ) : null}
+              </Field>
+
+              <Field data-invalid={Boolean(errors.url) || undefined}>
+                <FieldLabel htmlFor="tool-url">
+                  官网地址 <span className="text-brand">*</span>
+                </FieldLabel>
+                <Input
+                  id="tool-url"
+                  type="url"
+                  inputMode="url"
+                  value={form.url}
+                  onChange={(event) => setField("url", event.target.value)}
+                  placeholder="https://example.com"
+                  aria-invalid={Boolean(errors.url)}
+                  aria-describedby={errors.url ? "url-error" : undefined}
+                  className={cn("mt-1.5", fieldClass(Boolean(errors.url)))}
+                  autoComplete="url"
+                  spellCheck={false}
+                />
+                {errors.url ? (
+                  <FieldError id="url-error">{errors.url}</FieldError>
+                ) : null}
+              </Field>
+            </div>
+          </FieldSet>
+
+          <Field data-invalid={Boolean(errors.desc) || undefined}>
+            <div className="flex items-center justify-between gap-2">
+              <FieldLabel htmlFor="tool-desc">
+                一句话说明 <span className="text-brand">*</span>
+              </FieldLabel>
+              <span className="text-muted-foreground font-mono text-[10px] tabular-nums">
+                {form.desc.trim().length}/60
+              </span>
+            </div>
+            <Textarea
+              id="tool-desc"
+              value={form.desc}
+              onChange={(event) => setField("desc", event.target.value)}
+              placeholder="它解决什么问题？例如：内置 AI 的代码编辑器，可对话式修改项目。"
+              maxLength={60}
+              rows={3}
+              aria-invalid={Boolean(errors.desc)}
+              aria-describedby={errors.desc ? "desc-error" : undefined}
+              className={cn(
+                "border-border bg-background mt-1.5 min-h-20 rounded-lg text-[13px] shadow-none",
+                errors.desc &&
+                  "border-destructive focus-visible:border-destructive",
+              )}
             />
-            {errors.name ? (
-              <p id="name-error" className="text-destructive mt-1 text-[11px]">
-                {errors.name}
-              </p>
+            {errors.desc ? (
+              <FieldError id="desc-error">{errors.desc}</FieldError>
             ) : null}
-          </div>
+          </Field>
 
-          <div>
-            <label
-              htmlFor="tool-url"
-              className="text-foreground text-[12px] font-medium"
-            >
-              官网地址 <span className="text-brand">*</span>
-            </label>
-            <Input
-              id="tool-url"
-              type="url"
-              inputMode="url"
-              value={form.url}
-              onChange={(event) => setField("url", event.target.value)}
-              placeholder="https://example.com"
-              aria-invalid={Boolean(errors.url)}
-              aria-describedby={errors.url ? "url-error" : undefined}
-              className={cn("mt-1.5", fieldClass(Boolean(errors.url)))}
-              autoComplete="url"
-              spellCheck={false}
-            />
-            {errors.url ? (
-              <p id="url-error" className="text-destructive mt-1 text-[11px]">
-                {errors.url}
-              </p>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <div className="flex items-center justify-between gap-2">
-            <label
-              htmlFor="tool-desc"
-              className="text-foreground text-[12px] font-medium"
-            >
-              一句话说明 <span className="text-brand">*</span>
-            </label>
-            <span className="text-muted-foreground font-mono text-[10px] tabular-nums">
-              {form.desc.trim().length}/60
-            </span>
-          </div>
-          <Textarea
-            id="tool-desc"
-            value={form.desc}
-            onChange={(event) => setField("desc", event.target.value)}
-            placeholder="它解决什么问题？例如：内置 AI 的代码编辑器，可对话式修改项目。"
-            maxLength={60}
-            rows={3}
-            aria-invalid={Boolean(errors.desc)}
-            aria-describedby={errors.desc ? "desc-error" : undefined}
-            className={cn(
-              "border-border bg-background mt-1.5 min-h-20 rounded-lg text-[13px] shadow-none",
-              errors.desc &&
-                "border-destructive focus-visible:border-destructive",
-            )}
-          />
-          {errors.desc ? (
-            <p id="desc-error" className="text-destructive mt-1 text-[11px]">
-              {errors.desc}
-            </p>
-          ) : null}
-        </div>
-
-        <fieldset
-          className="mt-4 border-0 p-0"
-          aria-describedby={errors.categories ? "categories-error" : undefined}
-        >
-          <legend className="sr-only">工具分类</legend>
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-foreground text-[12px] font-medium">
-              分类 <span className="text-brand">*</span>
-            </p>
-            <span className="text-muted-foreground text-[10px]">最多 2 个</span>
-          </div>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {CATEGORIES.map((category) => {
-              const active = form.categories.includes(category.value);
-              const disabled = !active && form.categories.length >= 2;
-              return (
-                <button
-                  key={category.value}
-                  id={`tool-category-${category.value}`}
-                  type="button"
-                  aria-pressed={active}
-                  aria-invalid={Boolean(errors.categories)}
-                  aria-describedby={
-                    errors.categories ? "categories-error" : undefined
-                  }
-                  disabled={disabled}
-                  onClick={() => toggleCategory(category.value)}
-                  className={cn(
-                    "focus-visible:ring-brand/35 h-9 rounded-lg border px-2.5 text-[12px] transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-40",
-                    active
-                      ? "border-brand/40 bg-brand-soft text-brand"
-                      : "border-border bg-background text-muted-foreground hover:border-brand/30 hover:text-foreground",
-                  )}
-                >
-                  {category.label}
-                </button>
-              );
-            })}
-          </div>
-          {errors.categories ? (
-            <p
-              id="categories-error"
-              role="alert"
-              className="text-destructive mt-1 text-[11px]"
-            >
-              {errors.categories}
-            </p>
-          ) : null}
-        </fieldset>
-
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div>
-            <label
-              htmlFor="tool-pricing"
-              className="text-foreground text-[12px] font-medium"
-            >
-              定价
-            </label>
-            <Select
-              value={form.pricing}
-              onValueChange={(value) => setField("pricing", value as Pricing)}
-            >
-              <SelectTrigger
-                id="tool-pricing"
-                aria-label="定价"
-                className="border-border bg-background mt-1.5 h-10 w-full rounded-lg text-[13px] shadow-none"
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {PRICING_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <label
-              htmlFor="tool-platform"
-              className="text-foreground text-[12px] font-medium"
-            >
-              主平台
-            </label>
-            <Select
-              value={form.platform}
-              onValueChange={(value) => setField("platform", value as Platform)}
-            >
-              <SelectTrigger
-                id="tool-platform"
-                aria-label="主平台"
-                className="border-border bg-background mt-1.5 h-10 w-full rounded-lg text-[13px] shadow-none"
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {PLATFORM_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <label
-            htmlFor="tool-tags"
-            className="text-foreground text-[12px] font-medium"
+          <FieldSet
+            aria-describedby={
+              errors.categories ? "categories-error" : undefined
+            }
           >
-            检索关键词
-          </label>
-          <Input
-            id="tool-tags"
-            value={form.tags}
-            onChange={(event) => setField("tags", event.target.value)}
-            placeholder="例如：代码补全, 编辑器, AI"
-            className={cn("mt-1.5", fieldClass(false))}
-            autoComplete="off"
-          />
-          <p className="text-muted-foreground mt-1 text-[10px]">
-            用逗号分隔，最多 5 个；用于站内搜索。
-          </p>
-        </div>
+            <div className="flex items-center justify-between gap-2">
+              <FieldLabel>
+                分类 <span className="text-brand">*</span>
+              </FieldLabel>
+              <span className="text-muted-foreground text-[10px]">
+                最多 2 个
+              </span>
+            </div>
+            <div className="mt-1 flex flex-wrap gap-1.5">
+              {CATEGORIES.map((category) => {
+                const active = form.categories.includes(category.value);
+                const disabled = !active && form.categories.length >= 2;
+                return (
+                  <button
+                    key={category.value}
+                    id={`tool-category-${category.value}`}
+                    type="button"
+                    aria-pressed={active}
+                    aria-invalid={Boolean(errors.categories)}
+                    aria-describedby={
+                      errors.categories ? "categories-error" : undefined
+                    }
+                    disabled={disabled}
+                    onClick={() => toggleCategory(category.value)}
+                    className={cn(
+                      "focus-visible:ring-brand/35 h-9 rounded-lg border px-2.5 text-[12px] transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-40",
+                      active
+                        ? "border-brand/40 bg-brand-soft text-brand"
+                        : "border-border bg-background text-muted-foreground hover:border-brand/30 hover:text-foreground",
+                    )}
+                  >
+                    {category.label}
+                  </button>
+                );
+              })}
+            </div>
+            {errors.categories ? (
+              <FieldError id="categories-error" role="alert">
+                {errors.categories}
+              </FieldError>
+            ) : null}
+          </FieldSet>
 
-        <label className="border-border bg-background mt-4 flex cursor-pointer items-start gap-2.5 rounded-lg border p-3">
-          <input
-            type="checkbox"
-            checked={form.openSource}
-            onChange={(event) => setField("openSource", event.target.checked)}
-            className="mt-0.5 size-4 accent-[var(--brand)]"
-          />
-          <span>
-            <span className="block text-[12px] font-medium">
-              这个工具是开源的
-            </span>
-            <span className="text-muted-foreground mt-0.5 block text-[10px] leading-4">
-              仅在官网或仓库明确提供开放源代码时勾选。
-            </span>
-          </span>
-        </label>
+          <FieldSet>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field>
+                <FieldLabel htmlFor="tool-pricing">定价</FieldLabel>
+                <Select
+                  value={form.pricing}
+                  onValueChange={(value) =>
+                    setField("pricing", value as Pricing)
+                  }
+                >
+                  <SelectTrigger
+                    id="tool-pricing"
+                    aria-label="定价"
+                    className="border-border bg-background mt-1.5 h-10 w-full rounded-lg text-[13px] shadow-none"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PRICING_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FieldDescription>
+                  {PRICING_OPTIONS.find((o) => o.value === form.pricing)?.hint}
+                </FieldDescription>
+              </Field>
 
-        <div className="border-border mt-5 flex flex-wrap items-center gap-2 border-t pt-4">
-          <Button type="submit" size="sm" className="h-10 rounded-lg px-4">
+              <Field>
+                <FieldLabel htmlFor="tool-platform">主平台</FieldLabel>
+                <Select
+                  value={form.platform}
+                  onValueChange={(value) =>
+                    setField("platform", value as Platform)
+                  }
+                >
+                  <SelectTrigger
+                    id="tool-platform"
+                    aria-label="主平台"
+                    className="border-border bg-background mt-1.5 h-10 w-full rounded-lg text-[13px] shadow-none"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PLATFORM_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FieldDescription>
+                  {
+                    PLATFORM_OPTIONS.find((o) => o.value === form.platform)
+                      ?.label
+                  }{" "}
+                  是最主要的使用方式
+                </FieldDescription>
+              </Field>
+            </div>
+          </FieldSet>
+
+          <Field>
+            <FieldLabel htmlFor="tool-tags">检索关键词</FieldLabel>
+            <Input
+              id="tool-tags"
+              value={form.tags}
+              onChange={(event) => setField("tags", event.target.value)}
+              placeholder="例如：代码补全, 编辑器, AI"
+              className={cn("mt-1.5", fieldClass(false))}
+              autoComplete="off"
+            />
+            <FieldDescription>
+              用逗号分隔，最多 5 个；用于站内搜索。
+            </FieldDescription>
+          </Field>
+
+          <Field orientation="horizontal">
+            <FieldLabel
+              htmlFor="tool-open-source"
+              className="border-border bg-background w-full cursor-pointer items-start gap-2.5 rounded-lg border p-3"
+            >
+              <input
+                id="tool-open-source"
+                type="checkbox"
+                checked={form.openSource}
+                onChange={(event) =>
+                  setField("openSource", event.target.checked)
+                }
+                className="mt-0.5 size-4 accent-[var(--brand)]"
+              />
+              <span className="flex flex-col gap-0.5">
+                <span className="text-[12px] font-medium">
+                  这个工具是开源的
+                </span>
+                <span className="text-muted-foreground block text-[10px] leading-4 font-normal">
+                  仅在官网或仓库明确提供开放源代码时勾选。
+                </span>
+              </span>
+            </FieldLabel>
+          </Field>
+        </FieldGroup>
+
+        <div className="border-border mt-4 flex flex-wrap items-center gap-2 border-t pt-4">
+          <Button
+            type="submit"
+            size="sm"
+            className="h-10 rounded-lg px-4"
+            aria-label="校验表单并复制 JSON"
+          >
             {copied ? (
               <Check className="size-3.5" aria-hidden />
             ) : (
@@ -543,7 +553,7 @@ ${json}
         </div>
         <div className="border-border bg-card mt-2 rounded-xl border p-4 shadow-[0_1px_2px_rgba(15,23,42,0.035)]">
           <div className="flex items-start gap-3">
-            <span className="border-border bg-muted/50 flex size-10 shrink-0 items-center justify-center rounded-lg border text-[12px] font-semibold">
+            <span className="border-border bg-background flex size-10 shrink-0 items-center justify-center rounded-lg border text-[12px] font-semibold">
               {(form.name.trim() || "A").slice(0, 1)}
             </span>
             <div className="min-w-0 flex-1">
@@ -562,20 +572,28 @@ ${json}
             </div>
           </div>
           <div className="border-border mt-3 flex items-center justify-between gap-3 border-t pt-3 text-[11px]">
-            <span className="text-muted-foreground flex items-center gap-1.5">
-              {form.categories.length
-                ? form.categories.map(categoryLabel).join(" / ")
-                : "分类"}
-              <span className="text-border" aria-hidden>
-                /
+            <span className="text-muted-foreground flex min-w-0 items-center gap-1.5">
+              <span className="border-border bg-muted/50 text-muted-foreground inline-flex h-5 items-center rounded-md border px-1.5 font-medium">
+                {form.categories.length
+                  ? categoryLabel(form.categories[0] as Category)
+                  : "分类"}
               </span>
-              {pricingLabel(form.pricing)}
-              <span className="text-border" aria-hidden>
-                /
+              <span
+                className={
+                  form.pricing === "free"
+                    ? "bg-brand-soft text-brand inline-flex h-5 items-center rounded-md px-1.5 font-medium"
+                    : undefined
+                }
+              >
+                {pricingLabel(form.pricing)}
               </span>
-              {platformLabel(form.platform)}
+              {form.openSource ? (
+                <span className="border-border bg-background text-muted-foreground inline-flex h-5 items-center rounded-md border px-1.5">
+                  开源
+                </span>
+              ) : null}
             </span>
-            <span className="text-muted-foreground max-w-[38%] truncate font-mono text-[10px]">
+            <span className="text-muted-foreground max-w-[38%] shrink-0 truncate text-[11px]">
               {form.url
                 ? (() => {
                     try {
@@ -594,7 +612,7 @@ ${json}
             <ShieldCheck className="text-brand size-3.5" aria-hidden />
             提交前自检
           </p>
-          <ul className="text-muted-foreground mt-2 space-y-1.5 text-[11px] leading-5">
+          <ul className="text-muted-foreground mt-2 flex flex-col gap-1.5 text-[11px] leading-5">
             <li>官网能打开，且不是聚合页或镜像站。</li>
             <li>说明写「它能做什么」，不写「最强」「第一」。</li>
             <li>分类最多两个，定价与开源状态可核验。</li>

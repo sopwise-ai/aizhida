@@ -1,7 +1,12 @@
-import { ArrowUpRight, LockKeyhole, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, Ban, LockKeyhole, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-
+import {
+  Alert,
+  AlertAction,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
 import { DATA_UPDATED_LABEL, SITE_NAME } from "@/lib/site";
 import { tools } from "@/lib/tools";
@@ -55,8 +60,8 @@ export default function AboutPage() {
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
       <div className="max-w-3xl">
         <p className="eyebrow">收录标准 · Curated by humans</p>
-        <h1 className="display-title mt-4 text-4xl font-bold tracking-[-0.045em] sm:text-5xl">
-          只收王牌， 不收垃圾。
+        <h1 className="display-title text-foreground mt-4 text-4xl font-bold tracking-[-0.045em] sm:text-5xl">
+          只收<span className="text-gradient">王牌</span>， 不收垃圾。
         </h1>
         <p className="text-muted-foreground mt-5 max-w-2xl text-[15px] leading-7">
           {SITE_NAME} 目前收录 {tools.length} 个 AI
@@ -64,7 +69,7 @@ export default function AboutPage() {
         </p>
       </div>
 
-      <dl className="border-border bg-border mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-xl border sm:grid-cols-4">
+      <dl className="border-border bg-border mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-xl border shadow-sm sm:grid-cols-4">
         {stats.map((item) => (
           <div key={item.label} className="bg-card px-4 py-4">
             <dd className="font-mono text-xl font-medium tracking-[-0.03em] tabular-nums">
@@ -104,19 +109,22 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="border-border bg-card mt-3 rounded-xl border p-6 sm:p-8">
+      <section className="border-border bg-card mt-3 rounded-xl border p-6 shadow-sm sm:p-8">
         <h2 className="text-[17px] font-semibold tracking-[-0.02em]">
           明确不收录
         </h2>
         <ul className="text-muted-foreground mt-4 grid gap-2 text-[13px] leading-6 sm:grid-cols-2">
           {rejected.map((item) => (
             <li key={item} className="flex items-start gap-2">
-              <span className="bg-brand mt-2.5 size-1 shrink-0 rounded-full" />
+              <Ban
+                className="text-destructive/70 mt-1 size-3.5 shrink-0"
+                aria-hidden
+              />
               {item}
             </li>
           ))}
         </ul>
-        <p className="text-muted-foreground mt-5 text-[11px] leading-5">
+        <p className="text-muted-foreground border-border/70 mt-5 border-t pt-4 text-[11px] leading-5">
           本站没有任何付费收录、广告位或返佣链接。排序是人工编排，不代表热度排名。
         </p>
       </section>
@@ -127,7 +135,7 @@ export default function AboutPage() {
           className="border-border bg-card scroll-mt-24 rounded-xl border p-5"
         >
           <h2 className="text-sm font-semibold">数据口径</h2>
-          <ul className="text-muted-foreground mt-3 space-y-2 text-[12px] leading-6">
+          <ul className="text-muted-foreground mt-3 flex flex-col gap-2 text-[12px] leading-6">
             <li>定价只标主要档位：免费、免费增值、付费、试用。</li>
             <li>平台只标最主要的使用方式；多端产品可能有取舍。</li>
             <li>不展示无法核验的 Star 数或热度排名。</li>
@@ -142,7 +150,7 @@ export default function AboutPage() {
             <LockKeyhole className="size-3.5" aria-hidden />
             隐私说明
           </h2>
-          <ul className="text-muted-foreground mt-3 space-y-2 text-[12px] leading-6">
+          <ul className="text-muted-foreground mt-3 flex flex-col gap-2 text-[12px] leading-6">
             <li>免费使用，无需注册或登录即可浏览、搜索和筛选。</li>
             <li>搜索与筛选在浏览器本地完成，不上报使用数据。</li>
             <li>本站不接入第三方统计，也不设置广告 Cookie。</li>
@@ -151,21 +159,22 @@ export default function AboutPage() {
         </section>
       </div>
 
-      <div className="border-border bg-muted/30 mt-3 flex flex-col gap-3 rounded-xl border p-6 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm font-semibold">发现了一个值得收录的工具？</p>
-          <p className="text-muted-foreground mt-1 text-[12px] leading-5">
-            按提交页的模板准备信息，我们会按上面的标准核验。
-          </p>
-        </div>
-        <Link
-          href="/submit"
-          className={buttonVariants({ variant: "outline", size: "sm" })}
-        >
-          去提交
-          <ArrowUpRight className="size-3.5" aria-hidden />
-        </Link>
-      </div>
+      <Alert className="border-border bg-muted/30 mt-3 rounded-xl py-5">
+        <ShieldCheck className="text-brand" aria-hidden />
+        <AlertTitle>发现了一个值得收录的工具？</AlertTitle>
+        <AlertDescription>
+          按提交页的模板准备信息，我们会按上面的标准核验。
+        </AlertDescription>
+        <AlertAction>
+          <Link
+            href="/submit"
+            className={buttonVariants({ variant: "outline", size: "sm" })}
+          >
+            去提交
+            <ArrowUpRight className="size-3.5" aria-hidden />
+          </Link>
+        </AlertAction>
+      </Alert>
     </div>
   );
 }

@@ -7,8 +7,12 @@ import { tools } from "@/lib/tools";
 
 export function SiteFooter() {
   return (
-    <footer className="border-border/80 bg-background border-t">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+    <footer className="border-border/80 bg-card/40 relative overflow-hidden border-t">
+      <div
+        aria-hidden
+        className="from-brand/5 pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b to-transparent"
+      />
+      <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
         <div className="grid gap-10 sm:grid-cols-[1.5fr_1fr_1fr]">
           <div className="max-w-sm">
             <Link
@@ -28,13 +32,13 @@ export function SiteFooter() {
             </p>
           </div>
 
-          <div>
+          <nav aria-label="站点导航">
             <p className="eyebrow">站点</p>
-            <ul className="mt-4 space-y-2.5 text-[13px]">
+            <ul className="mt-4 flex flex-col gap-2.5 text-[13px]">
               <li>
                 <Link
                   href="/"
-                  className="text-muted-foreground hover:text-foreground inline-flex min-h-10 items-center transition-colors"
+                  className="text-muted-foreground hover:text-brand inline-flex min-h-9 items-center transition-colors"
                 >
                   全部工具
                 </Link>
@@ -42,7 +46,7 @@ export function SiteFooter() {
               <li>
                 <Link
                   href="/about"
-                  className="text-muted-foreground hover:text-foreground inline-flex min-h-10 items-center transition-colors"
+                  className="text-muted-foreground hover:text-brand inline-flex min-h-9 items-center transition-colors"
                 >
                   收录标准
                 </Link>
@@ -50,24 +54,24 @@ export function SiteFooter() {
               <li>
                 <Link
                   href="/submit"
-                  className="text-muted-foreground hover:text-foreground inline-flex min-h-10 items-center transition-colors"
+                  className="text-muted-foreground hover:text-brand inline-flex min-h-9 items-center transition-colors"
                 >
                   提交工具
                 </Link>
               </li>
             </ul>
-          </div>
+          </nav>
 
           <div>
             <p className="eyebrow">数据</p>
-            <ul className="text-muted-foreground mt-4 space-y-2.5 text-[13px]">
+            <ul className="text-muted-foreground mt-4 flex flex-col gap-2.5 text-[13px]">
               <li>{tools.length} 个工具</li>
               <li>6 个分类</li>
               <li>0 个广告位</li>
               <li>
                 <Link
                   href="/about#privacy"
-                  className="hover:text-foreground transition-colors"
+                  className="hover:text-brand inline-flex min-h-9 items-center transition-colors"
                 >
                   隐私说明
                 </Link>
@@ -87,7 +91,7 @@ export function SiteFooter() {
             </p>
             <a
               href="#main"
-              className="hover:text-foreground focus-visible:ring-ring/50 flex items-center gap-1 rounded-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
+              className="hover:text-brand focus-visible:ring-ring/50 -m-2 flex min-h-9 items-center gap-1 rounded-md p-2 transition-colors focus-visible:ring-2 focus-visible:outline-none"
             >
               <ArrowUp className="size-3" aria-hidden />
               回到顶部
