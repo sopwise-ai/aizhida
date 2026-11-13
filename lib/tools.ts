@@ -1,5 +1,6 @@
 import { z } from "zod";
 import rawTools from "@/data/tools.json";
+import { getToolLogo } from "./tool-logos";
 import {
   CATEGORY_VALUES,
   FEATURE_VALUES,
@@ -9,6 +10,7 @@ import {
   type Tool,
   TYPE_VALUES,
 } from "./tool-meta";
+import { type ToolSummary, toToolSummary } from "./tool-summary";
 import { vendors } from "./vendors";
 
 const httpsUrl = z
@@ -149,6 +151,14 @@ export const toolsSchema = z.array(toolSchema).superRefine((items, ctx) => {
  * 客户端组件只通过 props 拿数据，不会把 zod 带进浏览器包。
  */
 export const tools: Tool[] = toolsSchema.parse(rawTools);
+
+/**
+ * 首页与客户端交互只消费摘要：不含 description / links / 运营字段。
+ * 详情页直接读 tools。
+ */
+export const toolSummaries: ToolSummary[] = tools.map((tool) =>
+  toToolSummary(tool, getToolLogo(tool.id) ?? null),
+);
 
 const toolsById = new Map(tools.map((tool) => [tool.id, tool]));
 

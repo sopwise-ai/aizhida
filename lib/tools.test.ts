@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import { getToolLogo } from "./tool-logos";
-import { getTool, toolSchema, tools, toolsSchema } from "./tools";
+import {
+  getTool,
+  toolSchema,
+  toolSummaries,
+  tools,
+  toolsSchema,
+} from "./tools";
 
 const minimalTool = {
   id: "x-tool",
@@ -79,6 +85,21 @@ describe("tools dataset", () => {
       expect(tool.addedAt <= tool.updatedAt).toBe(true);
       expect(tool.verifiedAt <= tool.updatedAt).toBe(true);
     }
+  });
+
+  it("projects a lean summary for the client bundle", () => {
+    expect(toolSummaries).toHaveLength(tools.length);
+    const summary = toolSummaries[0];
+    const full = tools[0];
+    if (!summary || !full) throw new Error("dataset empty");
+
+    expect(summary).not.toHaveProperty("description");
+    expect(summary).not.toHaveProperty("links");
+    expect(summary.website).toBe(full.links.website);
+    // 摘要必须显著小于完整记录，否则首页又会把详情字段带上客户端。
+    expect(JSON.stringify(toolSummaries).length).toBeLessThan(
+      JSON.stringify(tools).length * 0.7,
+    );
   });
 
   it("looks tools up by id", () => {
