@@ -38,7 +38,7 @@
 - 工具详情页 `/tools/[id]`：85 个页面构建期预渲染，包含完整描述、能力标签、
   官方入口、基本信息、同类工具内链、canonical、Open Graph 与
   JSON-LD（SoftwareApplication + BreadcrumbList）；未知 id 直接 404。
-- 客户端摘要投影 `ToolSummary`（`lib/tool-summary.ts`）：首页不再把
+- 客户端摘要投影 `ToolSummary`（`lib/summary.ts`）：首页不再把
   `description`、`links`、运营字段下发到浏览器，首页 HTML 从 390KB 降到 278KB。
 - 首页增量渲染：首屏 48 张卡片，底部按批追加；筛选变化自动回到第一批，
   DOM 上限不再随工具数量线性增长。

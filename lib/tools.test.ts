@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { getToolLogo } from "./logos";
 import { FIELD_LIMITS } from "./meta";
+import { toolSchema } from "./schema";
 import {
   canonicalSiteKey,
   getTool,
-  toolSchema,
   toolSummaries,
   tools,
   toolsSchema,

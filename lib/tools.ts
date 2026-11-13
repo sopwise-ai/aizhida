@@ -8,7 +8,6 @@ import { vendors } from "./vendors";
 
 // 单条记录的 schema 在 lib/schema.ts：那里不 import 数据文件，
 // 才能被 scripts/generate-json-schema.ts 直接加载生成 JSON Schema。
-export { toolSchema };
 
 /**
  * 厂商注册表的结构与唯一性校验。放在构建期而不是只放测试：

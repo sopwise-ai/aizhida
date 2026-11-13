@@ -10,7 +10,7 @@ import {
 import { buttonVariants } from "@/components/ui/button";
 import { getToolLogo } from "@/lib/logos";
 import { CATEGORIES } from "@/lib/meta";
-import { DATA_UPDATED_LABEL, SITE_NAME } from "@/lib/site";
+import { DATA_UPDATED_AT, DATA_UPDATED_LABEL, SITE_NAME } from "@/lib/site";
 import { tools } from "@/lib/tools";
 
 export const metadata: Metadata = {
@@ -61,7 +61,7 @@ const stats = [
   { value: String(tools.length), label: "当前收录" },
   { value: String(CATEGORIES.length).padStart(2, "0"), label: "工具分类" },
   { value: "00", label: "广告位" },
-  { value: "2026.11", label: "最近整理" },
+  { value: DATA_UPDATED_AT.replace("-", "."), label: "最近整理" },
 ];
 
 export default function AboutPage() {
