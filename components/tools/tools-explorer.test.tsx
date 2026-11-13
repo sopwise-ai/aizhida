@@ -1,8 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { tools } from "@/lib/tools";
+import { toolSummaries } from "@/lib/tools";
 import { ToolsExplorer } from "./tools-explorer";
 
 vi.mock("@/components/tools/search-command", () => ({
@@ -13,6 +13,7 @@ vi.mock("@/components/tools/search-command", () => ({
 // 必须在每个用例后复位，否则上一个用例的筛选会泄漏到下一个。
 afterEach(() => {
   window.history.replaceState(null, "", "/");
+  vi.unstubAllGlobals();
 });
 
 // Radix ToggleGroup 的 roving-focus 组不会暴露 group role，直接按文本点按钮。
@@ -34,7 +35,7 @@ describe("tools explorer", () => {
       configurable: true,
     });
 
-    render(<ToolsExplorer tools={tools} />);
+    render(<ToolsExplorer tools={toolSummaries} />);
 
     // 复制入口只在有筛选条件时出现：先选中一个分类。
     await user.click(categoryButton("写作"));
@@ -49,7 +50,7 @@ describe("tools explorer", () => {
 
   it("removes a category via its filter chip", async () => {
     const user = userEvent.setup();
-    render(<ToolsExplorer tools={tools} />);
+    render(<ToolsExplorer tools={toolSummaries} />);
 
     await user.click(categoryButton("写作"));
     await user.click(
@@ -63,7 +64,7 @@ describe("tools explorer", () => {
 
   it("applies a suggestion chip from the empty state", async () => {
     const user = userEvent.setup();
-    render(<ToolsExplorer tools={tools} />);
+    render(<ToolsExplorer tools={toolSummaries} />);
 
     // 输入一个必然无结果的词触发空态。
     const search = screen.getAllByPlaceholderText(
@@ -76,8 +77,58 @@ describe("tools explorer", () => {
     expect(await screen.findByText("筛选结果")).toBeInTheDocument();
   });
 
+  it("renders the grid in batches and resets on filter change", async () => {
+    const user = userEvent.setup();
+    render(<ToolsExplorer tools={toolSummaries} />);
+
+    // 首屏只挂 24 张卡片，其余按批追加。
+    const cards = () => document.querySelectorAll('[data-slot="card"]');
+    expect(cards()).toHaveLength(24);
+
+    while (screen.queryByRole("button", { name: /再显示/ })) {
+      await user.click(screen.getByRole("button", { name: /再显示/ }));
+    }
+    expect(cards()).toHaveLength(toolSummaries.length);
+
+    await user.click(categoryButton("写作"));
+    expect(cards().length).toBeLessThanOrEqual(24);
+  });
+
+  it("auto-loads the next batch when the sentinel enters the viewport", () => {
+    const callbacks: IntersectionObserverCallback[] = [];
+
+    class MockIntersectionObserver {
+      constructor(callback: IntersectionObserverCallback) {
+        callbacks.push(callback);
+      }
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+      takeRecords() {
+        return [];
+      }
+    }
+
+    vi.stubGlobal("IntersectionObserver", MockIntersectionObserver);
+    render(<ToolsExplorer tools={toolSummaries} />);
+
+    expect(document.querySelectorAll('[data-slot="card"]')).toHaveLength(24);
+
+    const trigger = callbacks.at(-1);
+    if (!trigger) throw new Error("IntersectionObserver 未创建");
+    act(() => {
+      trigger(
+        [{ isIntersecting: true } as IntersectionObserverEntry],
+        {} as IntersectionObserver,
+      );
+    });
+
+    // 一次触底只追加一批：24 → 48。
+    expect(document.querySelectorAll('[data-slot="card"]')).toHaveLength(48);
+  });
+
   it("renders the hero, featured panel and the full grid", () => {
-    render(<ToolsExplorer tools={tools} />);
+    render(<ToolsExplorer tools={toolSummaries} />);
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
       "只收王牌，一键直达",
@@ -89,7 +140,7 @@ describe("tools explorer", () => {
 
   it("searches and flips the result headline back and forth", async () => {
     const user = userEvent.setup();
-    render(<ToolsExplorer tools={tools} />);
+    render(<ToolsExplorer tools={toolSummaries} />);
 
     const search = screen.getAllByPlaceholderText(
       "搜索所有工具…",
@@ -105,20 +156,20 @@ describe("tools explorer", () => {
 
   it("narrows results when a category is selected", async () => {
     const user = userEvent.setup();
-    render(<ToolsExplorer tools={tools} />);
+    render(<ToolsExplorer tools={toolSummaries} />);
 
     await user.click(categoryButton("写作"));
 
     expect(await screen.findByText("筛选结果")).toBeInTheDocument();
     const countText = screen.getAllByText(/\d+ 个工具/)[0] as HTMLElement;
     expect(Number.parseInt(countText.textContent ?? "0", 10)).toBeLessThan(
-      tools.length,
+      toolSummaries.length,
     );
   });
 
   it("restores everything via the 全部 tab", async () => {
     const user = userEvent.setup();
-    render(<ToolsExplorer tools={tools} />);
+    render(<ToolsExplorer tools={toolSummaries} />);
 
     await user.click(categoryButton("写作"));
     await user.click(categoryButton("全部"));
@@ -126,7 +177,7 @@ describe("tools explorer", () => {
     await screen.findAllByText("全部工具");
     const countText = screen.getAllByText(/\d+ 个工具/)[0] as HTMLElement;
     expect(Number.parseInt(countText.textContent ?? "0", 10)).toBe(
-      tools.length,
+      toolSummaries.length,
     );
   });
 });

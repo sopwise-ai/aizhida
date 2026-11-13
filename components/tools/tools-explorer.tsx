@@ -4,6 +4,7 @@ import {
   ArrowDown,
   ArrowUpRight,
   Check,
+  RefreshCw,
   Search,
   SearchX,
   Share2,
@@ -40,30 +41,40 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   filterTools,
   isCategory,
+  isFeature,
+  isPlatform,
   isPricing,
   type ToolFilters,
 } from "@/lib/filter-tools";
 import { DATA_UPDATED_LABEL } from "@/lib/site";
-import { getToolLogo } from "@/lib/tool-logos";
 import {
   CATEGORIES,
   type Category,
   categoryLabel,
+  type Feature,
+  featureLabel,
   type OpenSourceFilter,
+  type Platform,
   type Pricing,
+  platformLabel,
   pricingLabel,
-  type Tool,
 } from "@/lib/tool-meta";
+import type { ToolSummary } from "@/lib/tool-summary";
 import { cn } from "@/lib/utils";
 import { FilterSheet } from "./filter-sheet";
 import { SearchCommand } from "./search-command";
 import { ToolCard } from "./tool-card";
+import { ToolLogo } from "./tool-logo";
+
+const PAGE_SIZE = 24;
 
 const EMPTY_FILTERS: ToolFilters = {
   query: "",
   categories: [],
   pricing: "all",
   openSource: "all",
+  platforms: [],
+  features: [],
 };
 
 const SEARCH_SUGGESTIONS = [
@@ -81,6 +92,10 @@ function readFiltersFromUrl(): ToolFilters {
   const categories = categoryParam.split(",").filter(isCategory);
   const price = params.get("price");
   const source = params.get("source");
+  const platforms = (params.get("platform") ?? "")
+    .split(",")
+    .filter(isPlatform);
+  const features = (params.get("feature") ?? "").split(",").filter(isFeature);
 
   return {
     query: params.get("q") ?? "",
@@ -90,6 +105,8 @@ function readFiltersFromUrl(): ToolFilters {
       source === "yes" || source === "no"
         ? (source as OpenSourceFilter)
         : "all",
+    platforms,
+    features,
   };
 }
 
@@ -100,6 +117,10 @@ function writeFiltersToUrl(filters: ToolFilters, replace: boolean) {
     params.set("cat", filters.categories.join(","));
   if (filters.pricing !== "all") params.set("price", filters.pricing);
   if (filters.openSource !== "all") params.set("source", filters.openSource);
+  if (filters.platforms.length)
+    params.set("platform", filters.platforms.join(","));
+  if (filters.features.length)
+    params.set("feature", filters.features.join(","));
 
   const next = `${window.location.pathname}${params.size ? `?${params}` : ""}`;
   const current = `${window.location.pathname}${window.location.search}`;
@@ -121,36 +142,67 @@ function filterChipClass() {
   return "inline-flex min-h-8 items-center gap-1 rounded-md bg-accent px-2 py-1 text-[11px] leading-4 text-accent-foreground transition-colors hover:bg-muted";
 }
 
-function FeaturedPanel({ tools }: { tools: Tool[] }) {
-  const primary =
-    tools.find((tool) => tool.id === "chatgpt") ??
-    tools.find((tool) => tool.id === "cursor") ??
-    tools[0];
+const FEATURED_POOL = [
+  "chatgpt",
+  "midjourney",
+  "cursor",
+  "deepseek",
+  "claude",
+  "notion-ai",
+  "runway",
+  "perplexity",
+  "kimi",
+  "canva",
+  "elevenlabs",
+  "gamma",
+];
+
+function FeaturedPanel({ tools }: { tools: ToolSummary[] }) {
+  const [offset, setOffset] = useState(0);
+
+  const pool = useMemo(() => {
+    const picked = FEATURED_POOL.map((id) =>
+      tools.find((tool) => tool.id === id),
+    ).filter((tool): tool is ToolSummary => tool !== undefined);
+    return picked.length >= 4 ? picked : tools.slice(0, 8);
+  }, [tools]);
+
+  // 每次换 3 个，保证主推位和三条副位都换新。
+  const rotated = useMemo(
+    () => [
+      ...pool.slice(offset % pool.length),
+      ...pool.slice(0, offset % pool.length),
+    ],
+    [pool, offset],
+  );
+  const primary = rotated[0];
+  const rows = rotated.slice(1, 4);
 
   if (!primary) return null;
 
-  const rows = ["midjourney", "cursor", "deepseek"]
-    .map((id) => tools.find((tool) => tool.id === id))
-    .filter(
-      (tool): tool is Tool => tool !== undefined && tool.id !== primary.id,
-    );
-
-  const primaryLogo = getToolLogo(primary.id);
-
   return (
     <div className="border-border bg-card w-full max-w-[420px] rounded-2xl border p-2 shadow-[0_0_0_1px_rgba(25,23,33,0.03),0_24px_60px_-30px_rgba(76,29,149,0.18)] lg:ml-auto">
-      <div className="border-border bg-card/90 overflow-hidden rounded-xl border backdrop-blur">
+      <div
+        key={primary.id}
+        className="border-border bg-card/90 animate-panel-in overflow-hidden rounded-xl border backdrop-blur"
+      >
         <div className="border-border flex items-center justify-between border-b px-4 py-3">
           <span className="text-muted-foreground font-mono text-[9px] tracking-[0.16em] uppercase">
             本期精选
           </span>
-          <span className="text-muted-foreground font-mono text-[10px] tabular-nums">
-            04
-          </span>
+          <button
+            type="button"
+            onClick={() => setOffset((value) => (value + 3) % pool.length)}
+            className="text-muted-foreground hover:text-foreground focus-visible:ring-brand/35 inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] transition-colors focus-visible:ring-2 focus-visible:outline-none"
+            aria-label="换一批精选工具"
+          >
+            <RefreshCw className="size-3" aria-hidden />
+            换一批
+          </button>
         </div>
 
         <a
-          href={primary.links.website}
+          href={primary.website}
           target="_blank"
           rel="noopener noreferrer"
           className="group hover:bg-accent/30 focus-visible:ring-brand/35 relative block p-4 transition-colors focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
@@ -160,21 +212,8 @@ function FeaturedPanel({ tools }: { tools: Tool[] }) {
             className="bg-brand absolute inset-y-4 left-0 w-0.5 rounded-full"
           />
           <div className="flex items-start gap-3">
-            <span className="border-border flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-[10px] border bg-white">
-              {primaryLogo ? (
-                // biome-ignore lint/performance/noImgElement: local brand mark
-                <img
-                  src={primaryLogo}
-                  alt=""
-                  width={28}
-                  height={28}
-                  className="size-7 object-contain"
-                />
-              ) : (
-                <span className="text-sm font-semibold">
-                  {primary.name.slice(0, 1)}
-                </span>
-              )}
+            <span className="border-border bg-background flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-[10px] border">
+              <ToolLogo tool={primary} iconSize={28} />
             </span>
             <div className="min-w-0 flex-1">
               <p className="bg-brand-soft text-brand inline-flex h-5 items-center rounded-md px-1.5 text-[10px] font-medium tracking-[0.06em]">
@@ -207,30 +246,16 @@ function FeaturedPanel({ tools }: { tools: Tool[] }) {
 
         <div className="border-border border-t">
           {rows.map((tool) => {
-            const logo = getToolLogo(tool.id);
             return (
               <a
                 key={tool.id}
-                href={tool.links.website}
+                href={tool.website}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="border-border hover:bg-accent/30 focus-visible:ring-brand/35 flex items-center gap-2.5 border-b px-4 py-2.5 transition-colors last:border-b-0 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
               >
                 <span className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-[5px]">
-                  {logo ? (
-                    // biome-ignore lint/performance/noImgElement: local brand mark
-                    <img
-                      src={logo}
-                      alt=""
-                      width={20}
-                      height={20}
-                      className="size-5 object-contain"
-                    />
-                  ) : (
-                    <span className="text-[10px] font-semibold">
-                      {tool.name.slice(0, 1)}
-                    </span>
-                  )}
+                  <ToolLogo tool={tool} iconSize={20} />
                 </span>
                 <span className="min-w-0 flex-1 truncate text-[13px] font-medium">
                   {tool.name}
@@ -254,16 +279,32 @@ function FeaturedPanel({ tools }: { tools: Tool[] }) {
   );
 }
 
-export function ToolsExplorer({ tools }: { tools: Tool[] }) {
+export function ToolsExplorer({ tools }: { tools: ToolSummary[] }) {
   const [filters, setFilters] = useState<ToolFilters>(EMPTY_FILTERS);
   const [hydrated, setHydrated] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [ioUnavailable, setIoUnavailable] = useState(false);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
   const historyReady = useRef(false);
   const lastQuery = useRef(filters.query);
   const searchRef = useRef<HTMLInputElement>(null);
   const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const filtered = useMemo(() => filterTools(tools, filters), [tools, filters]);
+
+  // 1000 条数据也不把全部卡片塞进 DOM：首屏 24 张，按批追加。
+  // 分页状态带上筛选指纹，筛选一变就自动回到第一批，不需要额外的重置 effect。
+  const filterKey = `${filters.query}|${filters.categories.join(",")}|${filters.pricing}|${filters.openSource}|${filters.platforms.join(",")}|${filters.features.join(",")}`;
+  const [pagination, setPagination] = useState({
+    key: filterKey,
+    count: PAGE_SIZE,
+  });
+  const visibleCount =
+    pagination.key === filterKey ? pagination.count : PAGE_SIZE;
+  const visibleTools = useMemo(
+    () => filtered.slice(0, visibleCount),
+    [filtered, visibleCount],
+  );
 
   const categoryFacet = useMemo(
     () => filterTools(tools, { ...filters, categories: [] }),
@@ -303,10 +344,68 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
     [sourceFacet],
   );
 
+  const platformFacet = useMemo(
+    () => filterTools(tools, { ...filters, platforms: [] }),
+    [tools, filters],
+  );
+
+  const featureFacet = useMemo(
+    () => filterTools(tools, { ...filters, features: [] }),
+    [tools, filters],
+  );
+
+  const platformCounts = useMemo(() => {
+    const counts = new Map<Platform, number>();
+    for (const tool of platformFacet) {
+      for (const platform of tool.platforms) {
+        counts.set(platform, (counts.get(platform) ?? 0) + 1);
+      }
+    }
+    return counts;
+  }, [platformFacet]);
+
+  const featureCounts = useMemo(() => {
+    const counts = new Map<Feature, number>();
+    for (const tool of featureFacet) {
+      for (const feature of tool.features) {
+        counts.set(feature, (counts.get(feature) ?? 0) + 1);
+      }
+    }
+    return counts;
+  }, [featureFacet]);
+
   useEffect(() => {
     setFilters(readFiltersFromUrl());
     setHydrated(true);
   }, []);
+
+  // 浏览器不支持 IntersectionObserver 时退化为手动按钮（jsdom 测试也走这条路）。
+  useEffect(() => {
+    if (typeof IntersectionObserver === "undefined") setIoUnavailable(true);
+  }, []);
+
+  // 滚到底部自动追加下一批：rootMargin 提前 600px 触发，避免用户看到空档。
+  useEffect(() => {
+    // 首个 commit 里 ioUnavailable 还是 false，必须同时做运行时判断。
+    if (ioUnavailable || typeof IntersectionObserver === "undefined") return;
+    const node = loadMoreRef.current;
+    if (!node || visibleCount >= filtered.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        setPagination((previous) =>
+          previous.key === filterKey
+            ? { key: filterKey, count: previous.count + PAGE_SIZE }
+            : { key: filterKey, count: PAGE_SIZE * 2 },
+        );
+      },
+      { rootMargin: "600px 0px" },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [ioUnavailable, visibleCount, filtered.length, filterKey]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -363,7 +462,9 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
     filters.query.trim() !== "" ||
     filters.categories.length > 0 ||
     filters.pricing !== "all" ||
-    filters.openSource !== "all";
+    filters.openSource !== "all" ||
+    filters.platforms.length > 0 ||
+    filters.features.length > 0;
 
   const activeCategory = filters.categories[0];
 
@@ -451,6 +552,24 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
     }));
   }
 
+  function togglePlatform(platform: Platform) {
+    updateFilters((previous) => ({
+      ...previous,
+      platforms: previous.platforms.includes(platform)
+        ? previous.platforms.filter((item) => item !== platform)
+        : [...previous.platforms, platform],
+    }));
+  }
+
+  function toggleFeature(feature: Feature) {
+    updateFilters((previous) => ({
+      ...previous,
+      features: previous.features.includes(feature)
+        ? previous.features.filter((item) => item !== feature)
+        : [...previous.features, feature],
+    }));
+  }
+
   const resultLabel = filters.query.trim()
     ? "搜索结果"
     : hasFilters
@@ -458,7 +577,8 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
       : "全部工具";
 
   return (
-    <div>
+    // data-hydrated 供 e2e 判断客户端是否已接管（快捷键、⌘K 面板依赖水合）。
+    <div data-hydrated={hydrated ? "true" : "false"}>
       <SearchCommand tools={tools} />
       <section className="hero-surface border-border relative overflow-hidden border-b">
         <div className="relative mx-auto max-w-7xl px-4 pt-[calc(3.5rem+1.75rem)] pb-10 sm:px-6 sm:pt-[calc(5rem+3rem)] lg:px-8">
@@ -499,6 +619,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
                         query: event.target.value,
                       }))
                     }
+                    id="tool-search"
                     placeholder="搜索所有工具…"
                     aria-label="搜索 AI 工具"
                     autoComplete="off"
@@ -525,7 +646,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
                       onClick={() =>
                         window.dispatchEvent(new Event("open-search"))
                       }
-                      aria-label="打开快速搜索"
+                      aria-label="⌘K 打开快速搜索"
                       className="border-border bg-muted/40 text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-brand/35 absolute right-2 hidden h-8 items-center rounded-md border px-2 font-sans text-[10px] font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none sm:flex"
                     >
                       ⌘K
@@ -551,12 +672,12 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
                 </Link>
                 {tools[0] ? (
                   <a
-                    href={tools[0].links.website}
+                    href={tools[0].website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 transition-colors lg:hidden"
+                    className="text-muted-foreground hover:text-foreground inline-flex w-full items-center gap-1.5 transition-colors sm:w-auto lg:hidden"
                   >
-                    本周王牌：{tools[0].name}
+                    本期精选：{tools[0].name}
                     <ArrowUpRight className="size-3" aria-hidden />
                   </a>
                 ) : null}
@@ -578,35 +699,20 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
           <div className="from-background pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r to-transparent" />
           <div className="from-background pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l to-transparent" />
           <div className="animate-marquee flex w-max items-center gap-3">
-            {tools
-              .slice(0, 16)
-              .flatMap((tool) => [tool, tool])
-              .map((tool) => {
-                const logo = getToolLogo(tool.id);
-                return (
+            {(["a", "b"] as const).flatMap((copy) =>
+              tools
+                .filter((tool) => tool.logo)
+                .slice(0, 16)
+                .map((tool) => (
+                  // 复制一份整表做无缝循环，copy 前缀保证两组 key 不重复。
                   <span
-                    key={tool.id}
-                    className="border-border bg-card flex size-10 shrink-0 items-center justify-center rounded-xl border shadow-xs"
+                    key={`${tool.id}-${copy}`}
+                    className="border-border bg-card flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border shadow-xs"
                   >
-                    {logo ? (
-                      // biome-ignore lint/performance/noImgElement: local brand mark
-                      <img
-                        src={logo}
-                        alt=""
-                        width={20}
-                        height={20}
-                        loading="lazy"
-                        decoding="async"
-                        className="size-5 object-contain"
-                      />
-                    ) : (
-                      <span className="text-muted-foreground text-[11px] font-semibold">
-                        {tool.name.slice(0, 1)}
-                      </span>
-                    )}
+                    <ToolLogo tool={tool} iconSize={20} />
                   </span>
-                );
-              })}
+                )),
+            )}
           </div>
         </div>
       ) : null}
@@ -616,7 +722,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
         className="mx-auto max-w-7xl scroll-mt-20 px-4 py-8 sm:scroll-mt-24 sm:px-6 lg:px-8"
       >
         <p className="sr-only" aria-live="polite">
-          {filtered.length} 个工具
+          {filtered.length} 个工具，已显示 {visibleTools.length} 个
         </p>
         <div className="border-border bg-background/95 sticky top-14 z-20 -mx-4 border-b px-4 backdrop-blur sm:top-20 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
           <div className="flex items-center gap-2 py-3">
@@ -669,6 +775,7 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
                     key={category.value}
                     value={category.value}
                     aria-label={`${category.label}，${count} 个工具`}
+                    disabled={count === 0 && activeCategory !== category.value}
                     className={tabClass(activeCategory === category.value)}
                     onKeyDown={(event) =>
                       handleCategoryKeyDown(
@@ -691,10 +798,16 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
             <FilterSheet
               pricing={filters.pricing}
               openSource={filters.openSource}
+              platforms={filters.platforms}
+              features={filters.features}
               pricingCounts={pricingCounts}
               pricingTotal={pricingFacet.length}
               sourceTotal={sourceFacet.length}
               openSourceCount={openSourceCount}
+              platformCounts={platformCounts}
+              platformTotal={platformFacet.length}
+              featureCounts={featureCounts}
+              featureTotal={featureFacet.length}
               resultCount={filtered.length}
               onPricingChange={(value) =>
                 updateFilters((previous) => ({ ...previous, pricing: value }))
@@ -705,11 +818,15 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
                   openSource: value,
                 }))
               }
+              onPlatformToggle={togglePlatform}
+              onFeatureToggle={toggleFeature}
               onReset={() =>
                 updateFilters((previous) => ({
                   ...previous,
                   pricing: "all",
                   openSource: "all",
+                  platforms: [],
+                  features: [],
                 }))
               }
             />
@@ -783,12 +900,36 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
                   <X className="size-3" aria-hidden />
                 </button>
               ) : null}
+              {filters.platforms.map((platform) => (
+                <button
+                  key={platform}
+                  type="button"
+                  onClick={() => togglePlatform(platform)}
+                  className={filterChipClass()}
+                  aria-label={`移除平台筛选：${platformLabel(platform)}`}
+                >
+                  {platformLabel(platform)}
+                  <X className="size-3" aria-hidden />
+                </button>
+              ))}
+              {filters.features.map((feature) => (
+                <button
+                  key={feature}
+                  type="button"
+                  onClick={() => toggleFeature(feature)}
+                  className={filterChipClass()}
+                  aria-label={`移除特性筛选：${featureLabel(feature)}`}
+                >
+                  {featureLabel(feature)}
+                  <X className="size-3" aria-hidden />
+                </button>
+              ))}
               <button
                 type="button"
                 onClick={resetFilters}
                 className="text-muted-foreground decoration-border hover:text-foreground ml-1 inline-flex min-h-8 items-center text-[11px] underline underline-offset-4 transition-colors"
               >
-                清除全部
+                清除全部筛选
               </button>
             </div>
           ) : null}
@@ -809,10 +950,63 @@ export function ToolsExplorer({ tools }: { tools: Tool[] }) {
         {filtered.length > 0 ? (
           <>
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {filtered.map((tool) => (
+              {visibleTools.map((tool) => (
                 <ToolCard key={tool.id} tool={tool} />
               ))}
             </div>
+            {filtered.length > visibleTools.length ? (
+              <div
+                ref={loadMoreRef}
+                className="mt-6 flex flex-col items-center gap-2 py-4"
+              >
+                {ioUnavailable ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-10 rounded-lg px-4"
+                    onClick={() =>
+                      setPagination({
+                        key: filterKey,
+                        count: visibleCount + PAGE_SIZE,
+                      })
+                    }
+                  >
+                    再显示{" "}
+                    {Math.min(PAGE_SIZE, filtered.length - visibleTools.length)}{" "}
+                    个
+                  </Button>
+                ) : (
+                  <>
+                    <div
+                      role="progressbar"
+                      aria-label="已加载工具"
+                      aria-valuemin={0}
+                      aria-valuemax={filtered.length}
+                      aria-valuenow={visibleTools.length}
+                      className="bg-border h-1 w-40 overflow-hidden rounded-full"
+                    >
+                      <div
+                        className="bg-brand h-full rounded-full transition-[width] duration-300 motion-reduce:transition-none"
+                        style={{
+                          width: `${Math.round(
+                            (visibleTools.length / filtered.length) * 100,
+                          )}%`,
+                        }}
+                      />
+                    </div>
+                    <p className="text-muted-foreground text-[11px] tabular-nums">
+                      继续向下滚动 · 已显示 {visibleTools.length} /{" "}
+                      {filtered.length}
+                    </p>
+                  </>
+                )}
+              </div>
+            ) : filtered.length > PAGE_SIZE ? (
+              <p className="text-muted-foreground mt-6 text-center text-[11px]">
+                已显示全部 {filtered.length} 个工具
+              </p>
+            ) : null}
             <p className="text-muted-foreground mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px]">
               <span className="bg-brand size-1 rounded-full" aria-hidden />
               人工编排，排序不代表热度；数据整理于 {DATA_UPDATED_LABEL}。

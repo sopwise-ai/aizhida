@@ -26,3 +26,29 @@ test.describe("mobile navigation", () => {
     ).toBeVisible();
   });
 });
+
+test.describe("mobile filters and details", () => {
+  test("filters from the mobile sheet", async ({ page }) => {
+    await page.goto("/");
+
+    await page.getByRole("button", { name: /^筛选/ }).click();
+    await page.getByRole("button", { name: /^网页/ }).click();
+    await page.getByRole("button", { name: /关闭筛选面板/ }).click();
+
+    await expect(page).toHaveURL(/platform=web/);
+    await expect(
+      page.getByRole("button", { name: /移除平台筛选/ }),
+    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: /筛选结果/ })).toBeVisible();
+  });
+
+  test("tool detail page renders on a small viewport", async ({ page }) => {
+    await page.goto("/tools/chatgpt");
+
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("ChatGPT");
+    await expect(page.getByRole("link", { name: /打开官网/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "同类工具" })).toBeVisible();
+    // 同类工具带「同样支持」说明，验证排序理由可见。
+    await expect(page.getByText(/同样支持/).first()).toBeVisible();
+  });
+});

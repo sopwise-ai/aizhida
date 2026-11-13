@@ -1,153 +1,72 @@
 "use client";
 
-import { ArrowUpRight, Command } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
+import { useCallback, useEffect, useState } from "react";
 
-import {
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandShortcut,
-} from "@/components/ui/command";
-import { filterTools } from "@/lib/filter-tools";
-import { getToolLogo } from "@/lib/tool-logos";
-import { categoryLabel, type Tool } from "@/lib/tool-meta";
+import type { ToolSummary } from "@/lib/tool-summary";
 
-export function SearchCommand({ tools }: { tools: Tool[] }) {
+// 只有快捷键/搜索框真正打开时才需要 cmdk 与 dialog：首屏不下载这块 chunk。
+const SearchPalette = dynamic(
+  () => import("./search-palette").then((mod) => mod.SearchPalette),
+  { ssr: false },
+);
+
+export function SearchCommand({ tools }: { tools: ToolSummary[] }) {
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [loaded, setLoaded] = useState(false);
+  const [seed, setSeed] = useState("");
+
+  // 首屏搜索框已经输入了关键词时，打开面板要接着这段话搜，而不是清空重来。
+  const currentQuery = useCallback(
+    () =>
+      (document.getElementById("tool-search") as HTMLInputElement | null)
+        ?.value ?? "",
+    [],
+  );
+
+  const openPalette = useCallback(() => {
+    setSeed(currentQuery());
+    setLoaded(true);
+    setOpen(true);
+  }, [currentQuery]);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        setOpen((previous) => !previous);
+      if (
+        !(event.metaKey || event.ctrlKey) ||
+        event.key.toLowerCase() !== "k"
+      ) {
+        return;
       }
-    }
-    function onOpen() {
-      setOpen(true);
+      event.preventDefault();
+      setSeed(currentQuery());
+      setLoaded(true);
+      setOpen((previous) => !previous);
     }
 
     window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("open-search", onOpen);
+    window.addEventListener("open-search", openPalette);
     return () => {
       window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("open-search", onOpen);
+      window.removeEventListener("open-search", openPalette);
     };
-  }, []);
+  }, [openPalette, currentQuery]);
 
-  const results = useMemo(() => {
-    if (!query.trim()) return tools.slice(0, 7);
-    return filterTools(tools, {
-      query,
-      categories: [],
-      pricing: "all",
-      openSource: "all",
-    }).slice(0, 8);
-  }, [query, tools]);
-
-  function openTool(tool: Tool) {
-    window.open(tool.links.website, "_blank", "noopener,noreferrer");
-    setOpen(false);
-  }
+  if (!loaded) return null;
 
   return (
-    <CommandDialog
+    <SearchPalette
+      tools={tools}
+      initialQuery={seed}
       open={open}
       onOpenChange={(next) => {
         setOpen(next);
-        if (!next) setQuery("");
+        if (next) return;
+        // 快捷键打开时没有触发元素，Radix 会把焦点还给 body；显式回到搜索框。
+        requestAnimationFrame(() => {
+          document.getElementById("tool-search")?.focus();
+        });
       }}
-    >
-      <CommandInput
-        value={query}
-        onValueChange={setQuery}
-        placeholder={`搜索 ${tools.length} 个工具，或输入用途…`}
-        autoFocus
-      />
-      <CommandList>
-        <CommandEmpty>
-          没有找到匹配的工具，试试「视频」「免费」或「Agent」。
-        </CommandEmpty>
-        <CommandGroup heading={query.trim() ? "搜索结果" : "快速进入"}>
-          {results.map((tool) => {
-            const logo = getToolLogo(tool.id);
-            return (
-              <CommandItem
-                key={tool.id}
-                value={`${tool.name} ${tool.tagline} ${tool.features.join(" ")} ${tool.keywords.join(" ")}`}
-                onSelect={() => openTool(tool)}
-                className="gap-3"
-              >
-                <span className="border-border bg-background flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-md border">
-                  {logo ? (
-                    // biome-ignore lint/performance/noImgElement: local, fixed-size brand marks
-                    <img
-                      src={logo}
-                      alt=""
-                      width={18}
-                      height={18}
-                      className="size-[18px] object-contain"
-                    />
-                  ) : (
-                    <span className="bg-muted-foreground/30 size-1.5 rounded-full" />
-                  )}
-                </span>
-                <span className="min-w-0 flex-1 truncate font-medium">
-                  {tool.name}
-                </span>
-                <span className="text-muted-foreground hidden max-w-[45%] truncate text-[11px] sm:block">
-                  {tool.tagline}
-                </span>
-                <CommandShortcut className="ml-0 hidden sm:inline">
-                  {categoryLabel(tool.categories[0] ?? "assistant")}
-                </CommandShortcut>
-                <ArrowUpRight className="text-muted-foreground size-3.5" />
-              </CommandItem>
-            );
-          })}
-        </CommandGroup>
-        <CommandGroup heading="操作">
-          <CommandItem
-            value="浏览全部工具"
-            onSelect={() => {
-              setOpen(false);
-              document.getElementById("all-tools")?.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-              });
-            }}
-          >
-            <Command className="size-3.5" />
-            浏览全部工具
-            <CommandShortcut>↵</CommandShortcut>
-          </CommandItem>
-          <CommandItem
-            value="提交工具"
-            onSelect={() => {
-              window.location.href = "/submit";
-            }}
-          >
-            <ArrowUpRight className="size-3.5" />
-            提交一个工具
-          </CommandItem>
-        </CommandGroup>
-      </CommandList>
-      <div className="border-border text-muted-foreground hidden items-center justify-between border-t px-3 py-2 text-[10px] sm:flex">
-        <span className="flex items-center gap-2">
-          <kbd className="border-border rounded border px-1 py-0.5">↑↓</kbd>
-          选择
-          <kbd className="border-border rounded border px-1 py-0.5">↵</kbd>
-          打开
-        </span>
-        <span className="flex items-center gap-2">
-          <kbd className="border-border rounded border px-1 py-0.5">esc</kbd>
-          关闭
-        </span>
-      </div>
-    </CommandDialog>
+    />
   );
 }

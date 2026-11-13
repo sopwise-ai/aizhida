@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { SITE_URL } from "@/lib/site";
+import { CATEGORIES } from "@/lib/tool-meta";
+import { tools } from "@/lib/tools";
 import sitemap from "./sitemap";
 
 describe("sitemap", () => {
@@ -8,6 +10,8 @@ describe("sitemap", () => {
     const urls = data.map((entry) => entry.url);
 
     expect(urls).toContain(SITE_URL);
+    expect(urls).toContain(`${SITE_URL}/c/writing`);
+    expect(urls).toHaveLength(tools.length + CATEGORIES.length + 3);
     expect(urls).toContain(`${SITE_URL}/about`);
     expect(urls).toContain(`${SITE_URL}/submit`);
     for (const url of urls) {

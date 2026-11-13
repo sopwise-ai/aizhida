@@ -29,10 +29,17 @@ const Command = ({
 interface CommandDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** cmdk 自带过滤只认字面量；需要同义词检索时关掉，由调用方先算好结果。 */
+  shouldFilter?: boolean;
   children: React.ReactNode;
 }
 
-function CommandDialog({ open, onOpenChange, children }: CommandDialogProps) {
+function CommandDialog({
+  open,
+  onOpenChange,
+  shouldFilter = true,
+  children,
+}: CommandDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="overflow-hidden p-0 shadow-2xl sm:max-w-xl">
@@ -40,7 +47,10 @@ function CommandDialog({ open, onOpenChange, children }: CommandDialogProps) {
         <DialogDescription className="sr-only">
           输入名称或用途，选择一个工具直接打开官网。
         </DialogDescription>
-        <Command className="[&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:size-4 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-2.5 [&_[cmdk-item]_svg]:size-4">
+        <Command
+          shouldFilter={shouldFilter}
+          className="[&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:size-4 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-2.5 [&_[cmdk-item]_svg]:size-4"
+        >
           {children}
         </Command>
       </DialogContent>

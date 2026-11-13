@@ -119,6 +119,32 @@ function chipClass(active: boolean) {
   );
 }
 
+/** 同一套规则既用于提交校验，也用于实时提示「还差几项」。 */
+function collectErrors(state: FormState): Record<string, string> {
+  const next: Record<string, string> = {};
+  if (!state.name.trim()) next.name = "请填写工具名称。";
+  else if (state.name.trim().length > 30) next.name = "名称不要超过 30 个字。";
+  if (!state.url.trim()) next.url = "请填写官网地址。";
+  else {
+    try {
+      const parsed = new URL(state.url.trim());
+      if (parsed.protocol !== "https:")
+        next.url = "官网地址必须以 https:// 开头。";
+    } catch {
+      next.url = "请输入完整、有效的官网地址。";
+    }
+  }
+  const taglineLength = state.tagline.trim().length;
+  if (taglineLength < 8)
+    next.tagline = "一句话说明至少写 8 个字，讲清楚它能做什么。";
+  else if (taglineLength > 60) next.tagline = "一句话说明不要超过 60 个字。";
+  if (state.categories.length === 0) next.categories = "请选择 1–3 个分类。";
+  if (state.platforms.length === 0) next.platforms = "请至少选择一个平台。";
+  if (state.features.length < 2)
+    next.features = "请至少选择 2 个特性，方便检索与筛选。";
+  return next;
+}
+
 export function SubmitForm() {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -171,6 +197,10 @@ export function SubmitForm() {
   }, [form, keywords]);
 
   const json = useMemo(() => JSON.stringify(payload, null, 2), [payload]);
+  const missingCount = useMemo(
+    () => Object.keys(collectErrors(form)).length,
+    [form],
+  );
 
   function setField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((previous) => ({ ...previous, [key]: value }));
@@ -239,28 +269,7 @@ export function SubmitForm() {
   }
 
   function validate(): boolean {
-    const next: Record<string, string> = {};
-    if (!form.name.trim()) next.name = "请填写工具名称。";
-    else if (form.name.trim().length > 30) next.name = "名称不要超过 30 个字。";
-    if (!form.url.trim()) next.url = "请填写官网地址。";
-    else {
-      try {
-        const parsed = new URL(form.url.trim());
-        if (parsed.protocol !== "https:")
-          next.url = "官网地址必须以 https:// 开头。";
-      } catch {
-        next.url = "请输入完整、有效的官网地址。";
-      }
-    }
-    const taglineLength = form.tagline.trim().length;
-    if (taglineLength < 8)
-      next.tagline = "一句话说明至少写 8 个字，讲清楚它能做什么。";
-    else if (taglineLength > 60) next.tagline = "一句话说明不要超过 60 个字。";
-    if (form.categories.length === 0) next.categories = "请选择 1–3 个分类。";
-    if (form.platforms.length === 0) next.platforms = "请至少选择一个平台。";
-    if (form.features.length < 2)
-      next.features = "请至少选择 2 个特性，方便检索与筛选。";
-
+    const next = collectErrors(form);
     setErrors(next);
     if (Object.keys(next).length > 0) {
       const target = next.name
@@ -619,7 +628,7 @@ ${json}
             <div className="mt-2 flex flex-col gap-2.5">
               {FEATURE_GROUPS.map((group) => (
                 <div key={group.value}>
-                  <p className="text-muted-foreground/80 mb-1 text-[10px] font-medium">
+                  <p className="text-muted-foreground mb-1 text-[10px] font-medium">
                     {group.label}
                   </p>
                   <div className="flex flex-wrap gap-1.5">
@@ -815,13 +824,27 @@ ${json}
         </div>
 
         <div className="border-border bg-card mt-4 rounded-xl border p-4">
-          <p className="text-[12px] font-medium">JSON</p>
-          <pre
-            ref={jsonRef}
-            className="bg-muted/50 text-muted-foreground mt-2 max-h-72 overflow-auto rounded-md p-3 font-mono text-[10px] leading-5"
+          <p className="text-[12px] font-medium">JSON 预览</p>
+          <p
+            className={cn(
+              "mt-0.5 text-[10px] leading-4",
+              missingCount ? "text-muted-foreground" : "text-brand",
+            )}
           >
-            <code>{json}</code>
-          </pre>
+            {missingCount
+              ? `还有 ${missingCount} 项必填未完成，填完后才能复制或创建 Issue。`
+              : "必填项已齐全，可以复制 JSON 或创建 Issue。"}
+          </p>
+          <section aria-label="生成的工具 JSON 预览">
+            <pre
+              ref={jsonRef}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: 滚动区域必须可聚焦（axe scrollable-region-focusable）
+              tabIndex={0}
+              className="bg-muted/50 text-muted-foreground mt-2 max-h-72 overflow-auto rounded-md p-3 font-mono text-[10px] leading-5"
+            >
+              <code>{json}</code>
+            </pre>
+          </section>
         </div>
       </aside>
     </div>

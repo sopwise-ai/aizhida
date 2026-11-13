@@ -15,6 +15,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "clean": "rm -rf .next",
     "lint": "biome check",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

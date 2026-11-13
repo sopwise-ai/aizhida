@@ -15,6 +15,9 @@ export default defineConfig({
     baseURL,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
+    // 本地没有下载 Playwright 浏览器时可用系统 Chrome：
+    // PLAYWRIGHT_CHANNEL=chrome pnpm test:e2e（CI 不设置，保持默认 chromium）
+    channel: process.env.PLAYWRIGHT_CHANNEL,
   },
   projects: [
     {

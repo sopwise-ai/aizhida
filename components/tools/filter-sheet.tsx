@@ -15,9 +15,16 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import {
+  FEATURE_GROUPS,
+  FEATURES,
+  type Feature,
+  featureLabel,
   type OpenSourceFilter,
+  PLATFORMS,
+  type Platform,
   PRICING_OPTIONS,
   type Pricing,
+  platformLabel,
   pricingLabel,
 } from "@/lib/tool-meta";
 import { cn } from "@/lib/utils";
@@ -25,29 +32,54 @@ import { cn } from "@/lib/utils";
 interface FilterSheetProps {
   pricing: Pricing | "all";
   openSource: OpenSourceFilter;
+  platforms: Platform[];
+  features: Feature[];
   pricingCounts: Map<Pricing, number>;
   pricingTotal: number;
   sourceTotal: number;
   openSourceCount: number;
+  platformCounts: Map<Platform, number>;
+  platformTotal: number;
+  featureCounts: Map<Feature, number>;
+  featureTotal: number;
   resultCount: number;
   onPricingChange: (value: Pricing | "all") => void;
   onOpenSourceChange: (value: OpenSourceFilter) => void;
+  onPlatformToggle: (value: Platform) => void;
+  onFeatureToggle: (value: Feature) => void;
   onReset: () => void;
 }
+
+const optionClass =
+  "focus-visible:ring-brand/35 flex h-10 items-center justify-between rounded-lg border px-3 text-[12px] transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-40";
+const chipClass =
+  "focus-visible:ring-brand/35 inline-flex h-7 items-center gap-1 rounded-md border px-2 text-[11px] transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-40";
 
 export function FilterSheet({
   pricing,
   openSource,
+  platforms,
+  features,
   pricingCounts,
   pricingTotal,
   sourceTotal,
   openSourceCount,
+  platformCounts,
+  platformTotal,
+  featureCounts,
+  featureTotal,
   resultCount,
   onPricingChange,
   onOpenSourceChange,
+  onPlatformToggle,
+  onFeatureToggle,
   onReset,
 }: FilterSheetProps) {
-  const activeCount = Number(pricing !== "all") + Number(openSource !== "all");
+  const activeCount =
+    Number(pricing !== "all") +
+    Number(openSource !== "all") +
+    platforms.length +
+    features.length;
 
   return (
     <Sheet>
@@ -70,7 +102,7 @@ export function FilterSheet({
           ) : null}
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-[min(22rem,calc(100%-2rem))]">
+      <SheetContent side="right" className="w-[min(24rem,calc(100%-2rem))]">
         <SheetHeader className="border-border border-b p-5">
           <SheetTitle className="flex items-center gap-2">
             筛选工具
@@ -81,7 +113,7 @@ export function FilterSheet({
             ) : null}
           </SheetTitle>
           <SheetDescription>
-            按定价和授权方式缩小范围，结果会立即更新。
+            按定价、授权、平台与特性缩小范围，结果会立即更新。
           </SheetDescription>
         </SheetHeader>
 
@@ -102,7 +134,7 @@ export function FilterSheet({
                     aria-pressed={active}
                     onClick={() => onPricingChange(value)}
                     className={cn(
-                      "focus-visible:ring-brand/35 flex h-10 items-center justify-between rounded-lg border px-3 text-[12px] transition-colors focus-visible:ring-2 focus-visible:outline-none",
+                      optionClass,
                       active
                         ? "border-brand/40 bg-brand-soft text-brand font-medium"
                         : "border-border hover:bg-muted/60",
@@ -149,7 +181,7 @@ export function FilterSheet({
                     aria-pressed={active}
                     onClick={() => onOpenSourceChange(item.value)}
                     className={cn(
-                      "focus-visible:ring-brand/35 flex h-10 items-center justify-between rounded-lg border px-3 text-[12px] transition-colors focus-visible:ring-2 focus-visible:outline-none",
+                      optionClass,
                       active
                         ? "border-brand/40 bg-brand-soft text-brand font-medium"
                         : "border-border hover:bg-muted/60",
@@ -165,6 +197,98 @@ export function FilterSheet({
                   </button>
                 );
               })}
+            </div>
+          </section>
+
+          <Separator className="my-5" />
+
+          <section>
+            <h3 className="text-muted-foreground text-[12px] font-medium">
+              平台
+            </h3>
+            <div className="mt-2 grid grid-cols-2 gap-1.5">
+              {PLATFORMS.map((platform) => {
+                const active = platforms.includes(platform.value);
+                const count = platformCounts.get(platform.value) ?? 0;
+                return (
+                  <button
+                    key={platform.value}
+                    type="button"
+                    aria-pressed={active}
+                    disabled={count === 0 && !active}
+                    onClick={() => onPlatformToggle(platform.value)}
+                    className={cn(
+                      optionClass,
+                      active
+                        ? "border-brand/40 bg-brand-soft text-brand font-medium"
+                        : "border-border hover:bg-muted/60",
+                    )}
+                  >
+                    <span className="flex items-center gap-1.5">
+                      {platformLabel(platform.value)}
+                      {active ? <Check className="size-3" aria-hidden /> : null}
+                    </span>
+                    <span className="text-muted-foreground text-[10px] tabular-nums">
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-muted-foreground mt-2 text-[10px]">
+              平台之间是「或」：命中任一已选平台即保留（当前 {platformTotal}{" "}
+              个）
+            </p>
+          </section>
+
+          <Separator className="my-5" />
+
+          <section>
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-muted-foreground text-[12px] font-medium">
+                特性
+              </h3>
+              <span className="text-muted-foreground text-[10px] tabular-nums">
+                {featureTotal} 个工具
+              </span>
+            </div>
+            <div className="mt-2 max-h-64 overflow-y-auto pr-1">
+              {FEATURE_GROUPS.map((group) => (
+                <div key={group.value} className="mb-3 last:mb-0">
+                  <p className="text-muted-foreground mb-1 text-[10px] font-medium">
+                    {group.label}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {FEATURES.filter(
+                      (feature) => feature.group === group.value,
+                    ).map((feature) => {
+                      const active = features.includes(feature.value);
+                      const count = featureCounts.get(feature.value) ?? 0;
+                      return (
+                        <button
+                          key={feature.value}
+                          type="button"
+                          aria-pressed={active}
+                          aria-label={`${featureLabel(feature.value)}，${count} 个工具`}
+                          disabled={count === 0 && !active}
+                          onClick={() => onFeatureToggle(feature.value)}
+                          className={cn(
+                            chipClass,
+                            active
+                              ? "border-brand/40 bg-brand-soft text-brand font-medium"
+                              : "border-border text-muted-foreground hover:bg-muted/60",
+                          )}
+                        >
+                          {featureLabel(feature.value)}
+                          <span className="tabular-nums opacity-70">
+                            {count}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
         </div>

@@ -16,6 +16,9 @@ export default defineConfig({
     // globals 打开后 @testing-library/react 会在每个用例间自动 cleanup。
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
+    // jsdom + userEvent 的用例在并行跑满时会排队：默认 5s 对表单类交互偏紧，
+    // 15s 仍能在真挂起时快速失败。
+    testTimeout: 15_000,
     include: [
       "app/**/*.test.{ts,tsx}",
       "components/**/*.test.{ts,tsx}",
