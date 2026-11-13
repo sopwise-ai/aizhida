@@ -8,7 +8,7 @@ import {
   matchesQuery,
   type ToolFilters,
 } from "./filter-tools";
-import { tools } from "./tools";
+import { toolSummaries } from "./tools";
 
 function filtersWith(partial: Partial<ToolFilters>): ToolFilters {
   return { ...DEFAULT_FILTERS, ...partial };
@@ -16,20 +16,25 @@ function filtersWith(partial: Partial<ToolFilters>): ToolFilters {
 
 describe("filterTools", () => {
   it("returns everything with default filters", () => {
-    expect(filterTools(tools, DEFAULT_FILTERS)).toHaveLength(tools.length);
+    expect(filterTools(toolSummaries, DEFAULT_FILTERS)).toHaveLength(
+      toolSummaries.length,
+    );
   });
 
   it("filters by category", () => {
-    const result = filterTools(tools, filtersWith({ categories: ["writing"] }));
+    const result = filterTools(
+      toolSummaries,
+      filtersWith({ categories: ["writing"] }),
+    );
     expect(result.length).toBeGreaterThan(0);
-    expect(result.length).toBeLessThan(tools.length);
+    expect(result.length).toBeLessThan(toolSummaries.length);
     for (const tool of result) {
       expect(tool.categories).toContain("writing");
     }
   });
 
   it("filters by pricing", () => {
-    const result = filterTools(tools, filtersWith({ pricing: "free" }));
+    const result = filterTools(toolSummaries, filtersWith({ pricing: "free" }));
     expect(result.length).toBeGreaterThan(0);
     for (const tool of result) {
       expect(tool.pricing).toBe("free");
@@ -37,7 +42,10 @@ describe("filterTools", () => {
   });
 
   it("filters by open source", () => {
-    const result = filterTools(tools, filtersWith({ openSource: "yes" }));
+    const result = filterTools(
+      toolSummaries,
+      filtersWith({ openSource: "yes" }),
+    );
     expect(result.length).toBeGreaterThan(0);
     for (const tool of result) {
       expect(tool.openSource).toBe(true);
@@ -46,11 +54,11 @@ describe("filterTools", () => {
 
   it("combines different dimensions with AND", () => {
     const writing = filterTools(
-      tools,
+      toolSummaries,
       filtersWith({ categories: ["writing"] }),
     );
     const both = filterTools(
-      tools,
+      toolSummaries,
       filtersWith({ categories: ["writing"], pricing: "free" }),
     );
     expect(both.length).toBeLessThanOrEqual(writing.length);
@@ -61,12 +69,15 @@ describe("filterTools", () => {
 
   it("combines same-dimension categories with OR", () => {
     const writing = filterTools(
-      tools,
+      toolSummaries,
       filtersWith({ categories: ["writing"] }),
     );
-    const image = filterTools(tools, filtersWith({ categories: ["image"] }));
+    const image = filterTools(
+      toolSummaries,
+      filtersWith({ categories: ["image"] }),
+    );
     const either = filterTools(
-      tools,
+      toolSummaries,
       filtersWith({ categories: ["writing", "image"] }),
     );
     // 无查询时同维度取并集（一个工具可同时属于多个分类）。
@@ -78,38 +89,38 @@ describe("filterTools", () => {
 
 describe("matchesQuery", () => {
   it("matches everything for empty query", () => {
-    for (const tool of tools) {
+    for (const tool of toolSummaries) {
       expect(matchesQuery(tool, "")).toBe(true);
       expect(matchesQuery(tool, "   ")).toBe(true);
     }
   });
 
-  it("finds tools by exact name", () => {
-    const chatgpt = tools.find((tool) => tool.id === "chatgpt");
+  it("finds toolSummaries by exact name", () => {
+    const chatgpt = toolSummaries.find((tool) => tool.id === "chatgpt");
     if (!chatgpt) throw new Error("chatgpt missing");
     expect(matchesQuery(chatgpt, "ChatGPT")).toBe(true);
   });
 
   it("treats 免费 as the free tier, not any label containing 免费", () => {
-    const free = tools.filter((tool) => matchesQuery(tool, "免费"));
-    const freeTier = tools.filter((tool) => tool.pricing === "free");
+    const free = toolSummaries.filter((tool) => matchesQuery(tool, "免费"));
+    const freeTier = toolSummaries.filter((tool) => tool.pricing === "free");
     expect(free).toEqual(freeTier);
   });
 
-  it("expands synonyms so 聊天 finds chat tools", () => {
-    const chat = tools.filter((tool) => matchesQuery(tool, "聊天"));
+  it("expands synonyms so 聊天 finds chat toolSummaries", () => {
+    const chat = toolSummaries.filter((tool) => matchesQuery(tool, "聊天"));
     expect(chat.length).toBeGreaterThan(0);
     expect(chat.some((tool) => tool.id === "chatgpt")).toBe(true);
   });
 
   it("rejects non-matching queries", () => {
-    const first = tools[0];
+    const first = toolSummaries[0];
     if (!first) throw new Error("dataset empty");
     expect(matchesQuery(first, "不存在的工具名xyzzy")).toBe(false);
   });
 
   it("matches by hostname", () => {
-    const cursor = tools.find((tool) => tool.id === "cursor");
+    const cursor = toolSummaries.find((tool) => tool.id === "cursor");
     if (!cursor) throw new Error("cursor missing");
     expect(matchesQuery(cursor, "cursor.com")).toBe(true);
   });
@@ -132,5 +143,58 @@ describe("guards", () => {
     expect(isPlatform("web")).toBe(true);
     expect(isPlatform("teleport")).toBe(false);
     expect(isPlatform(null)).toBe(false);
+  });
+});
+
+describe("filterTools dimensions", () => {
+  it("filters by platform with OR semantics", () => {
+    const web = filterTools(toolSummaries, filtersWith({ platforms: ["web"] }));
+    const desktop = filterTools(
+      toolSummaries,
+      filtersWith({ platforms: ["desktop"] }),
+    );
+    const both = filterTools(
+      toolSummaries,
+      filtersWith({ platforms: ["web", "desktop"] }),
+    );
+    expect(web.length).toBeGreaterThan(0);
+    expect(desktop.length).toBeGreaterThan(0);
+    expect(both.length).toBeGreaterThanOrEqual(web.length);
+    expect(both.length).toBeLessThanOrEqual(web.length + desktop.length);
+    for (const tool of both) {
+      expect(
+        tool.platforms.includes("web") || tool.platforms.includes("desktop"),
+      ).toBe(true);
+    }
+  });
+
+  it("filters by feature with OR semantics", () => {
+    const result = filterTools(
+      toolSummaries,
+      filtersWith({ features: ["multimodal", "long-context"] }),
+    );
+    expect(result.length).toBeGreaterThan(0);
+    for (const tool of result) {
+      expect(
+        tool.features.includes("multimodal") ||
+          tool.features.includes("long-context"),
+      ).toBe(true);
+    }
+  });
+
+  it("combines platform, pricing and feature filters with AND", () => {
+    const result = filterTools(
+      toolSummaries,
+      filtersWith({
+        platforms: ["web"],
+        pricing: "free",
+        features: ["multimodal"],
+      }),
+    );
+    for (const tool of result) {
+      expect(tool.platforms).toContain("web");
+      expect(tool.pricing).toBe("free");
+      expect(tool.features).toContain("multimodal");
+    }
   });
 });

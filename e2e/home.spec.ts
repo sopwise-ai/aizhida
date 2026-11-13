@@ -25,6 +25,116 @@ test.describe("home page", () => {
     ).toBeVisible();
   });
 
+  test("opens a tool detail page from the card", async ({ page }) => {
+    await page.goto("/");
+
+    await page.getByRole("link", { name: "查看 ChatGPT 详情" }).click();
+
+    await expect(page).toHaveURL(/\/tools\/chatgpt$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("ChatGPT");
+    await expect(page.getByRole("link", { name: /打开官网/ })).toBeVisible();
+  });
+
+  test("loads the next batch when scrolling to the bottom", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    const cards = page.locator('[data-slot="card"]');
+    await expect(cards).toHaveCount(24);
+
+    // 滚动到底部触发 IntersectionObserver；重复滚动以容忍水合延迟。
+    await expect
+      .poll(
+        async () => {
+          await page.evaluate(() =>
+            window.scrollTo(0, document.body.scrollHeight),
+          );
+          return cards.count();
+        },
+        { timeout: 15_000 },
+      )
+      .toBeGreaterThan(24);
+  });
+
+  test("category page lists tools and links into details", async ({ page }) => {
+    await page.goto("/c/coding");
+
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(
+      "编程 AI 工具",
+    );
+    await page.getByRole("link", { name: "查看 Cursor 详情" }).click();
+    await expect(page).toHaveURL(/\/tools\/cursor$/);
+  });
+
+  test("opens the command palette with cmd+k", async ({ page }) => {
+    await page.goto("/");
+    // 快捷键依赖客户端水合；等标记就绪再按键，避免和水合赛跑。
+    await expect(page.locator('[data-hydrated="true"]')).toBeVisible();
+
+    await page.keyboard.press("Meta+k");
+    await expect(page.getByPlaceholder(/搜索 \d+ 个工具/)).toBeVisible();
+    await page.keyboard.press("Escape");
+
+    // 关闭后焦点回到首页搜索框，而不是 body。
+    await expect(page.locator("#tool-search")).toBeFocused();
+  });
+
+  test("seeds the palette with the home search query", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator('[data-hydrated="true"]')).toBeVisible();
+
+    await page.getByPlaceholder("搜索所有工具…").fill("画图");
+    await page.keyboard.press("Meta+k");
+
+    await expect(page.locator("[cmdk-input]")).toHaveValue("画图");
+  });
+
+  test("filters by platform and feature from the sheet", async ({ page }) => {
+    await page.goto("/");
+
+    await page.getByRole("button", { name: /^筛选/ }).click();
+    await page.getByRole("button", { name: /^网页/ }).click();
+    await page.getByRole("button", { name: /多模态/ }).click();
+    await page.getByRole("button", { name: /关闭筛选面板/ }).click();
+
+    await expect(page).toHaveURL(/platform=web/);
+    await expect(page).toHaveURL(/feature=multimodal/);
+    await expect(page.getByRole("heading", { name: /筛选结果/ })).toBeVisible();
+    await expect(page.locator('[data-slot="card"]').first()).toBeVisible();
+  });
+
+  test("jumps from a category page into the filtered home view", async ({
+    page,
+  }) => {
+    await page.goto("/c/coding");
+
+    await page.getByRole("link", { name: /在全部工具中筛选/ }).click();
+
+    await expect(page).toHaveURL(/\/\?cat=coding/);
+    await expect(page.getByRole("heading", { name: /筛选结果/ })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /移除分类筛选/ }),
+    ).toBeVisible();
+  });
+
+  test("rotates the featured pick", async ({ page }) => {
+    await page.goto("/");
+
+    const featured = page.locator("h2").first();
+    const before = await featured.textContent();
+    await page.getByRole("button", { name: "换一批精选工具" }).click();
+    await expect(featured).not.toHaveText(before ?? "");
+  });
+
+  test("labels official entries on the detail page", async ({ page }) => {
+    await page.goto("/tools/chatgpt");
+
+    await expect(page.getByRole("heading", { name: "官方入口" })).toBeVisible();
+    await expect(page.getByText("官网", { exact: true })).toBeVisible();
+    await expect(page.getByText("chatgpt.com")).toBeVisible();
+  });
+
   test("switches between themes", async ({ page }) => {
     await page.goto("/");
 

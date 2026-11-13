@@ -2,6 +2,8 @@ import {
   CATEGORY_VALUES,
   type Category,
   categoryLabel,
+  FEATURE_VALUES,
+  type Feature,
   featureLabel,
   type OpenSourceFilter,
   PLATFORM_VALUES,
@@ -10,9 +12,9 @@ import {
   platformLabel,
   pricingLabel,
   statusLabel,
-  type Tool,
   typeLabel,
 } from "./tool-meta";
+import type { ToolSummary } from "./tool-summary";
 import { vendorName } from "./vendors";
 
 export interface ToolFilters {
@@ -20,6 +22,8 @@ export interface ToolFilters {
   categories: Category[];
   pricing: Pricing | "all";
   openSource: OpenSourceFilter;
+  platforms: Platform[];
+  features: Feature[];
 }
 
 export const DEFAULT_FILTERS: ToolFilters = {
@@ -27,6 +31,8 @@ export const DEFAULT_FILTERS: ToolFilters = {
   categories: [],
   pricing: "all",
   openSource: "all",
+  platforms: [],
+  features: [],
 };
 
 /**
@@ -81,7 +87,7 @@ function expandTerm(term: string): string[] {
   return [normalized, ...group.map(normalize)];
 }
 
-function searchHaystack(tool: Tool): string {
+function searchHaystack(tool: ToolSummary): string {
   const categoryTerms = tool.categories.flatMap((category) => [
     category,
     categoryLabel(category),
@@ -99,7 +105,6 @@ function searchHaystack(tool: Tool): string {
     [
       tool.name,
       tool.tagline,
-      tool.description,
       tool.vendorId,
       vendorName(tool.vendorId),
       ...tool.keywords,
@@ -111,12 +116,12 @@ function searchHaystack(tool: Tool): string {
       pricingLabel(tool.pricing),
       statusLabel(tool.status),
       tool.openSource ? "开源 open source" : "闭源 closed source",
-      new URL(tool.links.website).hostname,
+      new URL(tool.website).hostname,
     ].join(" "),
   );
 }
 
-function matchScore(tool: Tool, rawQuery: string): number {
+function matchScore(tool: ToolSummary, rawQuery: string): number {
   const query = normalize(rawQuery.trim());
   if (!query) return 0;
 
@@ -128,7 +133,7 @@ function matchScore(tool: Tool, rawQuery: string): number {
 
   const name = normalize(tool.name);
   const attributes = [...tool.features, ...tool.keywords].map(normalize);
-  const desc = normalize(`${tool.tagline} ${tool.description}`);
+  const desc = normalize(tool.tagline);
   const haystack = searchHaystack(tool);
 
   const terms = query.split(/\s+/).filter(Boolean);
@@ -149,7 +154,7 @@ function matchScore(tool: Tool, rawQuery: string): number {
   return score;
 }
 
-export function matchesQuery(tool: Tool, query: string): boolean {
+export function matchesQuery(tool: ToolSummary, query: string): boolean {
   return matchScore(tool, query) >= 0;
 }
 
@@ -158,9 +163,9 @@ export function matchesQuery(tool: Tool, query: string): boolean {
  * different dimensions are AND.
  */
 export function filterTools(
-  tools: readonly Tool[],
+  tools: readonly ToolSummary[],
   filters: ToolFilters,
-): Tool[] {
+): ToolSummary[] {
   const filtered = tools.filter((tool) => {
     if (!matchesQuery(tool, filters.query)) return false;
 
@@ -177,6 +182,20 @@ export function filterTools(
 
     if (filters.openSource === "yes" && !tool.openSource) return false;
     if (filters.openSource === "no" && tool.openSource) return false;
+
+    if (
+      filters.platforms.length > 0 &&
+      !filters.platforms.some((platform) => tool.platforms.includes(platform))
+    ) {
+      return false;
+    }
+
+    if (
+      filters.features.length > 0 &&
+      !filters.features.some((feature) => tool.features.includes(feature))
+    ) {
+      return false;
+    }
 
     return true;
   });
@@ -204,4 +223,8 @@ export function isPricing(value: string | null): value is Pricing {
 
 export function isPlatform(value: string | null): value is Platform {
   return value !== null && PLATFORM_VALUES.includes(value as Platform);
+}
+
+export function isFeature(value: string | null): value is Feature {
+  return value !== null && FEATURE_VALUES.includes(value as Feature);
 }

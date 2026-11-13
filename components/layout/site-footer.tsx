@@ -14,7 +14,7 @@ export function SiteFooter() {
         className="from-brand/5 pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b to-transparent"
       />
       <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
-        <div className="grid gap-10 sm:grid-cols-[1.5fr_1fr_1fr]">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div className="max-w-sm">
             <Link
               href="/"
@@ -32,6 +32,22 @@ export function SiteFooter() {
               Data · {DATA_UPDATED_LABEL}
             </p>
           </div>
+
+          <nav aria-label="分类导航">
+            <p className="eyebrow">分类</p>
+            <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1 text-[13px]">
+              {CATEGORIES.map((category) => (
+                <li key={category.value}>
+                  <Link
+                    href={`/c/${category.value}`}
+                    className="text-muted-foreground hover:text-brand inline-flex min-h-8 items-center transition-colors"
+                  >
+                    {category.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
 
           <nav aria-label="站点导航">
             <p className="eyebrow">站点</p>

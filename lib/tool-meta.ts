@@ -4,17 +4,67 @@
  */
 
 export const CATEGORIES = [
-  { value: "assistant", label: "对话助手" },
-  { value: "writing", label: "写作" },
-  { value: "image", label: "绘画" },
-  { value: "video", label: "视频" },
-  { value: "audio", label: "语音" },
-  { value: "coding", label: "编程" },
-  { value: "productivity", label: "办公" },
-  { value: "search", label: "搜索" },
-  { value: "design", label: "设计" },
-  { value: "agent", label: "智能体" },
-  { value: "infrastructure", label: "基础设施" },
+  {
+    value: "assistant",
+    label: "对话助手",
+    description:
+      "能连续对话、读长文与文件的通用助手，适合问答、写作与资料整理。",
+  },
+  {
+    value: "writing",
+    label: "写作",
+    description:
+      "生成、改写、润色与校对文本，覆盖营销文案、学术写作与日常表达。",
+  },
+  {
+    value: "image",
+    label: "绘画",
+    description: "文生图、图生图与图像编辑，覆盖插画、海报、商品图与素材生产。",
+  },
+  {
+    value: "video",
+    label: "视频",
+    description:
+      "视频生成、剪辑、数字人口播与字幕转录，覆盖短视频与长视频工作流。",
+  },
+  {
+    value: "audio",
+    label: "语音",
+    description: "语音合成、声音克隆与音频处理，适合配音、播客与有声内容。",
+  },
+  {
+    value: "coding",
+    label: "编程",
+    description:
+      "代码补全、生成、重构与自主编程代理，覆盖编辑器、终端与在线 IDE。",
+  },
+  {
+    value: "productivity",
+    label: "办公",
+    description: "会议记录、笔记、日程、自动化与演示文稿，把重复工作交给 AI。",
+  },
+  {
+    value: "search",
+    label: "搜索",
+    description: "带来源引用的 AI 搜索与研究工具，适合查资料、调研与事实核对。",
+  },
+  {
+    value: "design",
+    label: "设计",
+    description: "平面设计、海报、矢量图与品牌视觉生成，适合快速出图与改稿。",
+  },
+  {
+    value: "agent",
+    label: "智能体",
+    description:
+      "可规划并执行多步任务的 AI 代理与工作流平台，覆盖编程、浏览与自动化。",
+  },
+  {
+    value: "infrastructure",
+    label: "基础设施",
+    description:
+      "模型运行时、开发框架与可自托管的平台，适合构建与部署 AI 应用。",
+  },
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number]["value"];

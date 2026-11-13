@@ -17,7 +17,7 @@ vi.mock("@/components/tools/tools-explorer", () => ({
   ),
 }));
 
-import { tools } from "@/lib/tools";
+import { toolSummaries } from "@/lib/tools";
 
 describe("home page", () => {
   it("renders the explorer with the full dataset", () => {
@@ -26,7 +26,7 @@ describe("home page", () => {
       "只收王牌，一键直达",
     );
     expect(Number(screen.getByTestId("tool-count").textContent)).toBe(
-      tools.length,
+      toolSummaries.length,
     );
   });
 });

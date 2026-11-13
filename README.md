@@ -32,6 +32,11 @@ pnpm run dev
 
 打开 [http://localhost:3000](http://localhost:3000)。
 
+启动排错：
+
+- `Can't resolve 'tailwindcss'`（页面全站 500）：`.next` 里的 Turbopack 缓存与当前 `node_modules` 不一致，重装依赖或切换分支后常见。`pnpm run clean` 后重新 `pnpm run dev` 即可，不需要改依赖。
+- `Another next dev server is already running`：仍有旧 dev 进程占着端口，按提示 `kill <PID>` 后重启；也可以 `pnpm run clean` 一并清掉残留的 `.next/dev/lock`。
+
 ## 脚本
 
 | 命令                     | 说明                                            |
@@ -39,6 +44,7 @@ pnpm run dev
 | `pnpm run dev`           | 启动开发服务器                                  |
 | `pnpm run build`         | 生产构建                                        |
 | `pnpm run start`         | 启动生产服务器                                  |
+| `pnpm run clean`         | 删除 `.next` 构建缓存（启动异常时用）           |
 | `pnpm run lint`          | Biome 检查（格式 + lint）                       |
 | `pnpm run format`        | Prettier 写入格式                               |
 | `pnpm run format:check`  | 校验格式                                        |

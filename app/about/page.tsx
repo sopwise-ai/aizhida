@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
 import { DATA_UPDATED_LABEL, SITE_NAME } from "@/lib/site";
+import { getToolLogo } from "@/lib/tool-logos";
 import { CATEGORIES } from "@/lib/tool-meta";
 import { tools } from "@/lib/tools";
 
@@ -48,6 +49,13 @@ const rejected = [
   "没有实际功能的套壳站或纯导流页",
   "无法核验官网、定价或基本信息的工具",
 ];
+
+const completeness = {
+  logo: tools.filter((tool) => getToolLogo(tool.id)).length,
+  github: tools.filter((tool) => tool.links.github).length,
+  docs: tools.filter((tool) => tool.links.docs).length,
+  pricing: tools.filter((tool) => tool.links.pricing).length,
+};
 
 const stats = [
   { value: String(tools.length), label: "当前收录" },
@@ -142,6 +150,9 @@ export default function AboutPage() {
             <li>不展示无法核验的 Star 数或热度排名。</li>
             <li>数据整理于 {DATA_UPDATED_LABEL}，价格与功能以官网为准。</li>
           </ul>
+          <p className="text-muted-foreground border-border/70 mt-4 border-t pt-3 text-[11px] leading-5">
+            {`数据完整度：${tools.length} 个工具中 ${completeness.logo} 个有官方 logo、${completeness.github} 个有开源仓库直链；文档 ${completeness.docs} 个、独立定价页 ${completeness.pricing} 个，暂以官网为准，后续核对会逐步补齐。`}
+          </p>
         </section>
         <section
           id="privacy"
