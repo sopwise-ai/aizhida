@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
-
 import { getToolLogo } from "./tool-logos";
+import { FIELD_LIMITS } from "./tool-meta";
 import {
+  canonicalSiteKey,
   getTool,
   toolSchema,
   toolSummaries,
@@ -48,10 +49,7 @@ describe("tools dataset", () => {
   });
 
   it("has unique canonical websites", () => {
-    const sites = tools.map((tool) => {
-      const url = new URL(tool.links.website);
-      return `${url.hostname.replace(/^www\./, "")}${url.pathname.replace(/\/+$/, "")}`;
-    });
+    const sites = tools.map((tool) => canonicalSiteKey(tool.links.website));
     expect(new Set(sites).size).toBe(tools.length);
   });
 
@@ -70,13 +68,23 @@ describe("tools dataset", () => {
     }
   });
 
-  it("keeps descriptions within the detail-page budget", () => {
+  it("keeps every record inside the shared field budgets", () => {
     for (const tool of tools) {
-      expect(tool.tagline.length).toBeLessThanOrEqual(60);
-      expect(tool.description.length).toBeGreaterThanOrEqual(120);
-      expect(tool.description.length).toBeLessThanOrEqual(300);
-      expect(tool.features.length).toBeGreaterThanOrEqual(2);
-      expect(tool.features.length).toBeLessThanOrEqual(6);
+      expect(tool.tagline.length).toBeLessThanOrEqual(
+        FIELD_LIMITS.taglineMaxLength,
+      );
+      expect(tool.description.length).toBeGreaterThanOrEqual(
+        FIELD_LIMITS.descriptionMinLength,
+      );
+      expect(tool.description.length).toBeLessThanOrEqual(
+        FIELD_LIMITS.descriptionMaxLength,
+      );
+      expect(tool.features.length).toBeGreaterThanOrEqual(
+        FIELD_LIMITS.featuresMin,
+      );
+      expect(tool.features.length).toBeLessThanOrEqual(
+        FIELD_LIMITS.featuresMax,
+      );
     }
   });
 
@@ -96,9 +104,9 @@ describe("tools dataset", () => {
     expect(summary).not.toHaveProperty("description");
     expect(summary).not.toHaveProperty("links");
     expect(summary.website).toBe(full.links.website);
-    // 摘要必须显著小于完整记录，否则首页又会把详情字段带上客户端。
+    // 摘要必须显著小于完整记录（实测约 0.53），否则详情字段又回客户端了。
     expect(JSON.stringify(toolSummaries).length).toBeLessThan(
-      JSON.stringify(tools).length * 0.7,
+      JSON.stringify(tools).length * 0.6,
     );
   });
 
@@ -164,5 +172,221 @@ describe("tools dataset", () => {
       { ...minimalTool, verifiedAt: "2026-11-12" },
     ]);
     expect(lateVerified.success).toBe(false);
+  });
+
+  it("rejects unknown fields instead of silently stripping them", () => {
+    expect(
+      toolSchema.safeParse({ ...minimalTool, platfroms: ["web"] }).success,
+    ).toBe(false);
+
+    expect(
+      toolSchema.safeParse({
+        ...minimalTool,
+        links: { ...minimalTool.links, gihub: "https://example.com" },
+      }).success,
+    ).toBe(false);
+  });
+
+  it("bounds taglines, keywords and taxonomy arrays", () => {
+    const cases = [
+      { name: " ChatGPT" },
+      { tagline: "太短" },
+      { tagline: " 一段足够长的说明文字 " },
+      { tagline: "长".repeat(61) },
+      { keywords: ["GPT"] },
+      { keywords: [" gpt"] },
+      { keywords: ["gpt "] },
+      { keywords: ["a".repeat(21)] },
+      { categories: ["assistant", "writing", "image", "coding"] },
+      { categories: ["writing", "writing"] },
+      { features: ["chat"] },
+      {
+        features: [
+          "chat",
+          "rewrite",
+          "summarize",
+          "translation",
+          "multimodal",
+          "long-context",
+          "file-upload",
+          "web-search",
+          "code-execution",
+        ],
+      },
+      { features: ["chat", "chat"] },
+      { platforms: ["web", "web"] },
+    ];
+
+    for (const patch of cases) {
+      expect(toolSchema.safeParse({ ...minimalTool, ...patch }).success).toBe(
+        false,
+      );
+    }
+  });
+
+  it("caps slug lengths so ids stay URL-friendly", () => {
+    expect(
+      toolSchema.safeParse({ ...minimalTool, id: "a".repeat(61) }).success,
+    ).toBe(false);
+    expect(
+      toolSchema.safeParse({ ...minimalTool, vendorId: "a".repeat(61) })
+        .success,
+    ).toBe(false);
+  });
+
+  it("rejects calendar-invalid dates", () => {
+    expect(
+      toolSchema.safeParse({ ...minimalTool, addedAt: "2026-02-30" }).success,
+    ).toBe(false);
+    expect(
+      toolSchema.safeParse({ ...minimalTool, addedAt: "2026-13-01" }).success,
+    ).toBe(false);
+  });
+
+  it("allows up to eight features for the expanded vocabulary", () => {
+    const result = toolSchema.safeParse({
+      ...minimalTool,
+      features: [
+        "chat",
+        "rewrite",
+        "summarize",
+        "translation",
+        "multimodal",
+        "long-context",
+        "file-upload",
+      ],
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects oversized urls and urls with credentials", () => {
+    const longUrl = `https://example.com/${"a".repeat(2048)}`;
+    expect(
+      toolSchema.safeParse({
+        ...minimalTool,
+        links: { ...minimalTool.links, website: longUrl },
+      }).success,
+    ).toBe(false);
+
+    expect(
+      toolSchema.safeParse({
+        ...minimalTool,
+        links: {
+          ...minimalTool.links,
+          website: "https://user:pass@example.com",
+        },
+      }).success,
+    ).toBe(false);
+  });
+
+  it("accepts real leap days and rejects impossible ones", () => {
+    expect(
+      toolSchema.safeParse({ ...minimalTool, addedAt: "2024-02-29" }).success,
+    ).toBe(true);
+    expect(
+      toolSchema.safeParse({ ...minimalTool, addedAt: "2023-02-29" }).success,
+    ).toBe(false);
+  });
+
+  it("rejects malformed urls without throwing from safeParse", () => {
+    const parse = () =>
+      toolSchema.safeParse({
+        ...minimalTool,
+        links: { ...minimalTool.links, website: "not a url" },
+      });
+
+    expect(parse).not.toThrow();
+    expect(parse().success).toBe(false);
+  });
+
+  it("uses the shared description budget at both boundaries", () => {
+    const atFloor = "字".repeat(FIELD_LIMITS.descriptionMinLength);
+    const atCeiling = "字".repeat(FIELD_LIMITS.descriptionMaxLength);
+
+    expect(
+      toolSchema.safeParse({ ...minimalTool, description: atFloor }).success,
+    ).toBe(true);
+    expect(
+      toolSchema.safeParse({ ...minimalTool, description: atFloor.slice(1) })
+        .success,
+    ).toBe(false);
+    expect(
+      toolSchema.safeParse({ ...minimalTool, description: atCeiling }).success,
+    ).toBe(true);
+    expect(
+      toolSchema.safeParse({
+        ...minimalTool,
+        description: `${atCeiling}字`,
+      }).success,
+    ).toBe(false);
+  });
+
+  it("accepts keywords up to the shared per-keyword limit", () => {
+    expect(
+      toolSchema.safeParse({
+        ...minimalTool,
+        keywords: ["a".repeat(FIELD_LIMITS.keywordMaxLength)],
+      }).success,
+    ).toBe(true);
+    expect(
+      toolSchema.safeParse({
+        ...minimalTool,
+        keywords: ["a".repeat(FIELD_LIMITS.keywordMaxLength + 1)],
+      }).success,
+    ).toBe(false);
+  });
+
+  it("canonicalizes www, trailing slashes and query but keeps ports", () => {
+    expect(canonicalSiteKey("https://www.example.com/")).toBe("example.com");
+    expect(canonicalSiteKey("https://example.com")).toBe("example.com");
+    expect(canonicalSiteKey("https://example.com/?ref=x#top")).toBe(
+      "example.com",
+    );
+    expect(canonicalSiteKey("https://example.com:8443/a/")).toBe(
+      "example.com:8443/a",
+    );
+  });
+
+  it("treats www and trailing-slash variants as the same website", () => {
+    const result = toolsSchema.safeParse([
+      minimalTool,
+      {
+        ...minimalTool,
+        id: "x-tool-2",
+        links: { ...minimalTool.links, website: "https://www.example.com/" },
+      },
+    ]);
+
+    expect(result.success).toBe(false);
+  });
+
+  it("treats the same host on a different port as a different website", () => {
+    const result = toolsSchema.safeParse([
+      minimalTool,
+      {
+        ...minimalTool,
+        id: "x-tool-2",
+        links: {
+          ...minimalTool.links,
+          website: "https://example.com:8443",
+        },
+      },
+    ]);
+
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects malformed websites without throwing from safeParse", () => {
+    const parse = () =>
+      toolsSchema.safeParse([
+        {
+          ...minimalTool,
+          links: { ...minimalTool.links, website: "not a url" },
+        },
+      ]);
+
+    expect(parse).not.toThrow();
+    expect(parse().success).toBe(false);
   });
 });

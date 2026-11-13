@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 
 import { JsonLd } from "@/components/seo/json-ld";
 import { ToolsExplorer } from "@/components/tools/tools-explorer";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { SITE_URL } from "@/lib/site";
+import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/site-meta";
 import { toolSummaries } from "@/lib/tools";
 
 export const metadata: Metadata = {

@@ -18,7 +18,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { SITE_NAME } from "@/lib/site";
+import { SITE_NAME } from "@/lib/site-meta";
 import { cn } from "@/lib/utils";
 
 const navLinks = [

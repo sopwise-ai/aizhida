@@ -1,98 +1,65 @@
 import { z } from "zod";
 import rawTools from "@/data/tools.json";
 import { getToolLogo } from "./tool-logos";
-import {
-  CATEGORY_VALUES,
-  FEATURE_VALUES,
-  PLATFORM_VALUES,
-  PRICING_VALUES,
-  STATUS_VALUES,
-  type Tool,
-  TYPE_VALUES,
-} from "./tool-meta";
+import { FIELD_LIMITS, type Tool } from "./tool-meta";
+import { SLUG_PATTERN, toolSchema } from "./tool-schema";
 import { type ToolSummary, toToolSummary } from "./tool-summary";
 import { vendors } from "./vendors";
 
-const httpsUrl = z
-  .string()
-  .url("url 不是合法链接")
-  .refine((url) => url.startsWith("https://"), "url 必须使用 https");
+// 单条记录的 schema 在 lib/tool-schema.ts：那里不 import 数据文件，
+// 才能被 scripts/generate-json-schema.ts 直接加载生成 JSON Schema。
+export { toolSchema };
 
-const keywordSchema = z
-  .string()
-  .min(1, "关键词不能为空")
-  .max(12, "关键词最多 12 个字符")
-  .refine((value) => value === value.toLowerCase(), "关键词必须小写");
+/**
+ * 厂商注册表的结构与唯一性校验。放在构建期而不是只放测试：
+ * vendorsById 是 Map，重复 id 会静默覆盖成"后写的赢"，这种数据
+ * 必须让 next build 失败。vendors.ts 本身保持零依赖，客户端可安全导入。
+ */
+export const vendorsSchema = z
+  .array(
+    z
+      .object({
+        id: z
+          .string()
+          .max(
+            FIELD_LIMITS.vendorIdMaxLength,
+            `vendor id 最多 ${FIELD_LIMITS.vendorIdMaxLength} 个字符`,
+          )
+          .regex(SLUG_PATTERN, "vendor id 只能包含小写字母、数字和连字符"),
+        name: z
+          .string()
+          .min(1, "厂商名称不能为空")
+          .max(
+            FIELD_LIMITS.vendorNameMaxLength,
+            `厂商名称最多 ${FIELD_LIMITS.vendorNameMaxLength} 个字符`,
+          ),
+      })
+      .strict(),
+  )
+  .superRefine((items, ctx) => {
+    const seen = new Set<string>();
+    items.forEach((item, index) => {
+      if (seen.has(item.id)) {
+        ctx.addIssue({
+          code: "custom",
+          message: `vendor id 重复：${item.id}`,
+          path: [index, "id"],
+        });
+      }
+      seen.add(item.id);
+    });
+  });
 
-const isoDate = z
-  .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "日期格式必须是 YYYY-MM-DD")
-  .refine((value) => {
-    const date = new Date(`${value}T00:00:00Z`);
-    return (
-      !Number.isNaN(date.getTime()) && date.toISOString().startsWith(value)
-    );
-  }, "日期不合法");
-
-function distinct<T>(values: T[]): boolean {
-  return new Set(values).size === values.length;
+/**
+ * 官网唯一性判定键：忽略 www、结尾斜杠、query 与 hash，保留端口
+ * （同域不同端口是不同服务）。抽成函数是为了让测试复用同一规则，
+ * 而不是各写一份正则。
+ */
+export function canonicalSiteKey(website: string): string {
+  const url = new URL(website);
+  const host = url.host.replace(/^www\./, "");
+  return `${host}${url.pathname.replace(/\/+$/, "")}`;
 }
-
-export const toolSchema = z.object({
-  id: z
-    .string()
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "id 只能包含小写字母、数字和连字符"),
-  name: z.string().min(1, "名称不能为空").max(30, "名称最多 30 个字符"),
-  vendorId: z
-    .string()
-    .regex(
-      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-      "vendorId 只能包含小写字母、数字和连字符",
-    ),
-  categories: z
-    .array(z.enum(CATEGORY_VALUES))
-    .min(1, "至少一个分类")
-    .max(3, "最多 3 个分类")
-    .refine(distinct, "分类不能重复"),
-  type: z.enum(TYPE_VALUES),
-  platforms: z
-    .array(z.enum(PLATFORM_VALUES))
-    .min(1, "至少一个平台")
-    .max(5, "平台最多 5 个")
-    .refine(distinct, "平台不能重复"),
-  pricing: z.enum(PRICING_VALUES),
-  openSource: z.boolean(),
-  status: z.enum(STATUS_VALUES),
-  tagline: z
-    .string()
-    .min(8, "一句话说明至少 8 个字符")
-    .max(60, "一句话说明最多 60 个字符"),
-  description: z
-    .string()
-    .min(120, "详情描述至少 120 个字符")
-    .max(300, "详情描述最多 300 个字符"),
-  features: z
-    .array(z.enum(FEATURE_VALUES))
-    .min(2, "至少 2 个特性")
-    .max(6, "最多 6 个特性")
-    .refine(distinct, "特性不能重复"),
-  keywords: z
-    .array(keywordSchema)
-    .max(6, "关键词最多 6 个")
-    .refine(distinct, "关键词不能重复"),
-  links: z.object({
-    website: httpsUrl,
-    github: httpsUrl.nullable(),
-    docs: httpsUrl.nullable(),
-    pricing: httpsUrl.nullable(),
-    store: httpsUrl.nullable(),
-  }),
-  affiliateUrl: httpsUrl.nullable(),
-  sponsored: z.boolean(),
-  addedAt: isoDate,
-  updatedAt: isoDate,
-  verifiedAt: isoDate,
-});
 
 // 导出供测试直接构造数组级用例（重复 id / 未知厂商 / 日期矛盾等）。
 export const toolsSchema = z.array(toolSchema).superRefine((items, ctx) => {
@@ -118,16 +85,23 @@ export const toolsSchema = z.array(toolSchema).superRefine((items, ctx) => {
       });
     }
 
-    const site = new URL(item.links.website);
-    const key = `${site.hostname.replace(/^www\./, "")}${site.pathname.replace(/\/+$/, "")}`;
-    if (seenSites.has(key)) {
-      ctx.addIssue({
-        code: "custom",
-        message: `官网重复：${item.links.website}`,
-        path: [index, "links", "website"],
-      });
+    // 官网非法时 z.url() 已单独报错；这里跳过重复检测，避免 safeParse 抛异常。
+    let siteKey: string | null = null;
+    try {
+      siteKey = canonicalSiteKey(item.links.website);
+    } catch {
+      siteKey = null;
     }
-    seenSites.add(key);
+    if (siteKey !== null) {
+      if (seenSites.has(siteKey)) {
+        ctx.addIssue({
+          code: "custom",
+          message: `官网重复：${item.links.website}`,
+          path: [index, "links", "website"],
+        });
+      }
+      seenSites.add(siteKey);
+    }
 
     if (item.updatedAt < item.addedAt) {
       ctx.addIssue({
@@ -148,9 +122,13 @@ export const toolsSchema = z.array(toolSchema).superRefine((items, ctx) => {
 
 /**
  * 数据在模块加载时校验：任何非法字段都会让 next build 直接失败。
- * 客户端组件只通过 props 拿数据，不会把 zod 带进浏览器包。
+ * 客户端组件只通过 props 拿数据；lib/client-boundary.test.ts 会扫描
+ * `"use client"` 文件，阻止它们导入本模块（避免 zod 进浏览器包）。
  */
 export const tools: Tool[] = toolsSchema.parse(rawTools);
+
+// vendors.json 与 tools.json 一样在构建期校验：非法/重复数据直接让 next build 失败。
+vendorsSchema.parse(vendors);
 
 /**
  * 首页与客户端交互只消费摘要：不含 description / links / 运营字段。

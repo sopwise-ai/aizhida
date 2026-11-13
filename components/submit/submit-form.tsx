@@ -29,7 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { CONTACT_EMAIL, REPO_URL } from "@/lib/site";
+import { CONTACT_EMAIL, REPO_URL } from "@/lib/site-meta";
 import {
   CATEGORIES,
   type Category,
@@ -37,6 +37,7 @@ import {
   FEATURE_GROUPS,
   FEATURES,
   type Feature,
+  FIELD_LIMITS,
   featureLabel,
   PLATFORMS,
   type Platform,
@@ -123,25 +124,50 @@ function chipClass(active: boolean) {
 function collectErrors(state: FormState): Record<string, string> {
   const next: Record<string, string> = {};
   if (!state.name.trim()) next.name = "请填写工具名称。";
-  else if (state.name.trim().length > 30) next.name = "名称不要超过 30 个字。";
+  else if (state.name.trim().length > FIELD_LIMITS.nameMaxLength)
+    next.name = `名称不要超过 ${FIELD_LIMITS.nameMaxLength} 个字。`;
+
   if (!state.url.trim()) next.url = "请填写官网地址。";
   else {
     try {
       const parsed = new URL(state.url.trim());
       if (parsed.protocol !== "https:")
         next.url = "官网地址必须以 https:// 开头。";
+      else if (parsed.href.length > FIELD_LIMITS.urlMaxLength)
+        next.url = `官网地址不要超过 ${FIELD_LIMITS.urlMaxLength} 个字符。`;
     } catch {
       next.url = "请输入完整、有效的官网地址。";
     }
   }
+
   const taglineLength = state.tagline.trim().length;
-  if (taglineLength < 8)
-    next.tagline = "一句话说明至少写 8 个字，讲清楚它能做什么。";
-  else if (taglineLength > 60) next.tagline = "一句话说明不要超过 60 个字。";
-  if (state.categories.length === 0) next.categories = "请选择 1–3 个分类。";
+  if (taglineLength < FIELD_LIMITS.taglineMinLength)
+    next.tagline = `一句话说明至少写 ${FIELD_LIMITS.taglineMinLength} 个字，讲清楚它能做什么。`;
+  else if (taglineLength > FIELD_LIMITS.taglineMaxLength)
+    next.tagline = `一句话说明不要超过 ${FIELD_LIMITS.taglineMaxLength} 个字。`;
+
+  if (state.categories.length === 0)
+    next.categories = `请选择 1–${FIELD_LIMITS.categoriesMax} 个分类。`;
   if (state.platforms.length === 0) next.platforms = "请至少选择一个平台。";
-  if (state.features.length < 2)
-    next.features = "请至少选择 2 个特性，方便检索与筛选。";
+
+  if (state.features.length < FIELD_LIMITS.featuresMin)
+    next.features = `请至少选择 ${FIELD_LIMITS.featuresMin} 个特性，方便检索与筛选。`;
+  else if (state.features.length > FIELD_LIMITS.featuresMax)
+    next.features = `最多选择 ${FIELD_LIMITS.featuresMax} 个特性。`;
+
+  const keywordList = state.keywords
+    .split(/[,，]/)
+    .map((keyword) => keyword.trim())
+    .filter(Boolean);
+  if (keywordList.length > FIELD_LIMITS.keywordsMax)
+    next.keywords = `关键词最多 ${FIELD_LIMITS.keywordsMax} 个。`;
+  else if (
+    keywordList.some(
+      (keyword) => keyword.length > FIELD_LIMITS.keywordMaxLength,
+    )
+  )
+    next.keywords = `单个关键词最多 ${FIELD_LIMITS.keywordMaxLength} 个字符。`;
+
   return next;
 }
 
@@ -158,7 +184,7 @@ export function SubmitForm() {
         .split(/[,，]/)
         .map((keyword) => keyword.trim().toLowerCase())
         .filter(Boolean)
-        .slice(0, 6),
+        .slice(0, FIELD_LIMITS.keywordsMax),
     [form.keywords],
   );
 
@@ -220,7 +246,8 @@ export function SubmitForm() {
           categories: previous.categories.filter((item) => item !== category),
         };
       }
-      if (previous.categories.length >= 3) return previous;
+      if (previous.categories.length >= FIELD_LIMITS.categoriesMax)
+        return previous;
       return { ...previous, categories: [...previous.categories, category] };
     });
     setErrors((previous) => {
@@ -257,7 +284,7 @@ export function SubmitForm() {
           features: previous.features.filter((item) => item !== feature),
         };
       }
-      if (previous.features.length >= 6) return previous;
+      if (previous.features.length >= FIELD_LIMITS.featuresMax) return previous;
       return { ...previous, features: [...previous.features, feature] };
     });
     setErrors((previous) => {
@@ -282,7 +309,9 @@ export function SubmitForm() {
               ? `tool-category-${CATEGORIES[0].value}`
               : next.platforms
                 ? "tool-platform-web"
-                : `tool-feature-${FEATURES[0].value}`;
+                : next.features
+                  ? `tool-feature-${FEATURES[0].value}`
+                  : "tool-keywords";
       requestAnimationFrame(() => {
         document.getElementById(target)?.focus();
       });
@@ -450,7 +479,7 @@ ${json}
                 一句话说明 <span className="text-brand">*</span>
               </FieldLabel>
               <span className="text-muted-foreground font-mono text-[10px] tabular-nums">
-                {form.tagline.trim().length}/60
+                {form.tagline.trim().length}/{FIELD_LIMITS.taglineMaxLength}
               </span>
             </div>
             <Textarea
@@ -458,7 +487,7 @@ ${json}
               value={form.tagline}
               onChange={(event) => setField("tagline", event.target.value)}
               placeholder="它解决什么问题？例如：内置 AI 的代码编辑器，可对话式修改项目。"
-              maxLength={60}
+              maxLength={FIELD_LIMITS.taglineMaxLength}
               rows={3}
               aria-invalid={Boolean(errors.tagline)}
               aria-describedby={errors.tagline ? "tagline-error" : undefined}
@@ -472,7 +501,8 @@ ${json}
               <FieldError id="tagline-error">{errors.tagline}</FieldError>
             ) : null}
             <FieldDescription>
-              详情页正文（120–300 字）由维护者在收录时补全。
+              详情页正文（{FIELD_LIMITS.descriptionMinLength}–
+              {FIELD_LIMITS.descriptionMaxLength} 字）由维护者在收录时补全。
             </FieldDescription>
           </Field>
 
@@ -486,7 +516,7 @@ ${json}
                 分类 <span className="text-brand">*</span>
               </FieldLabel>
               <span className="text-muted-foreground text-[10px]">
-                最多 3 个
+                最多 {FIELD_LIMITS.categoriesMax} 个
               </span>
             </div>
             <div className="mt-1 flex flex-wrap gap-1.5">
@@ -622,7 +652,7 @@ ${json}
                 特性 <span className="text-brand">*</span>
               </FieldLabel>
               <span className="text-muted-foreground text-[10px]">
-                2–6 个，可多选
+                {FIELD_LIMITS.featuresMin}–{FIELD_LIMITS.featuresMax} 个，可多选
               </span>
             </div>
             <div className="mt-2 flex flex-col gap-2.5">
@@ -636,7 +666,9 @@ ${json}
                       (feature) => feature.group === group.value,
                     ).map((feature) => {
                       const active = form.features.includes(feature.value);
-                      const disabled = !active && form.features.length >= 6;
+                      const disabled =
+                        !active &&
+                        form.features.length >= FIELD_LIMITS.featuresMax;
                       return (
                         <button
                           key={feature.value}
@@ -666,18 +698,24 @@ ${json}
             ) : null}
           </FieldSet>
 
-          <Field>
+          <Field data-invalid={Boolean(errors.keywords) || undefined}>
             <FieldLabel htmlFor="tool-keywords">检索关键词</FieldLabel>
             <Input
               id="tool-keywords"
               value={form.keywords}
               onChange={(event) => setField("keywords", event.target.value)}
               placeholder="例如：代码补全, 编辑器, ai"
-              className={cn("mt-1.5", fieldClass(false))}
+              aria-invalid={Boolean(errors.keywords)}
+              aria-describedby={errors.keywords ? "keywords-error" : undefined}
+              className={cn("mt-1.5", fieldClass(Boolean(errors.keywords)))}
               autoComplete="off"
             />
+            {errors.keywords ? (
+              <FieldError id="keywords-error">{errors.keywords}</FieldError>
+            ) : null}
             <FieldDescription>
-              用逗号分隔，最多 6 个；只用于站内搜索，不参与筛选。
+              用逗号分隔，最多 {FIELD_LIMITS.keywordsMax} 个；单个不超过{" "}
+              {FIELD_LIMITS.keywordMaxLength} 个字符，只用于站内搜索。
             </FieldDescription>
           </Field>
 

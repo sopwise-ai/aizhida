@@ -8,7 +8,7 @@ import {
   AlertTitle,
 } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
-import { DATA_UPDATED_LABEL, SITE_NAME } from "@/lib/site";
+import { DATA_UPDATED_LABEL, SITE_NAME } from "@/lib/site-meta";
 import { getToolLogo } from "@/lib/tool-logos";
 import { CATEGORIES } from "@/lib/tool-meta";
 import { tools } from "@/lib/tools";

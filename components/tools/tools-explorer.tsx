@@ -46,7 +46,7 @@ import {
   isPricing,
   type ToolFilters,
 } from "@/lib/filter-tools";
-import { DATA_UPDATED_LABEL } from "@/lib/site";
+import { DATA_UPDATED_LABEL } from "@/lib/site-meta";
 import {
   CATEGORIES,
   type Category,

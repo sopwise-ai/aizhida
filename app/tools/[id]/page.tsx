@@ -5,7 +5,8 @@ import { notFound } from "next/navigation";
 
 import { JsonLd } from "@/components/seo/json-ld";
 import { ToolLogo } from "@/components/tools/tool-logo";
-import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { SITE_URL } from "@/lib/site";
+import { SITE_NAME } from "@/lib/site-meta";
 import { getToolLogo } from "@/lib/tool-logos";
 import {
   categoryLabel,

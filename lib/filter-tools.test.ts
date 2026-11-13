@@ -3,11 +3,13 @@ import {
   DEFAULT_FILTERS,
   filterTools,
   isCategory,
+  isFeature,
   isPlatform,
   isPricing,
   matchesQuery,
   type ToolFilters,
 } from "./filter-tools";
+import { PRICING_VALUES } from "./tool-meta";
 import { toolSummaries } from "./tools";
 
 function filtersWith(partial: Partial<ToolFilters>): ToolFilters {
@@ -126,6 +128,52 @@ describe("matchesQuery", () => {
   });
 });
 
+describe("search quality", () => {
+  it("does not widen a proper noun into its alias group", () => {
+    const result = filterTools(
+      toolSummaries,
+      filtersWith({ query: "chatgpt" }),
+    );
+
+    // 修复前 "chatgpt" 命中 27 条（因为包含 "chat" 被扩成整组同义词）。
+    expect(result[0]?.id).toBe("chatgpt");
+    expect(result.length).toBeLessThan(5);
+  });
+
+  it("ranks an exact name match first", () => {
+    const result = filterTools(
+      toolSummaries,
+      filtersWith({ query: "ChatGPT" }),
+    );
+    expect(result[0]?.id).toBe("chatgpt");
+  });
+
+  it("matches tool ids so URL slugs are searchable", () => {
+    const claudeCode = toolSummaries.find((tool) => tool.id === "claude-code");
+    if (!claudeCode) throw new Error("claude-code missing");
+
+    expect(matchesQuery(claudeCode, "claude-code")).toBe(true);
+    expect(
+      filterTools(toolSummaries, filtersWith({ query: "claude-code" })),
+    ).toContainEqual(claudeCode);
+  });
+
+  it("matches the pricing slug as well as its label", () => {
+    const chatgpt = toolSummaries.find((tool) => tool.id === "chatgpt");
+    if (!chatgpt) throw new Error("chatgpt missing");
+
+    expect(chatgpt.pricing).toBe("freemium");
+    expect(matchesQuery(chatgpt, "freemium")).toBe(true);
+  });
+
+  it("keeps dataset order when there is no query", () => {
+    const result = filterTools(toolSummaries, DEFAULT_FILTERS);
+    expect(result.map((tool) => tool.id)).toEqual(
+      toolSummaries.map((tool) => tool.id),
+    );
+  });
+});
+
 describe("guards", () => {
   it("validates category values", () => {
     expect(isCategory("writing")).toBe(true);
@@ -133,8 +181,10 @@ describe("guards", () => {
     expect(isCategory(null)).toBe(false);
   });
 
-  it("validates pricing values", () => {
-    expect(isPricing("free")).toBe(true);
+  it("validates pricing values against the vocabulary", () => {
+    for (const value of PRICING_VALUES) {
+      expect(isPricing(value)).toBe(true);
+    }
     expect(isPricing("forever")).toBe(false);
     expect(isPricing(null)).toBe(false);
   });
@@ -143,6 +193,12 @@ describe("guards", () => {
     expect(isPlatform("web")).toBe(true);
     expect(isPlatform("teleport")).toBe(false);
     expect(isPlatform(null)).toBe(false);
+  });
+
+  it("validates feature values", () => {
+    expect(isFeature("multimodal")).toBe(true);
+    expect(isFeature("telepathy")).toBe(false);
+    expect(isFeature(null)).toBe(false);
   });
 });
 
@@ -196,5 +252,52 @@ describe("filterTools dimensions", () => {
       expect(tool.pricing).toBe("free");
       expect(tool.features).toContain("multimodal");
     }
+  });
+
+  it("requires every whitespace-separated term to match", () => {
+    const openIds = new Set(
+      filterTools(toolSummaries, filtersWith({ query: "开源" })).map(
+        (tool) => tool.id,
+      ),
+    );
+    const codeIds = new Set(
+      filterTools(toolSummaries, filtersWith({ query: "代码" })).map(
+        (tool) => tool.id,
+      ),
+    );
+    const intersection = new Set([...openIds].filter((id) => codeIds.has(id)));
+
+    const result = filterTools(
+      toolSummaries,
+      filtersWith({ query: "开源 代码" }),
+    );
+
+    expect(result.length).toBeGreaterThan(0);
+    expect(new Set(result.map((tool) => tool.id))).toEqual(intersection);
+  });
+
+  it("combines a query with dimension filters using AND", () => {
+    const result = filterTools(
+      toolSummaries,
+      filtersWith({ query: "chat", categories: ["writing"] }),
+    );
+
+    expect(result.length).toBeGreaterThan(0);
+    for (const tool of result) {
+      expect(tool.categories).toContain("writing");
+      expect(matchesQuery(tool, "chat")).toBe(true);
+    }
+  });
+
+  it("ignores trailing punctuation in queries", () => {
+    const result = filterTools(
+      toolSummaries,
+      filtersWith({ query: "ChatGPT？" }),
+    );
+    expect(result[0]?.id).toBe("chatgpt");
+
+    expect(
+      filterTools(toolSummaries, filtersWith({ query: "？" })),
+    ).toHaveLength(toolSummaries.length);
   });
 });

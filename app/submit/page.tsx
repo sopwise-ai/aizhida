@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { SubmitForm } from "@/components/submit/submit-form";
-import { SITE_NAME } from "@/lib/site";
+import { SITE_NAME } from "@/lib/site-meta";
 
 export const metadata: Metadata = {
   title: "提交工具",
@@ -21,7 +21,7 @@ const steps = [
   {
     title: "复制 JSON",
     description:
-      "表单会实时生成符合收录格式的 JSON，复制后在 Issue 中粘贴即可。",
+      "表单会实时生成 JSON 草稿（详情描述由维护者补全），复制后在 Issue 中粘贴即可。",
   },
   {
     title: "等待人工核验",

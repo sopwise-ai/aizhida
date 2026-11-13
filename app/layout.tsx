@@ -5,7 +5,8 @@ import type { ReactNode } from "react";
 import { AppProviders } from "@/components/app-providers";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { SITE_URL } from "@/lib/site";
+import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/site-meta";
 import { tools } from "@/lib/tools";
 import "./globals.css";
 

@@ -5,7 +5,8 @@ import { notFound } from "next/navigation";
 
 import { JsonLd } from "@/components/seo/json-ld";
 import { ToolCard } from "@/components/tools/tool-card";
-import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { SITE_URL } from "@/lib/site";
+import { SITE_NAME } from "@/lib/site-meta";
 import { CATEGORIES } from "@/lib/tool-meta";
 import { toolSummaries } from "@/lib/tools";
 

@@ -8,6 +8,7 @@ import {
   type OpenSourceFilter,
   PLATFORM_VALUES,
   type Platform,
+  PRICING_VALUES,
   type Pricing,
   platformLabel,
   pricingLabel,
@@ -74,17 +75,32 @@ function normalize(value: string): string {
   return value.toLowerCase().normalize("NFKC");
 }
 
+const NORMALIZED_ALIAS_GROUPS = ALIAS_GROUPS.map((group) =>
+  group.map((item) => normalize(item)),
+);
+
+function isCjk(value: string): boolean {
+  return /[\u3400-\u9fff]/.test(value);
+}
+
+/**
+ * 中文允许双向子串（"聊" ↔ "聊天"）；ASCII 只认整词。
+ * 否则 "chatgpt" 会因为包含 "chat" 被扩成整个聊天同义词组，
+ * 搜具体产品名反而返回几十条弱相关结果。
+ */
+function aliasMatches(term: string, candidate: string): boolean {
+  return isCjk(term)
+    ? term.includes(candidate) || candidate.includes(term)
+    : term === candidate;
+}
+
 function expandTerm(term: string): string[] {
   const normalized = normalize(term);
-  const group = ALIAS_GROUPS.find((items) =>
-    items.some((item) => {
-      const candidate = normalize(item);
-      return normalized.includes(candidate) || candidate.includes(normalized);
-    }),
+  const group = NORMALIZED_ALIAS_GROUPS.find((items) =>
+    items.some((candidate) => aliasMatches(normalized, candidate)),
   );
 
-  if (!group) return [normalized];
-  return [normalized, ...group.map(normalize)];
+  return group ? [normalized, ...group] : [normalized];
 }
 
 function searchHaystack(tool: ToolSummary): string {
@@ -103,6 +119,7 @@ function searchHaystack(tool: ToolSummary): string {
 
   return normalize(
     [
+      tool.id,
       tool.name,
       tool.tagline,
       tool.vendorId,
@@ -114,6 +131,7 @@ function searchHaystack(tool: ToolSummary): string {
       tool.type,
       typeLabel(tool.type),
       pricingLabel(tool.pricing),
+      tool.pricing,
       statusLabel(tool.status),
       tool.openSource ? "开源 open source" : "闭源 closed source",
       new URL(tool.website).hostname,
@@ -121,8 +139,15 @@ function searchHaystack(tool: ToolSummary): string {
   );
 }
 
+const TRAILING_PUNCTUATION = /[?？!！,，。;；:：]+$/u;
+
+/** 去掉首尾空白与句末标点，避免 "ChatGPT？" 这类输入直接零结果。 */
+function cleanQuery(value: string): string {
+  return normalize(value.trim()).replace(TRAILING_PUNCTUATION, "");
+}
+
 function matchScore(tool: ToolSummary, rawQuery: string): number {
-  const query = normalize(rawQuery.trim());
+  const query = cleanQuery(rawQuery);
   if (!query) return 0;
 
   // A plain "免费" query should mean the free tier, not all 75 tools whose
@@ -162,50 +187,59 @@ export function matchesQuery(tool: ToolSummary, query: string): boolean {
  * Same-dimension filters are OR (a tool can be in both writing and productivity),
  * different dimensions are AND.
  */
+function matchesDimensionFilters(
+  tool: ToolSummary,
+  filters: ToolFilters,
+): boolean {
+  if (
+    filters.categories.length > 0 &&
+    !filters.categories.some((category) => tool.categories.includes(category))
+  ) {
+    return false;
+  }
+
+  if (filters.pricing !== "all" && tool.pricing !== filters.pricing) {
+    return false;
+  }
+
+  if (filters.openSource === "yes" && !tool.openSource) return false;
+  if (filters.openSource === "no" && tool.openSource) return false;
+
+  if (
+    filters.platforms.length > 0 &&
+    !filters.platforms.some((platform) => tool.platforms.includes(platform))
+  ) {
+    return false;
+  }
+
+  if (
+    filters.features.length > 0 &&
+    !filters.features.some((feature) => tool.features.includes(feature))
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
 export function filterTools(
   tools: readonly ToolSummary[],
   filters: ToolFilters,
 ): ToolSummary[] {
-  const filtered = tools.filter((tool) => {
-    if (!matchesQuery(tool, filters.query)) return false;
-
-    if (
-      filters.categories.length > 0 &&
-      !filters.categories.some((category) => tool.categories.includes(category))
-    ) {
-      return false;
-    }
-
-    if (filters.pricing !== "all" && tool.pricing !== filters.pricing) {
-      return false;
-    }
-
-    if (filters.openSource === "yes" && !tool.openSource) return false;
-    if (filters.openSource === "no" && tool.openSource) return false;
-
-    if (
-      filters.platforms.length > 0 &&
-      !filters.platforms.some((platform) => tool.platforms.includes(platform))
-    ) {
-      return false;
-    }
-
-    if (
-      filters.features.length > 0 &&
-      !filters.features.some((feature) => tool.features.includes(feature))
-    ) {
-      return false;
-    }
-
-    return true;
-  });
-
-  if (!filters.query.trim()) return filtered;
-
-  return filtered
+  // 打分只做一次：原实现先 matchesQuery、再为排序重新 score，
+  // 每条记录要算两遍 haystack（含一次 URL 解析）。
+  const scored = tools
     .map((tool) => ({ tool, score: matchScore(tool, filters.query) }))
-    .sort((a, b) => b.score - a.score)
-    .map(({ tool }) => tool);
+    .filter(
+      ({ tool, score }) => score >= 0 && matchesDimensionFilters(tool, filters),
+    );
+
+  if (!filters.query.trim()) {
+    return scored.map(({ tool }) => tool);
+  }
+
+  // 同分保持数据集顺序（Array.prototype.sort 自 ES2019 起稳定）。
+  return scored.sort((a, b) => b.score - a.score).map(({ tool }) => tool);
 }
 
 export function isCategory(value: string | null): value is Category {
@@ -213,12 +247,7 @@ export function isCategory(value: string | null): value is Category {
 }
 
 export function isPricing(value: string | null): value is Pricing {
-  return (
-    value === "free" ||
-    value === "freemium" ||
-    value === "paid" ||
-    value === "trial"
-  );
+  return value !== null && PRICING_VALUES.includes(value as Pricing);
 }
 
 export function isPlatform(value: string | null): value is Platform {
