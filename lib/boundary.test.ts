@@ -7,9 +7,9 @@ const projectRoot = process.cwd();
 /** 只能在服务端导入的模块：要么在构建期读数据，要么依赖 zod / 进程环境。 */
 const SERVER_ONLY_MODULES = new Set([
   "@/lib/tools",
-  "@/lib/tool-schema",
-  "@/lib/tool-json-schema",
-  "@/lib/site",
+  "@/lib/schema",
+  "@/lib/json-schema",
+  "@/lib/url",
   "@/lib/env",
 ]);
 
@@ -39,7 +39,7 @@ function importsOf(source: string): string[] {
 
 /**
  * 架构不变量：客户端组件的导入链里不能出现服务端模块。
- * 起因是一次真实事故：客户端组件从 site.ts 取站名，把 zod 拖进首屏，
+ * 起因是一次真实事故：客户端组件从站点 URL 模块取常量，把 zod 拖进首屏，
  * 并在 Vercel 仅提供 VERCEL_URL 的部署里让浏览器读不到变量而崩溃。
  * biome 只能按目录拦（分不清 "use client"），这里按指令精确检查。
  */

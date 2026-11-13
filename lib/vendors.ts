@@ -1,8 +1,8 @@
 import rawVendors from "@/data/vendors.json";
-import type { Vendor } from "./tool-meta";
+import type { Vendor } from "./meta";
 
 /**
- * 厂商注册表。刻意不在这里引入 zod：filter-tools 也会用到 vendorName，
+ * 厂商注册表。刻意不在这里引入 zod：search.ts 也会用到 vendorName，
  * 而它是客户端模块，不应该把校验库带进浏览器包。
  *
  * 结构与唯一性在构建期由 lib/tools.ts 的 vendorsSchema 校验（重复 id 会让

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL } from "@/lib/url";
 import robots from "./robots";
 
 describe("robots", () => {

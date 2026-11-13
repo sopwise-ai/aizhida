@@ -5,9 +5,7 @@ import { notFound } from "next/navigation";
 
 import { JsonLd } from "@/components/seo/json-ld";
 import { ToolLogo } from "@/components/tools/tool-logo";
-import { SITE_URL } from "@/lib/site";
-import { SITE_NAME } from "@/lib/site-meta";
-import { getToolLogo } from "@/lib/tool-logos";
+import { getToolLogo } from "@/lib/logos";
 import {
   categoryLabel,
   featureLabel,
@@ -15,8 +13,10 @@ import {
   pricingLabel,
   statusLabel,
   typeLabel,
-} from "@/lib/tool-meta";
+} from "@/lib/meta";
+import { SITE_NAME } from "@/lib/site";
 import { getTool, tools } from "@/lib/tools";
+import { SITE_URL } from "@/lib/url";
 import { getVendor } from "@/lib/vendors";
 
 // 85（未来 1000+）个详情页全部在构建期预渲染；未知 id 直接 404，不做按需渲染。

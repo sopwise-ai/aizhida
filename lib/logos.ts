@@ -1,4 +1,4 @@
-import logoExtensions from "./tool-logos.json";
+import logoExtensions from "./logos.json";
 
 type LogoExtension = "svg" | "png";
 
@@ -8,7 +8,7 @@ type LogoExtension = "svg" | "png";
  * ToolSummary 已经带上了 logo 路径，见 lib/tools.ts。
  *
  * JSON 是生成/手工维护的资产索引：扩展名与"文件是否存在"由
- * lib/tool-logos.test.ts 校验（含反向检查，防止漏登记或死文件）。
+ * lib/logos.test.ts 校验（含反向检查，防止漏登记或死文件）。
  */
 const LOGOS = logoExtensions as Record<string, LogoExtension>;
 

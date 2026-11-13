@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { SubmitForm } from "@/components/submit/submit-form";
-import { SITE_NAME } from "@/lib/site-meta";
+import { SITE_NAME } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "提交工具",

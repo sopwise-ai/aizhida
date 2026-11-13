@@ -30,7 +30,7 @@ describe("env", () => {
     expect(env.NEXT_PUBLIC_CONTACT_EMAIL).toBe("hi@example.com");
   });
 
-  it("allows http outside production (https is enforced by site-url)", async () => {
+  it("allows http outside production (https is enforced by url.ts)", async () => {
     const { env } = await importEnv({
       NEXT_PUBLIC_SITE_URL: "http://localhost:3000",
     });

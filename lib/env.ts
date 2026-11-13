@@ -6,10 +6,10 @@ import { z } from "zod";
  *
  * 只放 `NEXT_PUBLIC_*`：这是纯静态站点，没有需要保密的运行时密钥。
  * 这里只做**语法**校验；部署策略（生产必须 https、禁止本地地址）
- * 属于业务规则，放在 `lib/site-url.ts`，避免规则各写一半。
+ * 属于业务规则，放在 `lib/url.ts`，避免规则各写一半。
  *
  * 客户端组件不要 import 本模块：会把 zod 与 @t3-oss/env-nextjs 带进
- * 浏览器包（实测约 90KB gzip），文案常量请用 `@/lib/site-meta`；
+ * 浏览器包（实测约 90KB gzip），文案常量请用 `@/lib/site`；
  * `components/**` 已由 biome 的 noRestrictedImports 拦住。
  */
 export const env = createEnv({

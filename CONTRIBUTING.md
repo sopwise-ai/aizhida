@@ -55,7 +55,7 @@ pnpm exec shadcn add dialog   # 添加新组件到 components/ui/
 ## 更新工具数据
 
 编辑 [`data/tools.json`](data/tools.json)。字段经 zod 校验
-（见 [`lib/tool-schema.ts`](lib/tool-schema.ts) 与 [`lib/tools.ts`](lib/tools.ts)），
+（见 [`lib/schema.ts`](lib/schema.ts) 与 [`lib/tools.ts`](lib/tools.ts)），
 id 重复、非 https 链接、超长说明都会让构建失败——这是有意设计，保证线上数据始终合法。
 编辑器会通过 [`data/schema/tools.schema.json`](data/schema/tools.schema.json) 提示
 枚举与长度；如果你改的是 schema 本身，跑 `pnpm schema:generate` 重新生成它，

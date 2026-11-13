@@ -1,12 +1,12 @@
 import { z } from "zod";
 import rawTools from "@/data/tools.json";
-import { getToolLogo } from "./tool-logos";
-import { FIELD_LIMITS, type Tool } from "./tool-meta";
-import { SLUG_PATTERN, toolSchema } from "./tool-schema";
-import { type ToolSummary, toToolSummary } from "./tool-summary";
+import { getToolLogo } from "./logos";
+import { FIELD_LIMITS, type Tool } from "./meta";
+import { SLUG_PATTERN, toolSchema } from "./schema";
+import { type ToolSummary, toToolSummary } from "./summary";
 import { vendors } from "./vendors";
 
-// 单条记录的 schema 在 lib/tool-schema.ts：那里不 import 数据文件，
+// 单条记录的 schema 在 lib/schema.ts：那里不 import 数据文件，
 // 才能被 scripts/generate-json-schema.ts 直接加载生成 JSON Schema。
 export { toolSchema };
 

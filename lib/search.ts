@@ -14,8 +14,8 @@ import {
   pricingLabel,
   statusLabel,
   typeLabel,
-} from "./tool-meta";
-import type { ToolSummary } from "./tool-summary";
+} from "./meta";
+import type { ToolSummary } from "./summary";
 import { vendorName } from "./vendors";
 
 export interface ToolFilters {

@@ -26,7 +26,7 @@ import {
   type Pricing,
   platformLabel,
   pricingLabel,
-} from "@/lib/tool-meta";
+} from "@/lib/meta";
 import { cn } from "@/lib/utils";
 
 interface FilterSheetProps {

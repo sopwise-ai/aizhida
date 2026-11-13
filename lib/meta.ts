@@ -258,7 +258,7 @@ export function statusLabel(value: ToolStatus): string {
 export type OpenSourceFilter = "all" | "yes" | "no";
 
 /**
- * 字段预算：lib/tool-schema.ts 与提交表单共用，避免同一个数字在多处各写一份。
+ * 字段预算：lib/schema.ts 与提交表单共用，避免同一个数字在多处各写一份。
  *
  * 数字来源（不是拍脑袋）：
  * - name 30：列表/详情标题的排版预算；

@@ -14,7 +14,7 @@ import {
   statusLabel,
   TOOL_TYPES,
   typeLabel,
-} from "./tool-meta";
+} from "./meta";
 import { tools } from "./tools";
 
 // 聚合校验：e2e 覆盖交互，这里保证工具数据与其派生统计保持一致。

@@ -8,9 +8,9 @@ import {
   AlertTitle,
 } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
-import { DATA_UPDATED_LABEL, SITE_NAME } from "@/lib/site-meta";
-import { getToolLogo } from "@/lib/tool-logos";
-import { CATEGORIES } from "@/lib/tool-meta";
+import { getToolLogo } from "@/lib/logos";
+import { CATEGORIES } from "@/lib/meta";
+import { DATA_UPDATED_LABEL, SITE_NAME } from "@/lib/site";
 import { tools } from "@/lib/tools";
 
 export const metadata: Metadata = {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { getToolLogo } from "./tool-logos";
-import { FIELD_LIMITS } from "./tool-meta";
+import { getToolLogo } from "./logos";
+import { FIELD_LIMITS } from "./meta";
 import {
   canonicalSiteKey,
   getTool,

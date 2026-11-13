@@ -1,8 +1,7 @@
 import type { MetadataRoute } from "next";
-
-import { SITE_URL } from "@/lib/site";
-import { CATEGORIES } from "@/lib/tool-meta";
+import { CATEGORIES } from "@/lib/meta";
 import { tools } from "@/lib/tools";
+import { SITE_URL } from "@/lib/url";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date("2026-11-11");

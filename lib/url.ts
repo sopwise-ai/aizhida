@@ -1,8 +1,9 @@
+import { env } from "./env";
+
 /**
- * 站点 URL 解析与校验（纯函数，无进程/环境依赖）。
+ * 站点 URL：`resolveSiteUrl` 是纯函数，底部用 env 求值得到 `SITE_URL`。
  *
- * 单独成模块的原因：这是唯一需要「构建期失败」的业务逻辑，
- * 提炼成纯函数后可以直接单测，不必在测试里反复 import 带副作用的模块。
+ * 只有服务端会导入本模块（依赖 env/zod）；客户端常量在 lib/site.ts。
  */
 
 export interface SiteUrlInput {
@@ -114,3 +115,15 @@ function isLocalAddress(hostname: string): boolean {
     host.startsWith("::ffff:127.")
   );
 }
+
+/**
+ * 服务端站点地址：构建/SSR 期间求值，非法值直接让构建失败。
+ * 客户端禁止导入本模块（依赖 env/zod），文案常量请用 `@/lib/site`。
+ */
+export const SITE_URL = resolveSiteUrl({
+  siteUrl: env.NEXT_PUBLIC_SITE_URL,
+  vercelUrl:
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL,
+  isProduction: process.env.NODE_ENV === "production",
+  port: process.env.PORT,
+});

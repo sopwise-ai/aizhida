@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
-import type { Feature, Platform, Pricing } from "@/lib/tool-meta";
+import type { Feature, Platform, Pricing } from "@/lib/meta";
 import { FilterSheet } from "./filter-sheet";
 
 const baseProps = {

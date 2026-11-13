@@ -7,7 +7,7 @@ import {
   PRICING_VALUES,
   STATUS_VALUES,
   TYPE_VALUES,
-} from "./tool-meta.ts";
+} from "./meta.ts";
 
 /**
  * 单条工具记录的权威 schema。
@@ -16,7 +16,7 @@ import {
  * 这个模块只描述「一条记录长什么样」，因而可以被脚本直接加载，
  * 生成 data/schema/tools.schema.json。
  *
- * 长度预算集中在 lib/tool-meta.ts 的 FIELD_LIMITS，提交表单复用同一组数字。
+ * 长度预算集中在 lib/meta.ts 的 FIELD_LIMITS，提交表单复用同一组数字。
  * 根对象与 links 都用 `.strict()`：拼写错误（`platfroms`、`gihub`）会让构建
  * 失败，而不是被 zod 静默丢弃——与 JSON Schema 的 additionalProperties 一致。
  *

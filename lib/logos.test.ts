@@ -1,8 +1,8 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { getToolLogo } from "./tool-logos";
-import logoExtensions from "./tool-logos.json";
+import { getToolLogo } from "./logos";
+import logoExtensions from "./logos.json";
 import { tools } from "./tools";
 
 const logoDir = join(process.cwd(), "public", "logos");

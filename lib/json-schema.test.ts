@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import rawTools from "@/data/tools.json";
-import { toolsJsonSchemaText } from "./tool-json-schema";
+import { toolsJsonSchemaText } from "./json-schema";
 import {
   CATEGORY_VALUES,
   FEATURE_VALUES,
@@ -11,7 +11,7 @@ import {
   PRICING_VALUES,
   STATUS_VALUES,
   TYPE_VALUES,
-} from "./tool-meta";
+} from "./meta";
 
 const committedPath = resolve(process.cwd(), "data/schema/tools.schema.json");
 
@@ -25,7 +25,7 @@ function readCommitted(): string {
  * 却忘了跑 `pnpm schema:generate`，让编辑器提示悄悄过期。
  */
 describe("data/schema/tools.schema.json", () => {
-  it("stays in sync with lib/tool-schema.ts", () => {
+  it("stays in sync with lib/schema.ts", () => {
     // 比对解析后的结构而不是原始文本：格式化差异不该让测试失败，
     // 字段或取值的漂移才该。
     expect(JSON.parse(readCommitted())).toEqual(
@@ -42,7 +42,7 @@ describe("data/schema/tools.schema.json", () => {
     expect(schema.items.additionalProperties).toBe(false);
   });
 
-  it("carries every controlled vocabulary from lib/tool-meta.ts", () => {
+  it("carries every controlled vocabulary from lib/meta.ts", () => {
     const { properties } = JSON.parse(readCommitted()).items;
 
     expect(properties.categories.items.enum).toEqual([...CATEGORY_VALUES]);

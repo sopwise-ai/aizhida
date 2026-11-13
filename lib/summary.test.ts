@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toToolSummary } from "./tool-summary";
+import { toToolSummary } from "./summary";
 import { getTool } from "./tools";
 
 const EXPECTED_KEYS = [

@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
-import { PRODUCTION_MISSING_MESSAGE, resolveSiteUrl } from "./site-url";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { PRODUCTION_MISSING_MESSAGE, resolveSiteUrl, SITE_URL } from "./url";
 
 const dev = { isProduction: false } as const;
 const prod = { isProduction: true } as const;
@@ -101,5 +102,68 @@ describe("resolveSiteUrl", () => {
     expect(() => resolveSiteUrl({ ...dev, vercelUrl: "not a host" })).toThrow(
       /VERCEL_URL 不是合法的绝对地址/,
     );
+  });
+});
+
+/**
+ * 这些用例通过 vi.stubEnv + resetModules 重新求值 lib/url.ts，
+ * 覆盖「构建期失败」这一唯一但关键的行为。
+ */
+async function importSiteWith(env: Record<string, string>) {
+  vi.resetModules();
+  for (const [key, value] of Object.entries(env)) {
+    vi.stubEnv(key, value);
+  }
+  return import("./url");
+}
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+  vi.resetModules();
+});
+
+describe("SITE_URL", () => {
+  it("is an absolute url without a trailing slash", () => {
+    expect(SITE_URL).not.toMatch(/\/+$/);
+    expect(() => new URL(SITE_URL)).not.toThrow();
+  });
+
+  it("normalizes trailing slashes from the configured url", async () => {
+    const { SITE_URL: siteUrl } = await importSiteWith({
+      NEXT_PUBLIC_SITE_URL: "https://example.com///",
+    });
+
+    expect(siteUrl).toBe("https://example.com");
+  });
+
+  it("fails the production build when no url is configured", async () => {
+    const imported = importSiteWith({
+      NEXT_PUBLIC_SITE_URL: "",
+      VERCEL_PROJECT_PRODUCTION_URL: "",
+      VERCEL_URL: "",
+      NODE_ENV: "production",
+    });
+
+    await expect(imported).rejects.toThrow(/生产构建必须提供/);
+  });
+
+  it("falls back to the Vercel production domain", async () => {
+    const { SITE_URL: siteUrl } = await importSiteWith({
+      NEXT_PUBLIC_SITE_URL: "",
+      VERCEL_PROJECT_PRODUCTION_URL: "aizhida.vercel.app",
+      VERCEL_URL: "",
+      NODE_ENV: "production",
+    });
+
+    expect(siteUrl).toBe("https://aizhida.vercel.app");
+  });
+
+  it("rejects plain http in production", async () => {
+    const imported = importSiteWith({
+      NEXT_PUBLIC_SITE_URL: "http://example.com",
+      NODE_ENV: "production",
+    });
+
+    await expect(imported).rejects.toThrow(/https/);
   });
 });

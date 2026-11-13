@@ -1,4 +1,4 @@
-import type { Tool } from "./tool-meta";
+import type { Tool } from "./meta";
 
 /**
  * 客户端只需要「能筛选、能搜索、能渲染卡片」的字段。

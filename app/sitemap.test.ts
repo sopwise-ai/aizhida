@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { SITE_URL } from "@/lib/site";
-import { CATEGORIES } from "@/lib/tool-meta";
+import { CATEGORIES } from "@/lib/meta";
 import { tools } from "@/lib/tools";
+import { SITE_URL } from "@/lib/url";
 import sitemap from "./sitemap";
 
 describe("sitemap", () => {

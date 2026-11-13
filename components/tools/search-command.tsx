@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
 
-import type { ToolSummary } from "@/lib/tool-summary";
+import type { ToolSummary } from "@/lib/summary";
 
 // 只有快捷键/搜索框真正打开时才需要 cmdk 与 dialog：首屏不下载这块 chunk。
 const SearchPalette = dynamic(

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { PRICING_VALUES } from "./meta";
 import {
   DEFAULT_FILTERS,
   filterTools,
@@ -8,8 +9,7 @@ import {
   isPricing,
   matchesQuery,
   type ToolFilters,
-} from "./filter-tools";
-import { PRICING_VALUES } from "./tool-meta";
+} from "./search";
 import { toolSummaries } from "./tools";
 
 function filtersWith(partial: Partial<ToolFilters>): ToolFilters {

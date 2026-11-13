@@ -29,7 +29,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { CONTACT_EMAIL, REPO_URL } from "@/lib/site-meta";
 import {
   CATEGORIES,
   type Category,
@@ -48,7 +47,8 @@ import {
   TOOL_TYPES,
   type ToolType,
   typeLabel,
-} from "@/lib/tool-meta";
+} from "@/lib/meta";
+import { CONTACT_EMAIL, REPO_URL } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 interface FormState {

@@ -289,5 +289,5 @@
     "additionalProperties": false
   },
   "title": "aizhida data/tools.json",
-  "description": "生成物，勿手改，运行 pnpm schema:generate 重写。本文件只描述数据结构与格式；关键词小写、链接不含账号密码、文本无首尾空格等 refine，以及 id 唯一、官网唯一、vendorId 必须存在于 data/vendors.json、addedAt ≤ updatedAt、verifiedAt ≤ updatedAt 等跨记录约束，只在构建期由 lib/tool-schema.ts 与 lib/tools.ts 校验。"
+  "description": "生成物，勿手改，运行 pnpm schema:generate 重写。本文件只描述数据结构与格式；关键词小写、链接不含账号密码、文本无首尾空格等 refine，以及 id 唯一、官网唯一、vendorId 必须存在于 data/vendors.json、addedAt ≤ updatedAt、verifiedAt ≤ updatedAt 等跨记录约束，只在构建期由 lib/schema.ts 与 lib/tools.ts 校验。"
 }

@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { CATEGORIES } from "@/lib/tool-meta";
+import { CATEGORIES } from "@/lib/meta";
 import { toolSummaries } from "@/lib/tools";
 import CategoryPage, { generateMetadata, generateStaticParams } from "./page";
 

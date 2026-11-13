@@ -5,10 +5,10 @@ import { notFound } from "next/navigation";
 
 import { JsonLd } from "@/components/seo/json-ld";
 import { ToolCard } from "@/components/tools/tool-card";
-import { SITE_URL } from "@/lib/site";
-import { SITE_NAME } from "@/lib/site-meta";
-import { CATEGORIES } from "@/lib/tool-meta";
+import { CATEGORIES } from "@/lib/meta";
+import { SITE_NAME } from "@/lib/site";
 import { toolSummaries } from "@/lib/tools";
+import { SITE_URL } from "@/lib/url";
 
 // 11 个分类落地页全部构建期预渲染；未知分类 404。
 export const dynamicParams = false;

@@ -39,15 +39,6 @@ import {
 } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
-  filterTools,
-  isCategory,
-  isFeature,
-  isPlatform,
-  isPricing,
-  type ToolFilters,
-} from "@/lib/filter-tools";
-import { DATA_UPDATED_LABEL } from "@/lib/site-meta";
-import {
   CATEGORIES,
   type Category,
   categoryLabel,
@@ -58,8 +49,17 @@ import {
   type Pricing,
   platformLabel,
   pricingLabel,
-} from "@/lib/tool-meta";
-import type { ToolSummary } from "@/lib/tool-summary";
+} from "@/lib/meta";
+import {
+  filterTools,
+  isCategory,
+  isFeature,
+  isPlatform,
+  isPricing,
+  type ToolFilters,
+} from "@/lib/search";
+import { DATA_UPDATED_LABEL } from "@/lib/site";
+import type { ToolSummary } from "@/lib/summary";
 import { cn } from "@/lib/utils";
 import { FilterSheet } from "./filter-sheet";
 import { SearchCommand } from "./search-command";

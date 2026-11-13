@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 
 import { JsonLd } from "@/components/seo/json-ld";
 import { ToolsExplorer } from "@/components/tools/tools-explorer";
-import { SITE_URL } from "@/lib/site";
-import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/site-meta";
+import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/site";
 import { toolSummaries } from "@/lib/tools";
+import { SITE_URL } from "@/lib/url";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
