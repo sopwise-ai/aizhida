@@ -1,0 +1,293 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "minItems": 1,
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "maxLength": 60,
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      },
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 30
+      },
+      "vendorId": {
+        "type": "string",
+        "maxLength": 60,
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      },
+      "categories": {
+        "minItems": 1,
+        "maxItems": 3,
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "assistant",
+            "writing",
+            "image",
+            "video",
+            "audio",
+            "coding",
+            "productivity",
+            "search",
+            "design",
+            "agent",
+            "infrastructure"
+          ]
+        },
+        "uniqueItems": true
+      },
+      "type": {
+        "type": "string",
+        "enum": [
+          "app",
+          "model",
+          "editor",
+          "plugin",
+          "platform",
+          "framework",
+          "api",
+          "runtime"
+        ]
+      },
+      "platforms": {
+        "minItems": 1,
+        "maxItems": 5,
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": ["web", "desktop", "mobile", "api", "extension"]
+        },
+        "uniqueItems": true
+      },
+      "pricing": {
+        "type": "string",
+        "enum": ["free", "freemium", "paid", "trial"]
+      },
+      "openSource": {
+        "type": "boolean"
+      },
+      "status": {
+        "type": "string",
+        "enum": ["active", "beta", "deprecated", "dead"]
+      },
+      "tagline": {
+        "type": "string",
+        "minLength": 8,
+        "maxLength": 60
+      },
+      "description": {
+        "type": "string",
+        "minLength": 80,
+        "maxLength": 300
+      },
+      "features": {
+        "minItems": 2,
+        "maxItems": 8,
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "multimodal",
+            "long-context",
+            "file-upload",
+            "image-understanding",
+            "web-search",
+            "browser-control",
+            "code-execution",
+            "voice-input",
+            "rewrite",
+            "summarize",
+            "translation",
+            "text-to-image",
+            "image-edit",
+            "text-to-video",
+            "image-to-video",
+            "video-edit",
+            "tts",
+            "voice-clone",
+            "avatar",
+            "transcription",
+            "slides",
+            "charts",
+            "code-gen",
+            "website-gen",
+            "chat",
+            "prompt-library",
+            "workflow",
+            "visual-builder",
+            "multi-agent",
+            "plugin-ecosystem",
+            "open-api",
+            "mcp",
+            "skill",
+            "cli",
+            "ide",
+            "team",
+            "batch",
+            "self-host",
+            "local-run",
+            "open-weights",
+            "marketing",
+            "academic",
+            "meeting",
+            "notes",
+            "research",
+            "customer-service",
+            "ecommerce",
+            "game-art",
+            "design",
+            "code-complete",
+            "refactor",
+            "testing",
+            "pair-programming",
+            "data-analysis",
+            "rag",
+            "fine-tune",
+            "model-serving",
+            "chinese",
+            "commercial",
+            "privacy",
+            "enterprise"
+          ]
+        },
+        "uniqueItems": true
+      },
+      "keywords": {
+        "maxItems": 6,
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20
+        },
+        "uniqueItems": true
+      },
+      "links": {
+        "type": "object",
+        "properties": {
+          "website": {
+            "type": "string",
+            "maxLength": 2048,
+            "pattern": "^https:\\/\\/",
+            "format": "uri"
+          },
+          "github": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2048,
+                "pattern": "^https:\\/\\/",
+                "format": "uri"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "docs": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2048,
+                "pattern": "^https:\\/\\/",
+                "format": "uri"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "pricing": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2048,
+                "pattern": "^https:\\/\\/",
+                "format": "uri"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "store": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2048,
+                "pattern": "^https:\\/\\/",
+                "format": "uri"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["website", "github", "docs", "pricing", "store"],
+        "additionalProperties": false
+      },
+      "affiliateUrl": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 2048,
+            "pattern": "^https:\\/\\/",
+            "format": "uri"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "sponsored": {
+        "type": "boolean"
+      },
+      "addedAt": {
+        "type": "string",
+        "format": "date",
+        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+      },
+      "updatedAt": {
+        "type": "string",
+        "format": "date",
+        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+      },
+      "verifiedAt": {
+        "type": "string",
+        "format": "date",
+        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+      }
+    },
+    "required": [
+      "id",
+      "name",
+      "vendorId",
+      "categories",
+      "type",
+      "platforms",
+      "pricing",
+      "openSource",
+      "status",
+      "tagline",
+      "description",
+      "features",
+      "keywords",
+      "links",
+      "affiliateUrl",
+      "sponsored",
+      "addedAt",
+      "updatedAt",
+      "verifiedAt"
+    ],
+    "additionalProperties": false
+  },
+  "title": "aizhida data/tools.json",
+  "description": "生成物，勿手改，运行 pnpm schema:generate 重写。本文件只描述数据结构与格式；关键词小写、链接不含账号密码、文本无首尾空格等 refine，以及 id 唯一、官网唯一、vendorId 必须存在于 data/vendors.json、addedAt ≤ updatedAt、verifiedAt ≤ updatedAt 等跨记录约束，只在构建期由 lib/schema.ts 与 lib/tools.ts 校验。"
+}

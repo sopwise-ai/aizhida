@@ -9,4 +9,6 @@
   "ignore": ["components/ui/card.tsx", "components/ui/skeleton.tsx"],
   // shadcn CLI 经 pnpm exec 手动调用，knip 静态分析看不到。
   "ignoreDependencies": ["shadcn"],
+  // JSON Schema 生成脚本只被 package.json 的 schema:generate 调用。
+  "entry": ["scripts/*.ts"],
 }

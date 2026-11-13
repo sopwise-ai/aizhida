@@ -1,11 +1,15 @@
 import type { MetadataRoute } from "next";
-
-import { SITE_URL } from "@/lib/site";
-import { CATEGORIES } from "@/lib/tool-meta";
+import { CATEGORIES } from "@/lib/meta";
 import { tools } from "@/lib/tools";
+import { SITE_URL } from "@/lib/url";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date("2026-11-11");
+  // 站点级日期跟随数据，而不是再手写一份（当前数据最新 updatedAt）。
+  const latestUpdate = tools.reduce(
+    (latest, tool) => (tool.updatedAt > latest ? tool.updatedAt : latest),
+    "1970-01-01",
+  );
+  const lastModified = new Date(latestUpdate);
 
   const categoryEntries = CATEGORIES.map((category) => {
     const latest =

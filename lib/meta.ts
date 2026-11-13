@@ -155,6 +155,9 @@ export const FEATURE_GROUPS = [
   { value: "attribute", label: "产品属性" },
 ] as const;
 
+/** 特性分组：FEATURES.group 的合法取值，由 FEATURE_GROUPS 派生。 */
+type FeatureGroup = (typeof FEATURE_GROUPS)[number]["value"];
+
 export const FEATURES = [
   { value: "multimodal", label: "多模态", group: "capability" },
   { value: "long-context", label: "长文本", group: "capability" },
@@ -187,6 +190,8 @@ export const FEATURES = [
   { value: "multi-agent", label: "多代理", group: "workflow" },
   { value: "plugin-ecosystem", label: "插件生态", group: "workflow" },
   { value: "open-api", label: "开放 API", group: "workflow" },
+  { value: "mcp", label: "MCP", group: "workflow" },
+  { value: "skill", label: "Skills", group: "workflow" },
   { value: "cli", label: "命令行", group: "workflow" },
   { value: "ide", label: "编辑器集成", group: "workflow" },
   { value: "team", label: "团队协作", group: "workflow" },
@@ -215,7 +220,11 @@ export const FEATURES = [
   { value: "commercial", label: "可商用", group: "attribute" },
   { value: "privacy", label: "隐私优先", group: "attribute" },
   { value: "enterprise", label: "企业级", group: "attribute" },
-] as const;
+] as const satisfies readonly {
+  value: string;
+  label: string;
+  group: FeatureGroup;
+}[];
 
 export type Feature = (typeof FEATURES)[number]["value"];
 
@@ -247,6 +256,34 @@ export function statusLabel(value: ToolStatus): string {
 }
 
 export type OpenSourceFilter = "all" | "yes" | "no";
+
+/**
+ * 字段预算：lib/schema.ts 与提交表单共用，避免同一个数字在多处各写一份。
+ *
+ * 数字来源（不是拍脑袋）：
+ * - name 30：列表/详情标题的排版预算；
+ * - tagline 60：卡片两行的高度预算；
+ * - description 80：中文摘要约 78–80 字，够写「是什么 + 适合谁 + 形态」；
+ * - features 8：61 个特性值 + 生态标签（MCP/Skills）的余量；
+ * - keyword 20：`stable diffusion`（16）这类英文检索词装得下；
+ * - url 2048：浏览器事实上的 URL 上限。
+ */
+export const FIELD_LIMITS = {
+  idMaxLength: 60,
+  nameMaxLength: 30,
+  vendorIdMaxLength: 60,
+  vendorNameMaxLength: 40,
+  categoriesMax: 3,
+  taglineMinLength: 8,
+  taglineMaxLength: 60,
+  descriptionMinLength: 80,
+  descriptionMaxLength: 300,
+  featuresMin: 2,
+  featuresMax: 8,
+  keywordsMax: 6,
+  keywordMaxLength: 20,
+  urlMaxLength: 2048,
+} as const;
 
 interface ToolLinks {
   website: string;

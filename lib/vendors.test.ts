@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { tools } from "./tools";
+import { tools, vendorsSchema } from "./tools";
 import { getVendor, vendorName, vendors } from "./vendors";
 
 describe("vendor registry", () => {
@@ -19,10 +19,39 @@ describe("vendor registry", () => {
     }
   });
 
+  it("rejects duplicate ids at build time", () => {
+    const result = vendorsSchema.safeParse([
+      { id: "openai", name: "OpenAI" },
+      { id: "openai", name: "OpenAI 2" },
+    ]);
+
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects malformed or bloated registry entries", () => {
+    expect(
+      vendorsSchema.safeParse([{ id: "Open AI", name: "X" }]).success,
+    ).toBe(false);
+    expect(vendorsSchema.safeParse([{ id: "openai", name: "" }]).success).toBe(
+      false,
+    );
+    expect(
+      vendorsSchema.safeParse([{ id: "openai", name: "OpenAI", url: "x" }])
+        .success,
+    ).toBe(false);
+  });
+
   it("resolves vendor display names", () => {
     expect(getVendor("openai")?.name).toBe("OpenAI");
+    expect(getVendor("unknown-vendor")).toBeUndefined();
     expect(vendorName("openai")).toBe("OpenAI");
     // 未知 vendor 退回 id，方便在 UI 上至少看到原值。
     expect(vendorName("unknown-vendor")).toBe("unknown-vendor");
+  });
+
+  it("resolves every tool vendor to a registered vendor", () => {
+    for (const tool of tools) {
+      expect(getVendor(tool.vendorId)?.id).toBe(tool.vendorId);
+    }
   });
 });

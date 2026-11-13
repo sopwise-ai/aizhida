@@ -21,7 +21,7 @@ const steps = [
   {
     title: "复制 JSON",
     description:
-      "表单会实时生成符合收录格式的 JSON，复制后在 Issue 中粘贴即可。",
+      "表单会实时生成 JSON 草稿（详情描述由维护者补全），复制后在 Issue 中粘贴即可。",
   },
   {
     title: "等待人工核验",

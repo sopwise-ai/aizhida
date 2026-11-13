@@ -21,6 +21,7 @@
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "knip": "knip",
+    "schema:generate": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-json-schema.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

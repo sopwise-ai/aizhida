@@ -1,4 +1,4 @@
-import type { ToolSummary } from "@/lib/tool-summary";
+import type { ToolSummary } from "@/lib/summary";
 
 /**
  * 工具品牌标的统一入口：有本地 logo 就渲染图片，没有就用同色系首字母占位。

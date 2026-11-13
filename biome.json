@@ -38,6 +38,24 @@
           "tailwindDirectives": true
         }
       }
+    },
+    {
+      "includes": ["components/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "@/lib/env": "env.ts 会引入 zod，只能服务端导入；客户端常量请用 @/lib/site",
+                  "@/lib/url": "url.ts 依赖 env/zod，只能服务端导入；客户端常量请用 @/lib/site"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   ],
   "linter": {

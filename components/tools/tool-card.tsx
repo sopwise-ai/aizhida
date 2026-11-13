@@ -1,8 +1,8 @@
 import { ArrowUpRight, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
-import { categoryLabel, platformLabel, pricingLabel } from "@/lib/tool-meta";
-import type { ToolSummary } from "@/lib/tool-summary";
+import { categoryLabel, platformLabel, pricingLabel } from "@/lib/meta";
+import type { ToolSummary } from "@/lib/summary";
 import { ToolLogo } from "./tool-logo";
 
 function domainOf(url: string): string {

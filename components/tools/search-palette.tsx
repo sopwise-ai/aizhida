@@ -11,9 +11,9 @@ import {
   CommandList,
   CommandShortcut,
 } from "@/components/ui/command";
-import { DEFAULT_FILTERS, filterTools } from "@/lib/filter-tools";
-import { categoryLabel } from "@/lib/tool-meta";
-import type { ToolSummary } from "@/lib/tool-summary";
+import { categoryLabel } from "@/lib/meta";
+import { DEFAULT_FILTERS, filterTools } from "@/lib/search";
+import type { ToolSummary } from "@/lib/summary";
 import { ToolLogo } from "./tool-logo";
 
 /**

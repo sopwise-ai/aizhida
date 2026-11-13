@@ -2,8 +2,8 @@ import { ArrowUp, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 import { BrandMark } from "@/components/brand-mark";
+import { CATEGORIES } from "@/lib/meta";
 import { DATA_UPDATED_LABEL, SITE_NAME, SITE_TAGLINE } from "@/lib/site";
-import { CATEGORIES } from "@/lib/tool-meta";
 import { tools } from "@/lib/tools";
 
 export function SiteFooter() {
